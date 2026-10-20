@@ -86,3 +86,4 @@ git add … && git commit …
 - `srwr`が`PATH`に無いと、`.mcp.json`もhookも動かない（hookは失敗しても作業は止まらず、記録だけが抜ける）。`srwr --version`で確かめる
 - **`session`を呼ぶと、作業場全体のテープが切り替わる**（`srwr tapes new`と同じ）。ほかのセッション（人間が別のClaude Codeを動かしているなど）にも効く。範囲トークンは、閉じたテープのものは使えなくなるので、`session`のあとは`look`し直す
 - `srwr view`は`~/.cache/srwr`に書くので、サンドボックスの中では動かさず、人間のターミナルで動かす
+- **srwrにはファイルを消す道具が無い。** 消すときは`bcuz "理由" git rm <ファイル>`で消す（理由は`bcuz`の記録に残る）。`srwr tapes check`には「テープにない`D`」として出るが、それでよい。コミットメッセージにも消した理由を書く

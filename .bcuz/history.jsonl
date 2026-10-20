@@ -18,3 +18,11 @@
 {"v":1,"ts":"2026-10-20T11:42:32.702Z","why":"コミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":9}
 {"v":1,"ts":"2026-10-20T11:42:35.965Z","why":"[1-1] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":13}
 {"v":1,"ts":"2026-10-20T11:42:36.159Z","why":"[1-1] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-20T11:42:39.238Z","why":"[1-1] の変更・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".claude/rules/documentation.md","CLAUDE.md","docs",".srwr/tapes"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-20T18:46:09.419Z","why":"サンプルが正規形か（テストで往復の一致を使えるか）を確かめる","cmd":["sh","-c","cat -A docs/examples/sample-crube/structure_ja.txt | grep -nE \" \\$|^\\$|\\t\\t[^|]\" ; grep -c \"\" docs/examples/sample-crube/structure.txt docs/examples/sample-crube/structure_ja.txt; tail -c1 docs/examples/sample-crube/structure.txt | od -c | head -1"],"dir":".","exit":0,"ms":6}
+{"v":1,"ts":"2026-10-20T18:47:20.641Z","why":"[2-1] のパーサーとテストを書いたあとの確認","cmd":["qsoku","check"],"dir":".","exit":0,"ms":2373}
+{"v":1,"ts":"2026-10-20T18:47:32.864Z","why":"実際のパッケージができたので、空のモジュール用のプレースホルダーを消す（directory-structure.md の指示）","cmd":["git","rm","-q","internal/doc.go"],"dir":".","exit":0,"ms":2}
+{"v":1,"ts":"2026-10-20T18:47:38.208Z","why":"doc.go を消してテストを1件足したあとの確認","cmd":["qsoku","check"],"dir":".","exit":0,"ms":615}
+{"v":1,"ts":"2026-10-20T18:47:46.524Z","why":"[2-1] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":1,"ms":7}
+{"v":1,"ts":"2026-10-20T18:47:56.267Z","why":"[2-1] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":13}
+{"v":1,"ts":"2026-10-20T18:47:56.458Z","why":"[2-1] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}

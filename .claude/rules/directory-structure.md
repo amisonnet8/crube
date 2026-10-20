@@ -17,7 +17,8 @@
 ├── .srwrignore             ← srwrがテープに記録しないファイル（`.mtqg/`・`.bcuz/`など）
 ├── .bcuz/                  ← bcuzの記録（`history.jsonl`）。`postCreate.sh`が`bcuz --init`で作る。**コミットする**（`merge=union`）
 ├── .srwr/                  ← srwrの鍵・ロック・テープ（最初のhook・MCPの呼び出しでできる。**閉じた`tapes/*.gz`だけコミットする**）
-├── internal/               ← このモジュールの中だけで使うコード
+├── internal/               ← このモジュールの中だけで使うコード（コア）
+│   └── structure/          ← structure ファイルの読み込みと正規形での書き出し
 ├── docs/                   ← 設計と仕様（日本語。目次は`docs/README.md`）
 │   ├── design/             ← なぜこの形なのか
 │   ├── reference/          ← 正確な仕様（CLI・MCP・ファイル形式）
@@ -41,7 +42,7 @@
 
 - **`cmd/`**: まだ無い。CLIの`crube`を実装するときに`cmd/crube/main.go`を作る。`main.go`は引数を`internal/`に渡すだけにする
 - **`internal/`**: Goの仕組みとして、モジュールの外からimportできない。外へ公開するパッケージは`internal/`に置かない
-- **`internal/doc.go`**: `package`宣言だけのプレースホルダー。Goのパッケージが1つも無いと`qsoku vet`・`lint`・`unit`が失敗するので、空のモジュールでも`qsoku check`が通るように置いてある。実際のパッケージを足したら消す
+- **`internal/structure/`**: structure ファイルのバイト列と木（`Tree`・`Entry`）の変換だけを持つ。ファイルの探索・ディスクへの書き込み・照合は持たない（ほかのコアのパッケージに置く）
 - **`go.sum`**: コミットする（改ざん検知・再現可能なビルドのため）
 - **`.mtqg/`**: コミットされる。中のファイルは直接編集せず、すべて`mtqg`のコマンド経由で書く（`.claude/rules/mtqg-usage.md`）。`.mtqg/.local/`はコミットされない
 - **`.bcuz/`**: bcuzが`.bcuz/history.jsonl`に追記する、コマンドの実行の記録（`.claude/rules/bcuz-usage.md`）。**コミットする**（`.gitignore`の`!/.bcuz/`）。行を足すだけなので、`.gitattributes`の`merge=union`で、マージしても両側の行が残る。コミットの前に`git add .bcuz/history.jsonl`する（`git commit`は`bcuz`を通さない）。秘密をコマンドに書かない（記録に残る）。中のファイルは直接編集しない。`.srwrignore`でテープにも載せない
