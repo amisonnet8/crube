@@ -9,7 +9,9 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"path/filepath"
 
+	"github.com/amisonnet8/crube/internal/ignore"
 	"github.com/amisonnet8/crube/internal/lang"
 	"github.com/amisonnet8/crube/internal/project"
 	"github.com/amisonnet8/crube/internal/structure"
@@ -25,6 +27,7 @@ type Options struct {
 // Project is a project found from Options.
 type Project struct {
 	Root     string // the project root, absolute
+	dir      string // where the operation runs (o.Dir), absolute: real paths are relative to it
 	lang     string
 	noIgnore bool
 }
@@ -38,11 +41,31 @@ func Open(o Options) (*Project, error) {
 	if dir == "" {
 		dir = "."
 	}
+	dir, err := filepath.Abs(dir)
+	if err != nil {
+		return nil, err
+	}
 	root, err := project.FindRoot(dir)
 	if err != nil {
 		return nil, err
 	}
-	return &Project{Root: root, lang: o.Lang, noIgnore: o.NoIgnore}, nil
+	return &Project{Root: root, dir: dir, lang: o.Lang, noIgnore: o.NoIgnore}, nil
+}
+
+// Ignore returns the matcher of .crube/ignore: with --no-ignore, or without
+// the file, only .crube/ is left out.
+func (p *Project) Ignore() (*ignore.Matcher, error) {
+	if p.noIgnore {
+		return ignore.None(), nil
+	}
+	data, err := project.ReadFile(p.Root, ignore.FileName)
+	if errors.Is(err, fs.ErrNotExist) {
+		return ignore.Parse(nil), nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return ignore.Parse(data), nil
 }
 
 // File returns the name, in .crube/, of the structure file that the

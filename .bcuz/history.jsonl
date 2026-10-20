@@ -97,3 +97,14 @@
 {"v":1,"ts":"2026-10-20T23:39:17.380Z","why":"[2-9] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":6}
 {"v":1,"ts":"2026-10-20T23:39:20.230Z","why":"[2-9] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":12}
 {"v":1,"ts":"2026-10-20T23:39:20.380Z","why":"[2-9] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":2}
+{"v":1,"ts":"2026-10-20T23:39:23.202Z","why":"[2-9] の変更・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".srwr/tapes",".claude/rules/directory-structure.md","internal/structure","internal/core"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-20T23:39:23.336Z","why":"足したあとの状態を確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":2}
+{"v":1,"ts":"2026-10-20T23:44:20.120Z","why":"参照操作を書いた段階で、ビルドと既存のテストが通るか確かめる","cmd":["qsoku","check"],"dir":".","exit":0,"ms":728}
+{"v":1,"ts":"2026-10-20T23:45:19.492Z","why":"参照操作のテストを書いたあとの確認","cmd":["qsoku","check"],"dir":".","exit":1,"ms":557}
+{"v":1,"ts":"2026-10-20T23:45:23.633Z","why":"gofmt の指摘（map の桁揃え）を整形ツールで直す","cmd":["qsoku","fmt"],"dir":".","exit":0,"ms":228}
+{"v":1,"ts":"2026-10-20T23:45:24.041Z","why":"整形のあとの確認","cmd":["qsoku","check"],"dir":".","exit":1,"ms":643}
+{"v":1,"ts":"2026-10-20T23:45:30.629Z","why":"期待値を直したあとの確認","cmd":["qsoku","check"],"dir":".","exit":0,"ms":762}
+{"v":1,"ts":"2026-10-20T23:45:34.271Z","why":"core のテストに SKIP が無いか確かめる（qsoku unit は引数を受けないので go test を直接使う）","cmd":["sh","-c","go test -count=1 -v ./internal/core/ | grep -E -- \"--- (SKIP|FAIL)\" || echo \"SKIP・FAIL なし\""],"dir":".","exit":0,"ms":213}
+{"v":1,"ts":"2026-10-20T23:45:42.631Z","why":"[2-10] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":9}
+{"v":1,"ts":"2026-10-20T23:45:45.243Z","why":"[2-10] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":13}
+{"v":1,"ts":"2026-10-20T23:45:45.432Z","why":"[2-10] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}
