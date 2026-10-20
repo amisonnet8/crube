@@ -46,5 +46,5 @@ $ crube tree
 | 実装言語 | Go(単一バイナリ) |
 | データ形式 | 独自のツリー形式テキスト(依存ライブラリなし) |
 | 書き込み先 | `.crube/` の中だけ |
-| 依存 | なし(Git も不要) |
+| 依存 | `golang.org/x/text`、`golang.org/x/term`、MCP の公式 Go SDK だけ(Git は不要) |
 | ライセンス | MIT |

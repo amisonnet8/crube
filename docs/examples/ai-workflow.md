@@ -14,6 +14,7 @@ crube 本体は AI を呼び出しません。AI エージェントが CLI ま�
 
 ```json
 {
+  "structure": ".crube/structure.txt",
   "items": [
     { "kind": "untracked", "type": "dir",  "path": "src/db/" },
     { "kind": "untracked", "type": "file", "path": "src/db/conn.go" },
@@ -26,7 +27,7 @@ crube 本体は AI を呼び出しません。AI エージェントが CLI ま�
 }
 ```
 
-フィールド名は実装時に確定します。ここでは形の例として示しています。
+各フィールドと並び順は [CLI リファレンス](../reference/cli.md#crube-status) を参照してください。
 
 ## エージェント向けの指示の例
 

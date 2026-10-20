@@ -8,7 +8,7 @@
 - `docs/design/`：なぜこの形なのか（今の設計とその理由）。決めたことは`docs/design/decisions.md`の表にも1行で足す
 - `docs/reference/`：正確な仕様（CLI・MCP・ファイル形式）。実装はこれに合わせる
 - `docs/examples/`：使い方の例と、サンプルの`.crube/`（`docs/examples/sample-crube/`）
-- docs は実装より先に書かれている。`docs/examples/ai-workflow.md`の`status --json`のフィールド名のように「実装時に確定」と書いたものは、実装で決めたら docs を直す
+- docs は実装より先に書かれている。「未定」「実装時に確定」と書いたもの（`docs/reference/cli.md`の`set`・`rm`・`mv`の`--json`の形など）は、決めたら docs を直す。利用者の目に触れるものは、決める前に了承を得る（`.claude/rules/working-with-human.md` 4章）
 - structure ファイルの例は、インデントと区切りが**タブ**。docs の例を書き換えるときに、エディタがタブをスペースに置き換えないよう気をつける（スペースのインデントは読み込みエラーになる仕様）
 
 ## 例の値

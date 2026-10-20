@@ -12,3 +12,9 @@
 {"v":1,"ts":"2026-10-20T10:05:45.014Z","why":"コミットに入れるテープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":22}
 {"v":1,"ts":"2026-10-20T10:05:45.224Z","why":"git addで入るものを事前に確かめる（ダミーや秘密が混ざらないか）","cmd":["git","add","-A","--dry-run"],"dir":".","exit":0,"ms":4}
 {"v":1,"ts":"2026-10-20T10:05:49.970Z","why":"初回コミットの前に、テンプレートの状態で検査が通ることを確かめる","cmd":["qsoku","check"],"dir":".","exit":0,"ms":326}
+{"v":1,"ts":"2026-10-20T10:05:52.712Z","why":"初回コミットの対象を登録する（dry-runで中身を確認済み）","cmd":["git","add","-A"],"dir":".","exit":0,"ms":5}
+{"v":1,"ts":"2026-10-20T11:39:53.854Z","why":"AskUserQuestionでの人間の了承を、人間を記録者として残す","cmd":["sh","-c","for id in fa3a04de7e e1c5669767 e82f85035e; do MTQG_AUTHOR_KIND=human MTQG_AUTHOR_NAME=amisonnet8 mtqg q add \"$id\" \"推奨案で了承（AskUserQuestion での回答を claude-code が代わりに記録）\" || exit 1; done; MTQG_AUTHOR_KIND=human MTQG_AUTHOR_NAME=amisonnet8 mtqg q add d681020d0d \"英語だけ（推奨案）で了承（AskUserQuestion での回答を claude-code が代わりに記録）\""],"dir":".","exit":0,"ms":16}
+{"v":1,"ts":"2026-10-20T11:42:01.255Z","why":"docsの修正後に、古い表記が残っていないか確かめる","cmd":["grep","-rnE","説明なし|実装時に確定|依存.*なし","docs","README.md","CLAUDE.md",".claude/rules"],"dir":".","exit":0,"ms":2}
+{"v":1,"ts":"2026-10-20T11:42:32.702Z","why":"コミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":9}
+{"v":1,"ts":"2026-10-20T11:42:35.965Z","why":"[1-1] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":13}
+{"v":1,"ts":"2026-10-20T11:42:36.159Z","why":"[1-1] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}

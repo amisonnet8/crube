@@ -28,7 +28,7 @@ crube（「しるべ（道標）」を縮めた名前）は、プロジェクト
 
 `CLAUDE.md`・`.claude/rules/`・`docs/`は日本語。
 
-<!-- TODO: コード・コメント・コミットメッセージ・CLI出力の言語を決めて書く（docs の CLI の例は「! 説明なし」など日本語の表示と、「created .crube/structure.txt」「untracked」など英語の表示が混ざっている）。詳しい書き方は`.claude/rules/documentation.md` -->
+<!-- TODO: コード・コメント・コミットメッセージの言語を決めて書く（CLI出力は英語だけと決まった。`docs/reference/cli.md`「出力の共通の決まり」）。詳しい書き方は`.claude/rules/documentation.md` -->
 
 ## 参照すべきファイル
 
