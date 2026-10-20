@@ -26,3 +26,15 @@
 {"v":1,"ts":"2026-10-20T18:47:46.524Z","why":"[2-1] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":1,"ms":7}
 {"v":1,"ts":"2026-10-20T18:47:56.267Z","why":"[2-1] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":13}
 {"v":1,"ts":"2026-10-20T18:47:56.458Z","why":"[2-1] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-20T18:47:59.574Z","why":"[2-1] の変更・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".claude/rules/directory-structure.md",".claude/rules/srwr-usage.md","internal",".srwr/tapes"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-20T18:55:14.183Z","why":"表示幅の計算に x/text/width を使うと決まった（質問 4d4c259091）ので依存に足す","cmd":["go","get","golang.org/x/text@latest"],"dir":".","exit":0,"ms":1085}
+{"v":1,"ts":"2026-10-20T18:55:21.127Z","why":"表示幅のテストの期待値を、実装と別の道具（PythonのEast Asian Width）で求める","cmd":["python3","-I","-c","\nimport unicodedata as u\ndef w(s):\n    n=0\n    for c in s:\n        if u.category(c) in ('Mn','Me','Cf'): continue\n        n += 2 if u.east_asian_width(c) in ('W','F') else 1\n    return n\nfor s in ['abc','日本語','ｱｲｳ','Ａ','○①α','é','é','😀','a‍b','認証(ログイン、セッション、トークン更新)','','\\t']:\n    print(repr(s), [u.east_asian_width(c) for c in s], w(s))\nprint(u.unidata_version)\n"],"dir":".","exit":0,"ms":18}
+{"v":1,"ts":"2026-10-20T18:56:01.274Z","why":"[2-2] の表示幅と上限の検証を書いたあとの確認","cmd":["qsoku","check"],"dir":".","exit":0,"ms":1287}
+{"v":1,"ts":"2026-10-20T18:56:07.782Z","why":"依存の記録（direct になっているか）と、見えない文字がソースに無いかを確かめる","cmd":["sh","-c","cat go.mod; echo ---; grep -rnP \"[\\x{2028}\\x{2029}\\x{200D}\\x{0301}]\" internal || echo \"見えない文字なし\""],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-20T18:56:07.965Z","why":"依存（x/text）を足したので、既知の脆弱性とライセンスを検査する","cmd":["qsoku","trivy"],"dir":".","exit":0,"ms":7231}
+{"v":1,"ts":"2026-10-20T18:56:20.958Z","why":"x/text を直接使うようになったので、go.mod の indirect を外し go.sum を揃える（qsokufile に該当の名前が無いので go を直接使う）","cmd":["go","mod","tidy"],"dir":".","exit":0,"ms":38}
+{"v":1,"ts":"2026-10-20T18:56:21.169Z","why":"go mod tidy の結果を確かめる","cmd":["sh","-c","cat go.mod; echo ---; cat go.sum"],"dir":".","exit":0,"ms":2}
+{"v":1,"ts":"2026-10-20T18:56:27.038Z","why":"go mod tidy のあとも検査が通るか確かめる","cmd":["qsoku","check"],"dir":".","exit":0,"ms":1128}
+{"v":1,"ts":"2026-10-20T18:56:39.266Z","why":"[2-2] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":1,"ms":8}
+{"v":1,"ts":"2026-10-20T18:56:43.736Z","why":"[2-2] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":12}
+{"v":1,"ts":"2026-10-20T18:56:43.926Z","why":"[2-2] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
