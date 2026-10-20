@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "mtqg": {
+      "args": [
+        "mcp"
+      ],
+      "command": "mtqg",
+      "type": "stdio"
+    },
+    "srwr": {
+      "command": "srwr",
+      "args": [
+        "mcp"
+      ]
+    }
+  }
+}

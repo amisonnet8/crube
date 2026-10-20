@@ -1,0 +1,23 @@
+.github/	CI workflows and repository settings
+cmd/	Executables
+	server/	HTTP API server
+		| Entry point is main.go.
+config/	Configuration files per environment (dev, staging, prod)
+	*.yaml	Settings for one environment, named after it
+docs/	Project documentation
+internal/	Private packages, not importable from outside
+	auth/	Authentication (login, session, token refresh)
+		| Entry point is auth.go.
+		| Settings are in config/auth.yaml.
+		session.go	Session storage and expiry handling
+			| Sessions are stored in Redis with a sliding expiry.
+			| The expiry is configured by session.ttl in config/auth.yaml.
+		*_test.go	Unit tests for the file of the same name
+	store/	Persistence layer (PostgreSQL)
+		*_test.go	Unit tests for the file of the same name
+migrations/	Database schema migrations, applied in filename order
+	*.sql	One migration step
+testdata/	Test fixtures
+	*/	Fixtures for one test suite
+Makefile	Build, test and lint tasks (run `make help`)
+go.mod	Go module definition

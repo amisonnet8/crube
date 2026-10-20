@@ -1,0 +1,6 @@
+# サンプル: .crube/ignore(gitignore と同じ書式。.gitignore は参照しない)
+.git/
+node_modules/
+dist/
+vendor/
+*.pb.go

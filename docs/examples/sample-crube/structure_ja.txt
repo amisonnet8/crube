@@ -1,0 +1,16 @@
+cmd/	実行ファイル
+	server/	HTTP API サーバー
+		| 入口は main.go。
+config/	環境別の設定ファイル(dev / staging / prod)
+	*.yaml	環境ごとの設定。ファイル名が環境名
+internal/	外部から import できない内部パッケージ
+	auth/	認証(ログイン、セッション、トークン更新)
+		| 入口は auth.go。
+		| 設定は config/auth.yaml にある。
+		session.go	セッションの保存と有効期限の管理
+			| セッションは Redis に保存し、アクセスのたびに有効期限を延長する。
+			| 有効期限は config/auth.yaml の session.ttl で設定する。
+		*_test.go	同名ファイルのテスト
+	store/	永続化レイヤー(PostgreSQL)
+migrations/	DB スキーマのマイグレーション。ファイル名順に適用する
+	*.sql	マイグレーション 1 ステップ

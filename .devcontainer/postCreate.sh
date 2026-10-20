@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# wget, gnupg,
+# lsb-release: Adding the Trivy apt repository below.
+# gcc:         qsoku race (CGO_ENABLED=1 go test -race) needs a C compiler.
+#              The container itself runs with CGO_ENABLED=0 (devcontainer.json).
+# jq:          Used by .claude/hooks/build.sh, .claude/hooks/require-bcuz.sh (and
+#              its test, qsoku hook) and the allowWrite block below; also for
+#              inspecting --json output.
+# ShellCheck:  Static analysis of tracked *.sh and *.bash files (qsoku shellcheck).
+#              Comment lines must not start with the lowercase directive word,
+#              or ShellCheck parses them as directives (SC1072/SC1073).
+# gh:          GitHub CLI (issues, pull requests, Actions runs) is the "github-cli"
+#              feature in devcontainer.json, not installed here. The feature is left
+#              unpinned (no "version" option): each rebuild installs the latest release.
+sudo apt-get update
+sudo apt-get install -y wget gnupg lsb-release gcc jq shellcheck
+
+# The Bash sandbox (.claude/settings.json "sandbox") needs bubblewrap (bwrap)
+# and socat on Linux; without them it silently stays off even with
+# "enabled": true. Install only what is missing, since some base images
+# already have them. Project-independent (.claude/rules/testing.md).
+missing_sandbox_deps=()
+command -v bwrap >/dev/null 2>&1 || missing_sandbox_deps+=(bubblewrap)
+command -v socat >/dev/null 2>&1 || missing_sandbox_deps+=(socat)
+if [ "${#missing_sandbox_deps[@]}" -gt 0 ]; then
+  sudo apt-get update
+  sudo apt-get install -y "${missing_sandbox_deps[@]}"
+fi
+
+# Trivy: known vulnerabilities (CVE) and license compatibility of dependencies
+# (qsoku trivy, .claude/rules/testing.md). Installed from the official apt repository.
+wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg >/dev/null
+echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list >/dev/null
+sudo apt-get update
+sudo apt-get install -y trivy
+
+# The Bash sandbox (.claude/settings.json) only honours an allowWrite path that
+# already exists, and ~/.cache itself is read-only there. Create every
+# filesystem.allowWrite path up front, or the first qsoku lint / qsoku trivy in
+# a fresh container fails with "read-only file system" (.claude/rules/testing.md).
+# The list is read from settings.json, so this block needs no change when
+# allowWrite does, and it is project-independent. "~/x" and "$HOME/x" are created
+# under the home directory; other absolute paths (e.g. /go) are created if they do
+# not exist yet, and a failure only warns (no sudo is used). Relative paths, "."
+# and $TMPDIR, and the special paths /dev, /proc and /sys are left alone.
+sandbox_settings="$(dirname "$0")/../.claude/settings.json"
+tilde='~'
+if [ -f "$sandbox_settings" ]; then
+  while IFS= read -r allow_path; do
+    case "$allow_path" in
+      "$tilde/"*) allow_path="$HOME/${allow_path#"$tilde/"}" ;;
+      /dev/* | /proc/* | /sys/*) continue ;;
+      /*) ;;
+      *) continue ;;
+    esac
+    mkdir -p "$allow_path" || echo "warning: cannot create allowWrite path $allow_path" >&2
+  done < <(jq -r '.sandbox.filesystem.allowWrite[]?' "$sandbox_settings")
+fi
+
+# golangci-lint: lint (qsoku check, .golangci.yaml). Built from source with the
+# container's Go (go install), not the prebuilt binary of install.sh. @latest,
+# not pinned: a golangci-lint reads the export data of the standard library only
+# up to the version of its own x/tools, so a pinned one stops working when the
+# container's Go moves on ("export data version 5 is greater than maximum
+# supported version 4"; building the same version again does not help). A newer
+# lint reads it. If lint still fails that way right after a Go update, the lint
+# is not out yet: `qsoku lint` says so (qsokufile, .claude/rules/testing.md).
+go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+
+go install golang.org/x/tools/gopls@latest
+go install golang.org/x/tools/cmd/goimports@latest
+
+# qsoku: build/check/test entry points (qsokufile).
+go install github.com/amisonnet8/qsoku/cmd/qsoku@latest
+
+# mtqg: memo/todo/qa/bug/glossary/rule journal (.mtqg/, CLAUDE.md, .mcp.json).
+go install github.com/amisonnet8/mtqg/cmd/mtqg@latest
+
+# srwr: the AI's edits go through its look / edit / new tools, each with a
+# reason (why), and are recorded on a tape (.claude/rules/srwr-usage.md).
+# @latest, like qsoku and mtqg above. srwr is 0.x, so after a rebuild that
+# picked up a new version, run `srwr init` once: it makes .claude/settings.json
+# follow any change in the tools' names.
+go install github.com/amisonnet8/srwr/cmd/srwr@latest
+
+# bcuz: every command Claude Code runs through the Bash tool goes through
+# `bcuz "<reason>" <command>`, which records when / why / what / result in
+# .bcuz/history.jsonl (.claude/rules/bcuz-usage.md; enforced by the PreToolUse
+# hook .claude/hooks/require-bcuz.sh). @latest, like the tools above.
+go install github.com/amisonnet8/bcuz/cmd/bcuz@latest
+
+# Create .bcuz/ at the repository root (idempotent: prints "already exists"
+# and succeeds if it is there). Without it, commands still run but are not recorded.
+(cd "$(dirname "$0")/.." && bcuz --init)
+
+# Wire up qsoku's bash integration (working-directory carry-back and
+# completion). Idempotent: skipped if already present, so re-running
+# postCreate.sh does not duplicate the line. The single quotes are intentional
+# -- the line is meant to land in ~/.bashrc unexpanded.
+# shellcheck disable=SC2016
+grep -qF 'qsoku .shell bash' ~/.bashrc 2>/dev/null || echo 'eval "$(qsoku .shell bash)"' >>~/.bashrc
+
+# mtqg's own bash completion, for interactive use in this container.
+mkdir -p ~/.local/share/bash-completion/completions
+mtqg completion bash >~/.local/share/bash-completion/completions/mtqg
