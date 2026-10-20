@@ -38,3 +38,9 @@
 {"v":1,"ts":"2026-10-20T18:56:39.266Z","why":"[2-2] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":1,"ms":8}
 {"v":1,"ts":"2026-10-20T18:56:43.736Z","why":"[2-2] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":12}
 {"v":1,"ts":"2026-10-20T18:56:43.926Z","why":"[2-2] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-20T18:56:46.541Z","why":"[2-2] の変更・依存・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".claude/rules/directory-structure.md","docs/design/decisions.md","go.mod","go.sum","internal",".srwr/tapes"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-20T19:03:42.255Z","why":"[2-3] の探索と書き込みガードを書いたあとの確認","cmd":["qsoku","check"],"dir":".","exit":1,"ms":422}
+{"v":1,"ts":"2026-10-20T19:03:51.603Z","why":"gosec の抑止を入れたあとの確認","cmd":["qsoku","check"],"dir":".","exit":0,"ms":615}
+{"v":1,"ts":"2026-10-20T19:03:58.303Z","why":"シンボリックリンクのテストが Skip されずに走ったかを確かめる（qsoku unit は引数を受けないので go test を直接使う）","cmd":["sh","-c","go test -count=1 -v -run TestWriteRefused ./internal/project/ | grep -E \"^(=== RUN|--- (PASS|FAIL|SKIP)|ok|FAIL)\" | grep -cE -- \"--- PASS\"; go test -count=1 -v -run TestWriteRefused ./internal/project/ | grep -E -- \"--- (SKIP|FAIL)\" || echo \"SKIP・FAIL なし\""],"dir":".","exit":0,"ms":354}
+{"v":1,"ts":"2026-10-20T19:04:09.964Z","why":"[2-3] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":8}
+{"v":1,"ts":"2026-10-20T19:04:13.638Z","why":"[2-3] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":12}
