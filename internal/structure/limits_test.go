@@ -89,3 +89,23 @@ func TestLimitErrorMessage(t *testing.T) {
 		t.Errorf("got %q, want %q", got, want)
 	}
 }
+
+func TestCheckName(t *testing.T) {
+	for _, name := range []string{"a", "a/", "*.csv", "*/", "[id].tsx", "my  file.txt", "|x", "x|", ".github/", "日本語.txt"} {
+		if err := CheckName(name); err != nil {
+			t.Errorf("CheckName(%q) = %v", name, err)
+		}
+	}
+	for _, name := range []string{"", "/", ".", "./", "..", "../", "a/b", "a//", "a\tb", "a\nb", "a\rb", " a", "a ", " a/", "a /", "|", "|/", "| x"} {
+		if err := CheckName(name); err == nil {
+			t.Errorf("CheckName(%q) succeeded", name)
+		}
+	}
+	// What CheckName accepts must read back as the same name.
+	for _, name := range []string{"a", "a/", "*.csv", "[id].tsx", "my  file.txt", "|x"} {
+		tree, err := Parse([]byte(name + "\tdesc\n"))
+		if err != nil || len(tree.Entries) != 1 || tree.Entries[0].Name != name {
+			t.Errorf("%q does not read back: %v", name, err)
+		}
+	}
+}

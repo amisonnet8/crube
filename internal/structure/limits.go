@@ -54,3 +54,18 @@ func CheckDetail(detail string) error {
 	}
 	return nil
 }
+
+// CheckName reports whether name (with a trailing "/" for a directory entry)
+// can be written as the name of an entry: the names that the format cannot
+// hold (docs/reference/file-format.md "書けない名前") are refused, as are an
+// empty name, a "/" inside it, and "." and "..".
+func CheckName(name string) error {
+	base := strings.TrimSuffix(name, "/")
+	if base == "" || base == "." || base == ".." ||
+		strings.ContainsAny(base, "/\t\r\n") ||
+		strings.HasPrefix(base, " ") || strings.HasSuffix(base, " ") ||
+		base == "|" || strings.HasPrefix(base, "| ") {
+		return fmt.Errorf("name %q cannot be written in a structure file", name)
+	}
+	return nil
+}

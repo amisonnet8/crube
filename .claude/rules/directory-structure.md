@@ -18,6 +18,7 @@
 ├── .bcuz/                  ← bcuzの記録（`history.jsonl`）。`postCreate.sh`が`bcuz --init`で作る。**コミットする**（`merge=union`）
 ├── .srwr/                  ← srwrの鍵・ロック・テープ（最初のhook・MCPの呼び出しでできる。**閉じた`tapes/*.gz`だけコミットする**）
 ├── internal/               ← このモジュールの中だけで使うコード（コア）
+│   ├── core/               ← CLIとMCPが呼ぶ操作（init・set・rm・mv、参照の操作）。ほかのパッケージを組み合わせる
 │   ├── ignore/             ← `.crube/ignore`の除外判定（gitignore と同じ書式）と、init が書く既定の中身
 │   ├── lang/               ← `CRUBE_LANG`から使う structure ファイルを1つ決める
 │   ├── match/              ← 照合（実在のパスに当たるエントリ。完全一致→`path.Match`を書いた順）
@@ -49,6 +50,7 @@
 
 - **`cmd/`**: まだ無い。CLIの`crube`を実装するときに`cmd/crube/main.go`を作る。`main.go`は引数を`internal/`に渡すだけにする
 - **`internal/`**: Goの仕組みとして、モジュールの外からimportできない。外へ公開するパッケージは`internal/`に置かない
+- **`internal/core/`**: CLI・MCPから呼ばれる操作の入口。引数の検証・判定はここか、ここが呼ぶパッケージに置き、CLI・MCPには書かない。書き込みは`internal/project`の関数だけを通す
 - **`internal/structure/`**: structure ファイルのバイト列と木（`Tree`・`Entry`）の変換だけを持つ。ファイルの探索・ディスクへの書き込み・照合は持たない（ほかのコアのパッケージに置く）
 - **`go.sum`**: コミットする（改ざん検知・再現可能なビルドのため）
 - **`.mtqg/`**: コミットされる。中のファイルは直接編集せず、すべて`mtqg`のコマンド経由で書く（`.claude/rules/mtqg-usage.md`）。`.mtqg/.local/`はコミットされない
