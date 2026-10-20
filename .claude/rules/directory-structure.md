@@ -18,6 +18,7 @@
 ├── .bcuz/                  ← bcuzの記録（`history.jsonl`）。`postCreate.sh`が`bcuz --init`で作る。**コミットする**（`merge=union`）
 ├── .srwr/                  ← srwrの鍵・ロック・テープ（最初のhook・MCPの呼び出しでできる。**閉じた`tapes/*.gz`だけコミットする**）
 ├── internal/               ← このモジュールの中だけで使うコード（コア）
+│   ├── ignore/             ← `.crube/ignore`の除外判定（gitignore と同じ書式）と、init が書く既定の中身
 │   ├── lang/               ← `CRUBE_LANG`から使う structure ファイルを1つ決める
 │   ├── match/              ← 照合（実在のパスに当たるエントリ。完全一致→`path.Match`を書いた順）
 │   ├── project/            ← `.crube/`の探索と、`.crube/`への書き込み（書き込みガード）。**`.crube/`に書くのはここだけ**
