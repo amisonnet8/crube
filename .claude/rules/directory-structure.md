@@ -22,6 +22,7 @@
 │   ├── lang/               ← `CRUBE_LANG`から使う structure ファイルを1つ決める
 │   ├── match/              ← 照合（実在のパスに当たるエントリ。完全一致→`path.Match`を書いた順）
 │   ├── project/            ← `.crube/`の探索と、`.crube/`への書き込み（書き込みガード）。**`.crube/`に書くのはここだけ**
+│   ├── status/             ← 走査と差分エンジン（未説明・孤立・上限超え・充足度）。読むだけ
 │   ├── structure/          ← structure ファイルの読み込みと正規形での書き出し、desc・detail の上限の検証
 │   └── textwidth/          ← 表示幅（全角2・半角1・曖昧1・結合文字0）
 ├── docs/                   ← 設計と仕様（日本語。目次は`docs/README.md`）

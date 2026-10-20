@@ -75,3 +75,10 @@
 {"v":1,"ts":"2026-10-20T19:23:18.078Z","why":"[2-6] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":8}
 {"v":1,"ts":"2026-10-20T19:23:20.876Z","why":"[2-6] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":12}
 {"v":1,"ts":"2026-10-20T19:23:21.064Z","why":"[2-6] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-20T19:23:24.285Z","why":"[2-6] の変更・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".srwr/tapes",".claude/rules/directory-structure.md",".claude/rules/testing.md","internal/ignore"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-20T19:23:24.462Z","why":"足したあとの状態を確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-20T19:27:26.858Z","why":"[2-7] の差分エンジンを書いたあとの確認","cmd":["qsoku","check"],"dir":".","exit":0,"ms":616}
+{"v":1,"ts":"2026-10-20T19:27:34.173Z","why":"status のテストに SKIP が無いか確かめる（qsoku unit は引数を受けないので go test を直接使う）","cmd":["sh","-c","go test -count=1 -v ./internal/status/ | grep -E -- \"--- (SKIP|FAIL)\" || echo \"SKIP・FAIL なし\""],"dir":".","exit":0,"ms":176}
+{"v":1,"ts":"2026-10-20T19:27:44.566Z","why":"[2-7] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":8}
+{"v":1,"ts":"2026-10-20T19:27:47.544Z","why":"[2-7] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":13}
+{"v":1,"ts":"2026-10-20T19:27:47.741Z","why":"[2-7] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
