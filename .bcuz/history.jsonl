@@ -44,3 +44,8 @@
 {"v":1,"ts":"2026-10-20T19:03:58.303Z","why":"シンボリックリンクのテストが Skip されずに走ったかを確かめる（qsoku unit は引数を受けないので go test を直接使う）","cmd":["sh","-c","go test -count=1 -v -run TestWriteRefused ./internal/project/ | grep -E \"^(=== RUN|--- (PASS|FAIL|SKIP)|ok|FAIL)\" | grep -cE -- \"--- PASS\"; go test -count=1 -v -run TestWriteRefused ./internal/project/ | grep -E -- \"--- (SKIP|FAIL)\" || echo \"SKIP・FAIL なし\""],"dir":".","exit":0,"ms":354}
 {"v":1,"ts":"2026-10-20T19:04:09.964Z","why":"[2-3] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":8}
 {"v":1,"ts":"2026-10-20T19:04:13.638Z","why":"[2-3] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":12}
+{"v":1,"ts":"2026-10-20T19:04:13.834Z","why":"[2-3] の変更・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".claude/rules/directory-structure.md","internal",".srwr/tapes"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-20T19:04:14.014Z","why":"[2-3] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-20T19:07:11.983Z","why":"Skill化のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":8}
+{"v":1,"ts":"2026-10-20T19:07:14.694Z","why":"Skill化のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":12}
+{"v":1,"ts":"2026-10-20T19:07:14.881Z","why":"Skill化のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}

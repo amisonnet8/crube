@@ -45,6 +45,8 @@
 
 ### コミットの前に、テープを閉じる
 
+**コミットするときは、Skill`commit-with-tape`（`.claude/skills/commit-with-tape/SKILL.md`）の手順で行う。** 下はその要点。
+
 ```
 srwr tapes check   # テープに無いのに変わったファイルが無いか（閉じる前に）
 srwr tapes new     # 今のテープを閉じて、その場で圧縮する
