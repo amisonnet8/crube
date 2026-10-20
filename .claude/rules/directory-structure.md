@@ -18,6 +18,7 @@
 ├── .bcuz/                  ← bcuzの記録（`history.jsonl`）。`postCreate.sh`が`bcuz --init`で作る。**コミットする**（`merge=union`）
 ├── .srwr/                  ← srwrの鍵・ロック・テープ（最初のhook・MCPの呼び出しでできる。**閉じた`tapes/*.gz`だけコミットする**）
 ├── internal/               ← このモジュールの中だけで使うコード（コア）
+│   ├── lang/               ← `CRUBE_LANG`から使う structure ファイルを1つ決める
 │   ├── project/            ← `.crube/`の探索と、`.crube/`への書き込み（書き込みガード）。**`.crube/`に書くのはここだけ**
 │   ├── structure/          ← structure ファイルの読み込みと正規形での書き出し、desc・detail の上限の検証
 │   └── textwidth/          ← 表示幅（全角2・半角1・曖昧1・結合文字0）

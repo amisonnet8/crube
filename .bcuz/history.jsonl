@@ -49,3 +49,11 @@
 {"v":1,"ts":"2026-10-20T19:07:11.983Z","why":"Skill化のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":8}
 {"v":1,"ts":"2026-10-20T19:07:14.694Z","why":"Skill化のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":12}
 {"v":1,"ts":"2026-10-20T19:07:14.881Z","why":"Skill化のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-20T19:07:17.963Z","why":"Skill化の変更・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".srwr/tapes",".claude/skills",".claude/rules/directory-structure.md",".claude/rules/srwr-usage.md","CLAUDE.md"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-20T19:07:18.139Z","why":"足したあとの状態を確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-20T19:14:27.606Z","why":"[2-4] の言語選択を書いたあとの確認","cmd":["qsoku","check"],"dir":".","exit":1,"ms":543}
+{"v":1,"ts":"2026-10-20T19:14:32.258Z","why":"gofmt の指摘（コメントの桁揃え）を整形ツールで直す","cmd":["qsoku","fmt"],"dir":".","exit":0,"ms":138}
+{"v":1,"ts":"2026-10-20T19:14:32.582Z","why":"整形のあとの確認","cmd":["qsoku","check"],"dir":".","exit":0,"ms":508}
+{"v":1,"ts":"2026-10-20T19:14:43.661Z","why":"[2-4] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":7}
+{"v":1,"ts":"2026-10-20T19:14:46.542Z","why":"[2-4] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":12}
+{"v":1,"ts":"2026-10-20T19:14:46.734Z","why":"[2-4] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
