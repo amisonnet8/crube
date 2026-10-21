@@ -320,3 +320,58 @@ func TestMoveRefused(t *testing.T) {
 		}
 	}
 }
+
+func TestEntryPathBackslash(t *testing.T) {
+	t.Run("Windows: \\ separates names", func(t *testing.T) {
+		old := osSeparator
+		osSeparator = '\\'
+		t.Cleanup(func() { osSeparator = old })
+
+		p := newProject(t, "", map[string]string{"structure.txt": ""})
+		set, err := p.Set(`src\auth\`, "Auth", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if set.Path != "src/auth/" {
+			t.Errorf("set returned %q", set.Path)
+		}
+		moved, err := p.Move(`src\auth\`, `lib\auth\`)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if moved.From != "src/auth/" || moved.To != "lib/auth/" {
+			t.Errorf("mv returned %+v", *moved)
+		}
+		tree, err := p.Tree(TreeOptions{Path: `lib\`})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(tree.Entries) != 1 || tree.Entries[0].Path != "lib/" {
+			t.Errorf("tree returned %+v", tree.Entries)
+		}
+		if got, want := content(t, p, "structure.txt"), "src/\nlib/\n\tauth/\tAuth\n"; got != want {
+			t.Errorf("structure.txt: got %q, want %q", got, want)
+		}
+		removed, err := p.Remove(`lib\auth\`)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if removed.Path != "lib/auth/" {
+			t.Errorf("rm returned %+v", *removed)
+		}
+	})
+
+	t.Run("elsewhere: \\ is a character of a name", func(t *testing.T) {
+		old := osSeparator
+		osSeparator = '/'
+		t.Cleanup(func() { osSeparator = old })
+
+		p := newProject(t, "", map[string]string{"structure.txt": ""})
+		if _, err := p.Set(`a\b`, "X", nil); err != nil {
+			t.Fatal(err)
+		}
+		if got, want := content(t, p, "structure.txt"), "a\\b\tX\n"; got != want {
+			t.Errorf("structure.txt: got %q, want %q", got, want)
+		}
+	})
+}

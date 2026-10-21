@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"path/filepath"
 	"slices"
 	"strings"
 
@@ -34,6 +35,7 @@ type MoveResult struct {
 // added as lines without a desc; a new entry goes after its siblings. It
 // returns the entry as written.
 func (p *Project) Set(entryPath, desc string, detail *string) (*SetResult, error) {
+	entryPath = normEntryPath(entryPath)
 	names, err := splitEntryPath(entryPath)
 	if err != nil {
 		return nil, err
@@ -78,6 +80,7 @@ func (p *Project) Set(entryPath, desc string, detail *string) (*SetResult, error
 // Remove removes the entry at entryPath, and every entry below it, from the
 // structure file of the language. Files of the project are not touched.
 func (p *Project) Remove(entryPath string) (*RemoveResult, error) {
+	entryPath = normEntryPath(entryPath)
 	names, err := splitEntryPath(entryPath)
 	if err != nil {
 		return nil, err
@@ -103,6 +106,7 @@ func (p *Project) Remove(entryPath string) (*RemoveResult, error) {
 // as lines without a desc; the entry goes after its new siblings. Files of
 // the project are not touched.
 func (p *Project) Move(from, to string) (*MoveResult, error) {
+	from, to = normEntryPath(from), normEntryPath(to)
 	fromNames, err := splitEntryPath(from)
 	if err != nil {
 		return nil, err
@@ -147,6 +151,20 @@ func count(e *structure.Entry) int {
 		n += count(c)
 	}
 	return n
+}
+
+// osSeparator is the separator of real paths on this OS. It is a variable so
+// that tests can act as Windows.
+var osSeparator = filepath.Separator
+
+// normEntryPath reads an entry path as a user gives it: on Windows, where "\"
+// cannot be in a name, "\" separates names as "/" does. Elsewhere "\" is a
+// character of a name, and the path is left as it is.
+func normEntryPath(entryPath string) string {
+	if osSeparator == '\\' {
+		return strings.ReplaceAll(entryPath, `\`, "/")
+	}
+	return entryPath
 }
 
 // splitEntryPath splits an entry path into the names of its entries, each

@@ -195,6 +195,7 @@ func (p *Project) Tree(o TreeOptions) (*TreeResult, error) {
 
 	top := tree.Entries
 	var topNames []string // the names above the entries of top
+	o.Path = normEntryPath(o.Path)
 	if o.Path != "" {
 		names, err := splitEntryPath(o.Path)
 		if err != nil {
