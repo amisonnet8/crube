@@ -103,6 +103,7 @@ crube: no .crube/ found (run crube init)
 crube: desc is 300 columns wide (limit 256)
 crube: src/foo.go: no such file
 crube: build/x: ignored by .crube/ignore (use --no-ignore)
+crube: .crube: .crube/ is always left out, even with --no-ignore
 ```
 
 引数の誤りは、コマンド名を付けて `crube: <コマンド>: <内容>` の 1 行で出します(終了コード 2)。引数の数の誤りには、そのコマンドの書式を添えます。

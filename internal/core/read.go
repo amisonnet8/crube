@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/amisonnet8/crube/internal/match"
+	"github.com/amisonnet8/crube/internal/project"
 	"github.com/amisonnet8/crube/internal/search"
 	"github.com/amisonnet8/crube/internal/status"
 	"github.com/amisonnet8/crube/internal/structure"
@@ -56,7 +57,7 @@ func (p *Project) Ls(path string) (*LsResult, error) {
 		return nil, fmt.Errorf("%s: not a directory (use crube show)", path)
 	}
 	if len(names) > 0 && ign.Ignored(names, true) {
-		return nil, ignored(path)
+		return nil, ignored(path, names)
 	}
 
 	// The entries of the directory, if the directory itself is matched.
@@ -130,7 +131,7 @@ func (p *Project) Show(path string) (*ShowResult, error) {
 	isLink := fi.Mode()&fs.ModeSymlink != 0
 	isDir := fi.IsDir() && !isLink
 	if ign.Ignored(names, isDir) {
-		return nil, ignored(path)
+		return nil, ignored(path, names)
 	}
 
 	r := &ShowResult{Path: strings.Join(names, "/"), Type: "file"}
@@ -375,6 +376,12 @@ func notFound(path string, err error) error {
 	return err
 }
 
-func ignored(path string) error {
+// ignored is the error for a path that is left out; names are its names from
+// the project root. .crube/ cannot be taken back with --no-ignore, so the error
+// for it does not suggest it.
+func ignored(path string, names []string) error {
+	if names[0] == project.DirName {
+		return fmt.Errorf("%s: %s/ is always left out, even with --no-ignore", path, project.DirName)
+	}
 	return fmt.Errorf("%s: ignored by .crube/ignore (use --no-ignore)", path)
 }

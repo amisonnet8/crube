@@ -163,6 +163,7 @@ func TestErrorExamples(t *testing.T) {
 			write(t, root, map[string]string{"build/x": "", ".crube/ignore": "build/\n"})
 			return root
 		}, []string{"show", "build/x"}},
+		"crube: .crube: .crube/ is always left out, even with --no-ignore":                                  {cliRoot, []string{"ls", ".crube", "--no-ignore"}},
 		`crube: unknown command "lss" (see crube --help)`:                                                   {nil, []string{"lss"}},
 		"crube: ls: unknown option --foo":                                                                   {nil, []string{"ls", "--foo"}},
 		"crube: ls: -C needs a value":                                                                       {nil, []string{"ls", "-C"}},

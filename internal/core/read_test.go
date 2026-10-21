@@ -157,12 +157,30 @@ func TestLsRefused(t *testing.T) {
 		"go.mod":        "go.mod: not a directory (use crube show)",
 		"build":         "build: ignored by .crube/ignore (use --no-ignore)",
 		"build/":        "build/: ignored by .crube/ignore (use --no-ignore)",
-		".crube":        ".crube: ignored by .crube/ignore (use --no-ignore)",
+		".crube":        ".crube: .crube/ is always left out, even with --no-ignore",
 		"src/../..":     "src/../..: outside the project",
 		"data/2026.csv": "data/2026.csv: not a directory (use crube show)",
 	} {
 		if _, err := p.Ls(path); err == nil || err.Error() != msg {
 			t.Errorf("ls %s: got %v, want %q", path, err, msg)
+		}
+	}
+}
+
+// .crube/ is left out even with --no-ignore, so the error does not suggest it.
+func TestCrubeIsAlwaysLeftOut(t *testing.T) {
+	root := readProject(t)
+	for _, noIgnore := range []bool{false, true} {
+		p := open(t, Options{Dir: root, NoIgnore: noIgnore})
+		for _, path := range []string{".crube", ".crube/"} {
+			if _, err := p.Ls(path); err == nil || err.Error() != path+": .crube/ is always left out, even with --no-ignore" {
+				t.Errorf("ls %s (no-ignore %v): got %v", path, noIgnore, err)
+			}
+		}
+		for _, path := range []string{".crube", ".crube/structure.txt"} {
+			if _, err := p.Show(path); err == nil || err.Error() != path+": .crube/ is always left out, even with --no-ignore" {
+				t.Errorf("show %s (no-ignore %v): got %v", path, noIgnore, err)
+			}
 		}
 	}
 }
