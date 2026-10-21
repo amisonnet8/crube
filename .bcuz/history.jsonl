@@ -366,3 +366,6 @@
 {"v":1,"ts":"2026-10-21T09:47:17.373Z","why":"使われない nolint を消したあとの確認","cmd":["qsoku","check"],"dir":".","exit":0,"ms":997}
 {"v":1,"ts":"2026-10-21T09:47:33.349Z","why":"[5-5]のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":1,"ms":10}
 {"v":1,"ts":"2026-10-21T09:47:37.942Z","why":"[5-5]のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":15}
+{"v":1,"ts":"2026-10-21T09:47:38.155Z","why":"[5-5]の変更・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".srwr/tapes","README.md","docs/assets","e2e/demo_test.go","qsokufile",".claude/rules/qsoku-usage.md",".claude/rules/documentation.md",".claude/rules/directory-structure.md",".crube/structure.txt",".crube/structure_ja.txt"],"dir":".","exit":0,"ms":8}
+{"v":1,"ts":"2026-10-21T09:47:38.345Z","why":"[5-5]のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":5}
+{"v":1,"ts":"2026-10-21T10:17:53.662Z","why":"シェル補完の質問への人間の答え（todo に足す、README より先に行う）を記録する","cmd":["env","MTQG_AUTHOR_KIND=human","MTQG_AUTHOR_NAME=amisonnet8","mtqg","q","add","68150afda5","todo に足す。README の直しより先に、シェル補完に対応する"],"dir":".","exit":0,"ms":5}
