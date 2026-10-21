@@ -1,104 +1,106 @@
-# データモデル
+*[日本語](data-model_ja.md) | **English***
 
-ファイル形式の正確な定義は [reference/file-format.md](../reference/file-format.md) にあります。このページでは、その形になった理由を説明します。
+# Data model
 
-## ツリー形式のテキスト
+The exact definition of the file format is in [reference/file-format.md](../reference/file-format.md). This page explains why it has that shape.
 
-structure は、プロジェクトのディレクトリ構成をそのままタブのインデントで書いた、独自のテキスト形式です。深さは行頭のタブの数だけで決まるので、インデントの幅を数える必要がありません。
+## Text written as a tree
+
+The structure is a text format of its own that writes the directory structure of the project as it is, indented with tabs. The depth is only the number of tabs at the start of a line, so there is no indentation width to count.
 
 ```
-src/	アプリケーションのソースコード
-	auth/	認証(ログイン、セッション、トークン更新)
-		| 入口は index.ts。設定は config/auth.yaml。
-		session.ts	セッションの保存と有効期限の管理
-		*_test.go	同名ファイルのテスト
-data/	データ格納場所
-	*.csv	CSVデータ
+src/	Application source code
+	auth/	Authentication (login, sessions, token refresh)
+		| The entry point is index.ts. Settings are in config/auth.yaml.
+		session.ts	Session storage and expiry
+		*_test.go	Tests of the file of the same name
+data/	Data files
+	*.csv	CSV data
 ```
 
-- 1 行が 1 エントリで、「名前」と「desc」をタブで区切る。
-- タブはインデントと区切りにだけ使い、空白はすべて名前か desc の一部になる。そのため、空白を含む名前もそのまま書ける。
-- 子はインデント(タブ 1 つ)で表す。
-- `|` で始まる行は、直前のエントリの detail(補足)。
+- One line is one entry: a name and a desc, separated by a tab.
+- Tabs are used only to indent and to separate; every space is part of the name or the desc. So names with spaces are written as they are.
+- Children are indented (one tab).
+- A line starting with `|` is the detail (more about it) of the entry above.
 
-理由:
+Why:
 
-- **見たままがツリー**: `crube tree` は、このファイルと同じ入れ子の形で表示する。書く形と読む形が同じなので、人間も AI も迷わない。
-- **パターンの範囲がはっきりする**: パターンは、それを書いたディレクトリの直下の名前にだけ当たる(後述)。
-- **移動が簡単**: ディレクトリを移動するときは、そのブロックを丸ごと移せばよい。中のパターンは相対なので書き換え不要。
-- **依存がない**: 行単位の小さなパーサーで読める。YAML などのライブラリは要らない。
+- **What you see is the tree**: `crube tree` shows the same nesting as this file. The form you write is the form you read, so neither people nor AI get lost.
+- **The reach of a pattern is clear**: a pattern matches only names directly in the directory where it is written (see below).
+- **Moving is easy**: to move a directory, move its block as a whole. The patterns in it are relative, so they need no rewriting.
+- **No dependencies**: a small line-by-line parser reads it. No library such as YAML is needed.
 
-## 名前とパターン
+## Names and patterns
 
-エントリの名前は、実在するファイル名・ディレクトリ名か、パターンです。区別はしません。照合は次の順で行います。
+The name of an entry is the name of a real file or directory, or a pattern. They are not told apart. Matching goes in this order:
 
-1. 同じディレクトリに、名前が完全に一致するエントリがあれば、それを使う。
-2. なければ、同じディレクトリのエントリを上から順に、Go 標準の `path.Match` でパターンとして照合し、最初に当たったものを使う。
+1. If the same directory has an entry whose name is exactly the name, that one is used.
+2. Otherwise, the entries of the same directory are matched as patterns with Go's standard `path.Match`, from the top, and the first that matches is used.
 
-- パターンが当たるのは、それを書いたディレクトリの**直下の名前だけ**。`data/` の下の `*.csv` は、`data/sub/x.csv` には当たらない。
-- 末尾が `/` のエントリはディレクトリだけに、それ以外はファイル(とシンボリックリンク)だけに当たる。`*/` は直下のすべてのディレクトリに当たる。
-- 規則 1 があるので、`[id].tsx` のように `path.Match` の記号を含む名前も、そのまま書けば実在の名前として当たる。
-- パターンの優先順位は書いた順。より具体的なパターンを上に書く。
+- A pattern matches **only names directly in** the directory where it is written. `*.csv` under `data/` does not match `data/sub/x.csv`.
+- An entry ending in `/` matches only directories; the others match only files (and symbolic links). `*/` matches every directory directly in it.
+- Because of rule 1, a name with symbols of `path.Match`, such as `[id].tsx`, matches the real name when written as it is.
+- Patterns take priority in the order written. Write the more specific ones above.
 
-マッチング処理は標準ライブラリだけで済み、`**` のような階層をまたぐ書式も持ちません。
+Matching needs only the standard library, and there is no syntax, such as `**`, that crosses levels.
 
-## フィールドは desc と detail だけ
+## Only desc and detail
 
-エントリが持つのは、1 行の説明(desc)と、任意の補足(detail)だけです。入口となるファイル、別名、関連するパスといった情報も、必要なら detail に文章で書きます。
+An entry has only a one-line description (desc) and an optional detail. Information such as the file to start from, other names, or related paths is written in the detail as text when needed.
 
-desc を省略した行も書けます。これは「説明なし」で、深い場所のエントリを書くために親を置く、構造だけの行です。
+A line without a desc can be written too. It means "no description": a line for structure only, put there as the parent of an entry deep down.
 
-## 書き込みは正規形で出力し直す
+## Writing outputs the canonical form
 
-crube が structure ファイルに書き込むときは、ファイル全体を正規の形で出力し直します。
+When crube writes a structure file, it outputs the whole file again in the canonical form.
 
-- エントリの順序は保つ(パターンの優先順位が順序で決まるため)。
-- インデントはタブ、名前と desc の区切りはタブ 1 つ。桁揃えはしない。
-- 空行と行末の空白は取り除く。
+- The order of the entries is kept (the priority of patterns depends on it).
+- Indentation is tabs, and the name and the desc are separated by one tab. Nothing is aligned.
+- Empty lines and spaces at the end of lines are removed.
 
-ファイルは機械的に読み書きできることを優先し、桁は揃えません。見やすく揃えた表示は `crube tree` が担当します。
+The file puts reading and writing by machine first, and is not aligned. The aligned view is the job of `crube tree`.
 
-## 多言語: 言語ごとに独立したファイル
+## Languages: one independent file per language
 
-言語ごとに structure ファイルを 1 つ持つだけです。ファイル同士を結び付ける仕組みは持ちません。
+There is just one structure file per language. Nothing ties the files to each other.
 
-| ファイル | 言語 |
+| File | Language |
 | --- | --- |
-| `structure.txt` | 英語(デフォルト) |
-| `structure_<言語タグ>.txt` | その言語(例: `structure_ja.txt`) |
+| `structure.txt` | English (the default) |
+| `structure_<language tag>.txt` | That language (for example `structure_ja.txt`) |
 
-- **対象言語**は環境変数 `CRUBE_LANG` で決める。未設定、または `en` なら英語。
-- 対象言語のファイルがあれば、参照も編集もそのファイルだけを使う。
-- 対象言語のファイルがなければ(作っていなければ)、参照も編集も `structure.txt` を使う。
-- 切り替えはファイル単位。1 つの表示の中で、言語が混ざることはない。
-- 各ファイルは独立して完結している。
-- 言語ファイルは `crube init` で作る(`CRUBE_LANG=ja crube init` で `structure_ja.txt` ができる)。
-- 言語間の対応は管理しない。`mv` や `rm` も対象言語のファイルにだけ効く。ほかの言語のファイルの過不足は、その言語で `status` を実行すれば孤立・未説明として見える。
+- The **target language** is given by the `CRUBE_LANG` environment variable. Unset, or `en`, it is English.
+- If there is a file for the target language, reading and editing use only that file.
+- If there is no file for the target language (none has been made), reading and editing use `structure.txt`.
+- The switch is per file. Languages never mix in one view.
+- Each file is complete on its own.
+- A language file is made with `crube init` (`CRUBE_LANG=ja crube init` makes `structure_ja.txt`).
+- What matches what between languages is not managed. `mv` and `rm` work only on the file of the target language. What another language's file lacks or has too much shows as orphans and untracked paths when `status` runs in that language.
 
-## シンボリックリンク
+## Symbolic links
 
-シンボリックリンクはたどらず、通常のファイルと同じ 1 エントリとして扱います。
+Symbolic links are not followed: one is a single entry, just like a regular file.
 
-- ループ、同じ実体の重複、プロジェクト外への走査がいずれも起きない。
-- どの環境でも結果が同じになる。
-- ディレクトリへのリンクでも、中には入らないので末尾に `/` を付けない。
-- 説明はリンク先ではなくリンク自体に付ける。リンク先は `show` で参考表示する。
+- No loops, no duplicates of the same thing, and no walking outside the project.
+- The result is the same in every environment.
+- Even a link to a directory gets no `/` at the end, since crube does not go into it.
+- The description is attached to the link itself, not to its target. `show` shows the target for reference.
 
-## .crube/ は 1 つだけ
+## Only one .crube/
 
-`.crube/` はプロジェクトルートに 1 つだけ置き、入れ子にはしません。structure ファイルの最上位は、プロジェクトルート直下を表します。
+There is only one `.crube/`, at the project root; they are not nested. The top level of a structure file is what is directly in the project root.
 
-担当範囲の境界、設定の継承、書き込み先の選択といった規則が不要になり、仕様と実装が単純になります。
+So there is no need for rules on the boundaries of what each one covers, on inheriting settings, or on choosing where to write, and the specification and the implementation stay simple.
 
-## 長さの上限
+## Length limits
 
-長さは表示幅(全角 = 2、半角 = 1)で数えます。文字数で数えると、日本語と英語で情報量も画面上の幅も大きく変わるためです。
+Lengths are counted in display width (full width = 2, half width = 1). Counted in characters, the amount of information and the width on screen would differ a lot between Japanese and English.
 
-crube が持つのは上限だけで、推奨の長さは決めません。
+crube has only limits; it sets no recommended length.
 
-| フィールド | 上限 |
+| Field | Limit |
 | --- | --- |
-| desc | 256 桁(日本語で約 128 字) |
-| detail | 全行の合計で 4096 桁 |
+| desc | 256 columns (about 128 Japanese characters) |
+| detail | 4096 columns, all lines together |
 
-desc は ls / tree で名前と同じ 1 行に表示するものなので、上限を短めにしています。長い説明は detail(`show` で表示)に書きます。
+The desc is shown on the same line as the name by ls / tree, so its limit is short. A long description goes in the detail (shown by `show`).

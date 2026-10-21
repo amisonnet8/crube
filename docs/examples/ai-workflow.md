@@ -1,16 +1,18 @@
-# AI エージェントによる説明の更新
+*[日本語](ai-workflow_ja.md) | **English***
 
-crube 本体は AI を呼び出しません。AI エージェントが CLI または MCP を使って説明を書き込みます。AI の種類を問わず、同じ手順で使えます。
+# Updating descriptions with an AI agent
 
-## 手順
+crube itself does not call AI. An AI agent writes the descriptions through the CLI or MCP. The steps are the same whatever the AI.
 
-1. `crube status --json` で、説明が必要な箇所を取得する。
-2. AI が該当ファイルの中身や、利用可能な情報源(設計資料、作業記録など)を読む。
-3. AI が `crube set` / `mv` / `rm`(または MCP の書き込みツール)で structure を更新する。
-4. もう一度 `crube status` を実行し、問題がなくなったことを確認する。
-5. 人間が `.crube/` の差分をレビューする。
+## Steps
 
-## status --json の出力例
+1. Get the places that need a description with `crube status --json`.
+2. The AI reads those files and whatever sources it has (design documents, work records and so on).
+3. The AI updates the structure with `crube set` / `mv` / `rm` (or the MCP writing tools).
+4. Run `crube status` again to make sure no problem is left.
+5. A person reviews the diff of `.crube/`.
+
+## Example output of status --json
 
 ```json
 {
@@ -27,32 +29,32 @@ crube 本体は AI を呼び出しません。AI エージェントが CLI ま�
 }
 ```
 
-各フィールドと並び順は [CLI リファレンス](../reference/cli.md#crube-status) を参照してください。
+For each field and the order, see the [CLI reference](../reference/cli.md#crube-status).
 
-## エージェント向けの指示の例
+## Example instructions for agents
 
-`.claude/` などのエージェント側ルールに、次のような指示を書いておくと運用しやすくなります。
+Instructions like these in the agent's rules (`.claude/` and the like) make it easy to run.
 
 ```markdown
-## ファイルを探すとき
-- まず `crube find <キーワード>` か `crube tree` で場所を確認する。
+## When looking for files
+- First find the place with `crube find <keywords>` or `crube tree`.
 
-## 作業を終えるとき
-- `crube status --json` を実行する。
-- untracked / orphan があれば、ファイルを読んで
-  `crube set` / `crube mv` / `crube rm` で説明を更新する。
-- 自分がファイルを移動・改名した場合は、`crube mv <旧パス> <新パス>` で説明を付け替える。
-- desc は 1 行で、何がそこにあるかを書く。詳しい内容は --detail に書く。
-- 複数の言語のファイルがある場合は、`CRUBE_LANG` を切り替えて、言語ごとに同じ手順を行う。
+## When finishing work
+- Run `crube status --json`.
+- If there are untracked / orphan items, read the files and
+  update the descriptions with `crube set` / `crube mv` / `crube rm`.
+- If you moved or renamed files, move their descriptions with `crube mv <old path> <new path>`.
+- Write the desc in one line: what is there. Put the details in --detail.
+- If there are files for several languages, switch `CRUBE_LANG` and do the same for each language.
 ```
 
-## 運用のタイミング
+## When to run it
 
-- AI エージェントの作業終了時、またはコミット前のフックで手順 1〜4 を実行する。
-- CI では `crube status --require dirs` などの終了コードで説明漏れを検出する。どの段階を求めるかはプロジェクトで決める。
+- Run steps 1 to 4 when an AI agent finishes its work, or in a pre-commit hook.
+- In CI, catch missing descriptions by the exit code of `crube status --require dirs` or the like. Which level to require is up to the project.
 
 ```yaml
-# 例: CI のステップ
+# Example: a CI step
 - name: Check crube descriptions
   run: crube status --require dirs
 ```

@@ -1,51 +1,53 @@
-# crube ドキュメント
+*[日本語](README_ja.md) | **English***
 
-crube は、プロジェクト内のファイルとディレクトリに説明を付けて `.crube/` に保存し、説明付きの `ls` / `tree` / `find` で目的の場所へすぐたどり着けるようにするツールです。説明の作成・更新には AI を使えますが、参照するときに AI は必要ありません。
+# crube documentation
+
+crube attaches descriptions to the files and directories of a project, keeps them in `.crube/`, and lets you reach the place you want quickly with `ls` / `tree` / `find` that show those descriptions. AI can write and update the descriptions, but reading them needs no AI.
 
 ```
 $ cd src/auth
 $ crube tree
-  src/             アプリケーションのソースコード
->   auth/          認証(ログイン、セッション、トークン更新)
-      session.ts   セッションの保存と有効期限の管理
-      *_test.go    同名ファイルのテスト
-    main.go        エントリポイント
-  data/            データ格納場所
-    *.csv          CSVデータ
+  src/             Application source code
+>   auth/          Authentication (login, sessions, token refresh)
+      session.ts   Session storage and expiry
+      *_test.go    Tests of the file of the same name
+    main.go        Entry point
+  data/            Data files
+    *.csv          CSV data
 ```
 
-## 目次
+## Contents
 
-### design/ — 設計
+### design/ — Design
 
-なぜこの形なのかを説明します。
+Why crube is shaped the way it is.
 
-- [概要と基本方針](design/overview.md) — 目的、範囲、基本方針、用語
-- [アーキテクチャ](design/architecture.md) — コアと CLI / MCP の構成、実装言語とライブラリ
-- [データモデル](design/data-model.md) — ツリー形式、パターン、多言語、シンボリックリンク、長さの上限
-- [鮮度と充足度](design/freshness.md) — status の判定と、充足度を使う側に委ねる考え方
-- [決定事項](design/decisions.md) — 決めたことと理由の一覧
+- [Overview and principles](design/overview.md) — purpose, scope, principles, terms
+- [Architecture](design/architecture.md) — the core and the CLI / MCP around it, language and libraries
+- [Data model](design/data-model.md) — the tree format, patterns, languages, symbolic links, length limits
+- [Freshness and coverage](design/freshness.md) — what status reports, and why coverage is left to the user
+- [Decisions](design/decisions.md) — what was decided, and why
 
-### reference/ — リファレンス
+### reference/ — Reference
 
-正確な仕様です。
+The exact specification.
 
-- [CLI](reference/cli.md) — コマンド、オプション、環境変数 `CRUBE_LANG`、終了コード
-- [MCP](reference/mcp.md) — ツール一覧と引数
-- [ファイル形式](reference/file-format.md) — `structure.txt` の文法、言語ごとのファイル、`ignore`
+- [CLI](reference/cli.md) — commands, options, the `CRUBE_LANG` environment variable, exit codes
+- [MCP](reference/mcp.md) — the tools and their arguments
+- [File format](reference/file-format.md) — the grammar of `structure.txt`, files per language, `ignore`
 
-### examples/ — 例
+### examples/ — Examples
 
-- [はじめての crube](examples/getting-started.md) — 初期化から参照までの流れ
-- [AI エージェントによる説明の更新](examples/ai-workflow.md) — status --json を使った更新手順、CI
-- [サンプルの .crube/](examples/sample-crube/) — `structure.txt`、`structure_ja.txt`、`ignore`
+- [Getting started](examples/getting-started.md) — from init to reading the descriptions
+- [Updating descriptions with an AI agent](examples/ai-workflow.md) — updating with status --json, CI
+- [A sample .crube/](examples/sample-crube/) — `structure.txt`, `structure_ja.txt`, `ignore`
 
-## 基本情報
+## At a glance
 
-| 項目 | 内容 |
+| Item | Value |
 | --- | --- |
-| 実装言語 | Go(単一バイナリ) |
-| データ形式 | 独自のツリー形式テキスト(依存ライブラリなし) |
-| 書き込み先 | `.crube/` の中だけ |
-| 依存 | `golang.org/x/text`、`golang.org/x/term`、MCP の公式 Go SDK だけ(Git は不要) |
-| ライセンス | MIT |
+| Language | Go (a single binary) |
+| Data format | A text format of its own, written as a tree (no library needed) |
+| Writes to | Only inside `.crube/` |
+| Dependencies | Only `golang.org/x/text`, `golang.org/x/term` and the official MCP Go SDK (no Git needed) |
+| License | MIT |

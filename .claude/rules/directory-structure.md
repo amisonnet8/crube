@@ -8,7 +8,7 @@
 .
 ├── CLAUDE.md               ← プロジェクトルール（参照先の案内）
 ├── LICENSE                 （MIT）
-├── README.md
+├── README.md / README_ja.md（英語と日本語の対）
 ├── qsokufile               ← ビルド・テストの近道（qsoku）
 ├── go.mod / go.sum
 ├── .gitattributes          （`* text=auto eol=lf`）
@@ -34,11 +34,11 @@
 │   ├── status/             ← 走査と差分エンジン（未説明・孤立・上限超え・充足度）。読むだけ
 │   ├── structure/          ← structure ファイルの読み込みと正規形での書き出し、desc・detail の上限の検証
 │   └── textwidth/          ← 表示幅（全角2・半角1・曖昧1・結合文字0）
-├── docs/                   ← 設計と仕様（日本語。目次は`docs/README.md`）
+├── docs/                   ← 設計と仕様（各ページが英語`X.md`と日本語`X_ja.md`の対。目次は`docs/README.md`）
 │   ├── design/             ← なぜこの形なのか
 │   ├── reference/          ← 正確な仕様（CLI・MCP・ファイル形式）
 │   ├── examples/           ← 使い方の例。`sample-crube/`はサンプルの`.crube/`
-│   └── assets/             ← README の画像（`header.svg`は手で書いたもの、`demo.svg`は`qsoku demo`がテストで作るもの）
+│   └── assets/             ← README の画像（`header.svg`は手で書いたもの、`demo.svg`・`demo_ja.svg`は`qsoku demo`がテストで作るもの）
 ├── .devcontainer/          ← 開発環境（devcontainer.json、postCreate.sh）
 ├── .claude/                ← rules/（ルール）、skills/（commit-with-tape：テープを閉じてコミットする手順。mutation-check：壊して確かめる手順と、変異の道具`mutants/`（別の Go モジュール）・crube の仕様の変異の一覧）、hooks/（build.sh、require-bcuz.sh とそのテスト）、settings.json（人間が管理する）
 ├── .github/workflows/      ← CI

@@ -1,10 +1,12 @@
+*[日本語](README_ja.md) | **English***
+
 <a id="top"></a>
 
 <div align="center">
 
 <img src="docs/assets/header.svg" alt="crube — a signpost for your project" width="100%">
 
-**ファイルとディレクトリに説明を付けて、説明付きの `ls` / `tree` / `find` で<br>目的の場所へすぐたどり着くための CLI と MCP サーバー**
+**A CLI and MCP server that attaches descriptions to files and directories,<br>so that `ls` / `tree` / `find` with descriptions take you straight to the place you want**
 
 [![CI](https://github.com/amisonnet8/crube/actions/workflows/ci.yml/badge.svg)](https://github.com/amisonnet8/crube/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/amisonnet8/crube?include_prereleases&sort=semver)](https://github.com/amisonnet8/crube/releases)
@@ -12,132 +14,132 @@
 [![Go](https://img.shields.io/github/go-mod/go-version/amisonnet8/crube?logo=go&logoColor=white)](go.mod)
 [![MCP](https://img.shields.io/badge/MCP-server-6e40c9)](docs/reference/mcp.md)
 
-[デモ](#demo) · [特徴](#features) · [インストール](#install) · [はじめ方](#quick-start) · [使い方](#usage) · [AI エージェントと使う](#ai-agents) · [ドキュメント](#docs)
+[Demo](#demo) · [Features](#features) · [Install](#install) · [Quick start](#quick-start) · [Usage](#usage) · [With AI agents](#ai-agents) · [Docs](#docs)
 
 </div>
 
 ---
 
-crube は、プロジェクト内のファイルとディレクトリに説明を付けて `.crube/` に保存し、説明付きの `ls` / `tree` / `find` で目的の場所へすぐたどり着けるようにするツールです。説明の作成・更新には AI を使えますが、参照するときに AI は要りません。
+crube attaches descriptions to the files and directories of a project, keeps them in `.crube/`, and lets you reach the place you want quickly with `ls` / `tree` / `find` that show those descriptions. AI can write and update the descriptions, but reading them needs no AI.
 
 > [!NOTE]
-> まだリリース前です（CLI と MCP サーバーは動きます）。ビルド済みのバイナリは、最初のリリースから GitHub Releases で配ります。今は `go install` で入れられます。
+> Not released yet (the CLI and the MCP server work). Prebuilt binaries will be on GitHub Releases from the first release. For now, install it with `go install`.
 
 <a id="demo"></a>
 
-## 🎬 デモ
+## 🎬 Demo
 
 <p align="center">
-  <img src="docs/assets/demo.svg" alt="ターミナルで crube の tree・find・show・status を動かす様子" width="100%">
+  <img src="docs/assets/demo.svg" alt="crube's tree, find, show and status in a terminal" width="100%">
 </p>
 
-現在地に `>` の印を付ける `tree`、パスと説明から引く `find`、1 つのパスの詳細を見る `show`、説明の過不足を報告する `status`。この画像は、テストが crube の実際の出力から作っています。
+`tree` marks where you are with `>`, `find` looks up paths and descriptions, `show` gives the details of one path, and `status` reports missing and stale descriptions. The image is made by a test from crube's real output.
 
 <a id="features"></a>
 
-## ✨ 特徴
+## ✨ Features
 
-- 🧭 **説明付きの `ls` / `tree` / `find`**：見慣れたコマンドに、説明が並ぶ。`tree` は現在地に印を付ける
-- 🤖 **書くのは AI、引くのに AI は要らない**：説明の作成・更新は AI エージェントに任せられる。参照は保存済みのテキストだけで動く
-- 🔒 **書き込むのは `.crube/` の中だけ**：プロジェクトのファイルは読むだけ。`rm`・`mv` も説明を消す・動かすだけ
-- 📝 **人が読めるテキスト**：ディレクトリ構成をタブのインデントで書いた 1 ファイル。差分のレビューもしやすい
-- 🩺 **鮮度のチェック**：`status` が未説明・孤立・上限超えを報告する。CI では `--require all|dirs` で止められる
-- 🔌 **MCP サーバーを内蔵**：`crube mcp` で、シェルのない AI エージェントからも同じ機能を使える
-- 🌐 **多言語**：言語ごとに独立したファイル（`structure_ja.txt` など）を、`CRUBE_LANG` で切り替える
-- 📦 **単一バイナリ、Git に依存しない**：Go 製。Git も `.gitignore` も使わず、どこでも同じ結果になる
+- 🧭 **`ls` / `tree` / `find` with descriptions**: the commands you know, with descriptions beside the names. `tree` marks where you are
+- 🤖 **AI writes, reading needs no AI**: leave writing and updating descriptions to an AI agent. Reading works on the saved text alone
+- 🔒 **Writes only inside `.crube/`**: the project's files are only read. `rm` and `mv` only remove or move descriptions
+- 📝 **Text people can read**: one file that writes the directory structure indented with tabs. Diffs are easy to review
+- 🩺 **Freshness checks**: `status` reports untracked paths, orphans and values over the limit. In CI, `--require all|dirs` can stop a build
+- 🔌 **A built-in MCP server**: with `crube mcp`, AI agents without a shell get the same features
+- 🌐 **Many languages**: one independent file per language (`structure_ja.txt` and so on), switched with `CRUBE_LANG`
+- 📦 **A single binary, no Git needed**: written in Go. It uses neither Git nor `.gitignore`, and gives the same result anywhere
 
 <a id="install"></a>
 
-## 📦 インストール
+## 📦 Install
 
 ```bash
 go install github.com/amisonnet8/crube/cmd/crube@latest
 ```
 
-Go 1.27 以降が要ります。
+Requires Go 1.27 or later.
 
 <a id="quick-start"></a>
 
-## 🚀 はじめ方
+## 🚀 Quick start
 
 ```bash
 cd your-project
-crube init                                          # .crube/ を作る
-crube set src/ "アプリケーションのソースコード"     # 説明を付ける
-crube set "data/*.csv" "CSVデータ" --detail "毎晩、請求システムから書き出す"
-crube status                                        # 説明の過不足を見る
-crube tree                                          # 説明付きのツリーを見る
+crube init                                       # make .crube/
+crube set src/ "Application source code"         # describe a path
+crube set "data/*.csv" "CSV data" --detail "Exported every night from the billing system"
+crube status                                     # see what is missing
+crube tree                                       # see the tree with descriptions
 ```
 
-最初から最後まで通しで追うなら、[はじめての crube](docs/examples/getting-started.md) へ。
+To follow it all the way through, see [Getting started](docs/examples/getting-started.md).
 
 <a id="usage"></a>
 
-## 🧭 使い方
+## 🧭 Usage
 
-`tree` は structure ファイルの中身を、ファイルと同じ入れ子の形で見せ、現在地に `>` を付けます。
+`tree` shows what is in the structure file, nested as the files are, and marks where you are with `>`.
 
 ```console
 $ cd src/auth
 $ crube tree
-  src/             アプリケーションのソースコード
->   auth/          認証(ログイン、セッション、トークン更新)
-      session.ts   セッションの保存と有効期限の管理
-      *_test.go    同名ファイルのテスト
-    main.go        エントリポイント
-  data/            データ格納場所
-    *.csv          CSVデータ
+  src/             Application source code
+>   auth/          Authentication (login, sessions, token refresh)
+      session.ts   Session storage and expiry
+      *_test.go    Tests of the file of the same name
+    main.go        Entry point
+  data/            Data files
+    *.csv          CSV data
 ```
 
-`find` はパス・desc・detail から探します（大文字・小文字を区別しない、空白で区切った語の AND）。
+`find` searches paths, descs and details (case-insensitive; words separated by spaces are ANDed).
 
 ```console
-$ crube find セッション
-src/auth/             認証(ログイン、セッション、トークン更新)
-src/auth/session.ts   セッションの保存と有効期限の管理
+$ crube find session
+src/auth/             Authentication (login, sessions, token refresh)
+src/auth/session.ts   Session storage and expiry
 ```
 
-`ls` は実在するファイルを、`show` は 1 つのパスの説明（detail まで）を見せます。
+`ls` shows the real files, and `show` the description of one path (with its detail).
 
 ```console
 $ crube ls src
-auth/     認証(ログイン、セッション、トークン更新)
+auth/     Authentication (login, sessions, token refresh)
 db/       ! no description
-main.go   エントリポイント
+main.go   Entry point
 $ crube show src/auth/session.ts
 src/auth/session.ts
-  desc    セッションの保存と有効期限の管理
-  detail  セッションは Redis に保存し、アクセスのたびに有効期限を延長する。
-          有効期限は config/auth.yaml の session.ttl で設定する。
+  desc    Session storage and expiry
+  detail  Sessions are kept in Redis; each access extends the expiry.
+          The expiry is set by session.ttl in config/auth.yaml.
 ```
 
-| コマンド | 内容 |
+| Command | What it does |
 | --- | --- |
-| `crube init` | `.crube/` を作る |
-| `crube ls [path]` | 実在するファイルの一覧を、説明付きで表示 |
-| `crube tree [path] [-d N]` | structure の内容を表示し、現在地に印を付ける |
-| `crube find <query>` | パス・説明で検索 |
-| `crube show <path>` | 1 つのパスの全情報 |
-| `crube status [--require all\|dirs]` | 実ディレクトリと structure の差分（未説明・孤立・上限超え・充足度） |
-| `crube set <path> <desc> [--detail <text>]` | 説明の追加・更新 |
-| `crube rm <path>` / `crube mv <from> <to>` | 説明の削除・付け替え（配下も含む。ファイルには触れない） |
-| `crube mcp [--allow-write]` | MCP サーバーとして起動 |
-| `crube completion <shell>` | bash・zsh・fish・PowerShell の補完スクリプトを出力（エントリのパスも TAB で補える） |
+| `crube init` | Makes `.crube/` |
+| `crube ls [path]` | Lists the real files, with descriptions |
+| `crube tree [path] [-d N]` | Shows the structure, marking where you are |
+| `crube find <query>` | Searches paths and descriptions |
+| `crube show <path>` | Everything about one path |
+| `crube status [--require all\|dirs]` | The difference between the real directories and the structure (untracked, orphans, over the limit, coverage) |
+| `crube set <path> <desc> [--detail <text>]` | Adds or changes a description |
+| `crube rm <path>` / `crube mv <from> <to>` | Removes or moves descriptions (with those below; files are not touched) |
+| `crube mcp [--allow-write]` | Runs as an MCP server |
+| `crube completion <shell>` | Prints a completion script for bash, zsh, fish or PowerShell (entry paths complete with TAB too) |
 
-参照・編集のコマンドは `--json` で構造化した結果を出せます。詳しくは [CLI リファレンス](docs/reference/cli.md)。
+The reading and editing commands can output structured results with `--json`. See the [CLI reference](docs/reference/cli.md) for more.
 
 <a id="ai-agents"></a>
 
-## 🤖 AI エージェントと使う
+## 🤖 With AI agents
 
-AI が説明を書き、人が `.crube/` の差分をレビューする、という分担を想定しています。
+The idea is that AI writes the descriptions, and people review the diff of `.crube/`.
 
-1. `crube status --json` で、説明が必要な場所を取り出す
-2. AI がファイルを読み、`crube set` / `mv` / `rm`（または MCP の書き込みツール）で説明を直す
-3. もう一度 `crube status` で、問題がなくなったことを確かめる
+1. Get the places that need a description with `crube status --json`
+2. The AI reads the files and fixes the descriptions with `crube set` / `mv` / `rm` (or the MCP writing tools)
+3. Run `crube status` again to make sure no problem is left
 
 <details>
-<summary><b>MCP クライアントへの登録例</b></summary>
+<summary><b>Registering with an MCP client</b></summary>
 
 ```json
 {
@@ -151,56 +153,56 @@ AI が説明を書き、人が `.crube/` の差分をレビューする、とい
 }
 ```
 
-`--allow-write` を外すと、参照のツール（`tree`・`ls`・`find`・`show`・`status`）だけを公開します。書き込みのツール（`set_description`・`remove_description`・`move_description`）も、書くのは `.crube/` の中だけです。詳しくは [MCP リファレンス](docs/reference/mcp.md)。
+Without `--allow-write`, only the reading tools (`tree`, `ls`, `find`, `show`, `status`) are offered. The writing tools (`set_description`, `remove_description`, `move_description`) too write only inside `.crube/`. See the [MCP reference](docs/reference/mcp.md) for more.
 
 </details>
 
 <details>
-<summary><b>エージェント向けの指示の例（CLAUDE.md など）</b></summary>
+<summary><b>Example instructions for agents (CLAUDE.md and the like)</b></summary>
 
 ```markdown
-## ファイルを探すとき
-- まず `crube find <キーワード>` か `crube tree` で場所を確認する。
+## When looking for files
+- First find the place with `crube find <keywords>` or `crube tree`.
 
-## 作業を終えるとき
-- `crube status --json` を実行する。
-- untracked / orphan があれば、ファイルを読んで
-  `crube set` / `crube mv` / `crube rm` で説明を更新する。
-- 自分がファイルを移動・改名した場合は、`crube mv <旧パス> <新パス>` で説明を付け替える。
+## When finishing work
+- Run `crube status --json`.
+- If there are untracked / orphan items, read the files and
+  update the descriptions with `crube set` / `crube mv` / `crube rm`.
+- If you moved or renamed files, move their descriptions with `crube mv <old path> <new path>`.
 ```
 
 </details>
 
 <details>
-<summary><b>CI で説明漏れを止める（GitHub Actions）</b></summary>
+<summary><b>Stopping missing descriptions in CI (GitHub Actions)</b></summary>
 
 ```yaml
 - name: Check crube descriptions
   run: crube status --require dirs
 ```
 
-`--require dirs` はすべてのディレクトリに、`--require all` はすべてのファイルとディレクトリに説明があることを求めます。どこまで求めるかは、プロジェクトが決めます。
+`--require dirs` requires a description on every directory, and `--require all` on every file and directory. How far to require is up to the project.
 
 </details>
 
 <a id="docs"></a>
 
-## 📚 ドキュメント
+## 📚 Docs
 
 | | |
 | --- | --- |
-| 💬 [対話形式のガイド](https://notebook.google.com/notebook/201d48b7-45c8-4ba8-8853-d9c3b3181b8d) | 質問しながら crube を調べられる（Gemini Notebook 製） |
-| 📖 [docs/README.md](docs/README.md) | 目次 |
-| 🏛️ [docs/design/](docs/design/) | 設計（概要と基本方針、アーキテクチャ、データモデル、鮮度と充足度、決定事項） |
-| 📐 [docs/reference/](docs/reference/) | 仕様（[CLI](docs/reference/cli.md)、[MCP](docs/reference/mcp.md)、[ファイル形式](docs/reference/file-format.md)） |
-| 🧪 [docs/examples/](docs/examples/) | 使い方の例（[はじめての crube](docs/examples/getting-started.md)、[AI エージェントによる更新](docs/examples/ai-workflow.md)） |
+| 💬 [Interactive guide](https://notebook.google.com/notebook/201d48b7-45c8-4ba8-8853-d9c3b3181b8d) | Ask questions to learn about crube (made with Gemini Notebook) |
+| 📖 [docs/README.md](docs/README.md) | Contents |
+| 🏛️ [docs/design/](docs/design/) | Design (overview and principles, architecture, data model, freshness and coverage, decisions) |
+| 📐 [docs/reference/](docs/reference/) | Reference ([CLI](docs/reference/cli.md), [MCP](docs/reference/mcp.md), [file format](docs/reference/file-format.md)) |
+| 🧪 [docs/examples/](docs/examples/) | Examples ([Getting started](docs/examples/getting-started.md), [Updating with an AI agent](docs/examples/ai-workflow.md)) |
 
-## 📄 ライセンス
+## 📄 License
 
 [MIT](LICENSE)
 
 ---
 
 <div align="center">
-<sub><a href="#top">⬆ 先頭へ戻る</a></sub>
+<sub><a href="#top">⬆ Back to top</a></sub>
 </div>

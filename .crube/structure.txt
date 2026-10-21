@@ -10,7 +10,7 @@
 		datetime.md	Dates and times: keep UTC, show in the local time zone
 		directory-structure.md	Where each file goes, and the layout of the repository
 		distribution.md	How crube is released (tags and draft releases made by people)
-		documentation.md	How to write docs/: example values come from tools
+		documentation.md	How to write README and docs/: English and Japanese pairs, example values from tools
 		mtqg-usage.md	How to record memos, todos, questions, bugs and rules with mtqg
 		naming.md	Names: the product, the terms and the commands
 		qsoku-usage.md	The qsoku names for build, test and lint, and how to call them
@@ -47,7 +47,7 @@
 cmd/	Executables
 	crube/	The crube command
 		main.go	Entry point: hands the arguments to internal/cli
-docs/	Design and specification (Japanese)
+docs/	Design and specification, each page in English (X.md) and Japanese (X_ja.md)
 	README.md	Table of contents of the docs
 	design/	Why crube is shaped as it is
 		architecture.md	Architecture: the core, the CLI and the MCP server, and the write guard
@@ -55,6 +55,7 @@ docs/	Design and specification (Japanese)
 		decisions.md	Table of the decisions made, with their reasons
 		freshness.md	Freshness and coverage: what status reports, and status --require
 		overview.md	Overview, basic policies and terms
+		*_ja.md	The Japanese page of X.md (X_ja.md); fixed in the same change as the English one
 	examples/	Examples of use
 		ai-workflow.md	How an AI agent keeps the descriptions up to date with status, set, mv and rm
 		getting-started.md	First steps: init, status, set, tree, find
@@ -62,13 +63,17 @@ docs/	Design and specification (Japanese)
 			ignore	Sample ignore file
 			structure.txt	Sample structure file in English
 			structure_ja.txt	Sample structure file in Japanese
+		*_ja.md	The Japanese page of X.md (X_ja.md); fixed in the same change as the English one
 	reference/	Exact specification
 		cli.md	CLI reference: commands, options, output and exit codes
 		file-format.md	File format of .crube/: structure files and the ignore file
 		mcp.md	MCP server reference: the tools and what they return
+		*_ja.md	The Japanese page of X.md (X_ja.md); fixed in the same change as the English one
 	assets/	Images of the README
 		header.svg	The header of the README (hand-written SVG)
-		demo.svg	The animated terminal of the README, made by qsoku demo from what crube prints
+		demo.svg	The animated terminal of README.md (English descriptions), made by qsoku demo from what crube prints
+		demo_ja.svg	The animated terminal of README_ja.md (Japanese descriptions), made by qsoku demo from what crube prints
+	*_ja.md	The Japanese page of X.md (X_ja.md); fixed in the same change as the English one
 internal/	Packages of crube: the core, and the CLI on top of it
 	cli/	Command line: parses arguments, calls core, writes JSON or text
 		args.go	Option parser (options may come before or after the arguments)
@@ -123,14 +128,15 @@ internal/	Packages of crube: the core, and the CLI on top of it
 .srwrignore	Files srwr does not put on its tapes
 CLAUDE.md	Rules for Claude Code in this repository, and the rule files to read
 LICENSE	MIT license
-README.md	What crube is, with an example
+README.md	What crube is, with an example (English; README_ja.md is the Japanese one)
 go.mod	Go module and its dependencies
 go.sum	Checksums of the dependencies
 qsokufile	Named commands for build, test and lint (qsoku)
 trivy.yaml	Trivy settings: what counts as a vulnerability or license failure
 e2e/	Checks of the docs against what crube really does, and of the MCP server against the CLI
 	helpers_test.go	Reading Markdown code blocks, a small shell for the $ lines, and the example projects
-	docs_test.go	getting-started, the cli.md and README examples, the JSON examples and the error lines
+	docs_test.go	getting-started, the cli.md and README examples, the JSON examples and the error lines, in both languages; the pairs of pages
 	mcp_test.go	Each MCP tool returns what the CLI --json gives, and fails with the same message
-	demo_test.go	Draws docs/assets/demo.svg from a real session, and checks it is up to date
+	demo_test.go	Draws docs/assets/demo.svg and demo_ja.svg from a real session, and checks they are up to date
 	completion_test.go	Runs the completion scripts in the real shells that are installed
+*_ja.md	The Japanese page of X.md (README_ja.md)

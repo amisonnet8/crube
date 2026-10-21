@@ -1,46 +1,49 @@
-# 決定事項
+*[日本語](decisions_ja.md) | **English***
 
-設計の過程で決めたことと、その理由の一覧です。
+# Decisions
 
-| 項目 | 決定 | 理由 |
+What was decided while designing crube, and why.
+
+| Item | Decision | Why |
 | --- | --- | --- |
-| ツール名 | crube | — |
-| 実装言語 | Go | 単一バイナリで配布しやすい |
-| ライセンス | MIT | — |
-| structure の形式 | ディレクトリ構成をタブのインデントで書く独自のテキスト形式。1 行 = 名前 + タブ + desc、`\|` で始まる行は detail | 見たままがツリーで読み書きしやすい。ライブラリ不要 |
-| ファイル名 | `structure.txt`、言語ごとに `structure_<言語タグ>.txt` | テキストとして開ける |
-| パターン | エントリの名前に `path.Match` のパターンを書ける。当たるのは同じディレクトリの直下だけ。完全一致が優先、次に書いた順 | 照合は標準ライブラリで済み、優先順位の規則が単純 |
-| 書き込みの形 | ファイル全体を正規形で出力し直す。順序は保ち、桁揃え・空行・コメントは保持しない | 書き出しを単純にする |
-| 書き込みの範囲 | `.crube/` の中だけ。プロジェクトのファイルは絶対に作成・変更・削除しない | 安心して導入・実行できるようにする |
-| Git との関係 | 依存しない。Git の情報も `.gitignore` も使わない | 仕様を単純にし、どんな環境でも同じ結果にする |
-| `.crube/` の数 | プロジェクトに 1 つ。入れ子にしない | 担当範囲や設定の継承といった規則を不要にする |
-| フィールド | desc と detail(どちらも任意)だけ | 入口・別名・関連パスも detail に文章で書けば足りる |
-| 設定ファイル | 持たない。言語は環境変数 `CRUBE_LANG`、そのほかはコマンドのオプションで指定する | 設定項目を管理する仕組みを不要にする |
-| 多言語 | 言語ごとに独立したファイルを持つだけ。`CRUBE_LANG` の言語のファイルを参照・編集し、なければ英語の `structure.txt` を使う。言語間の対応は管理しない | 翻訳の追跡やフォールバックの規則を持たない |
-| 移動の検出 | 行わない。孤立と未説明として報告し、付け替えは使う側が `mv` で行う | 推測をツールに持たせない |
-| 検索インデックス | 持たない。毎回 structure を読んで検索する | キャッシュの管理を不要にする |
-| 説明の充足度 | 既定値を持たない。status が all / dirs の一致を報告し、どこまで求めるかは使う側が選ぶ | ポリシーをツールに持たせない |
-| シンボリックリンク | たどらず、ファイルと同じ 1 エントリとして扱い、リンク自体に説明を付ける | ループ・重複・外部走査が起きない |
-| desc の長さ | 上限のみ持つ(desc 256 桁・改行不可、detail 4096 桁)。推奨は使う側に任せる | 1 行表示の前提を守る。推奨はポリシーなので持たない |
-| 役割の範囲 | 「何がどこにあるか」の説明だけを扱う。目的別の参照順序、AI 呼び出し、他ツールからの取り込みは扱わない | 多くの役割を背負い込まない。手順や知識はエージェント側のルール(`.claude/` など)に任せる |
-| MCP | 提供する。CLI と同じコアの薄いラッパー。書き込みツールは `crube mcp --allow-write` で起動したときだけ公開 | シェルのない環境の AI からも使え、構造化データで返せる |
-| MCP のツール名 | 参照・保守系は CLI と同じ(`show` など)。書き込み系だけ `set_description` などの別名 | 挙動のズレを防ぐ。書き込み系は、ファイル操作と誤解されない名前にする |
-| 依存ライブラリ | 表示幅に `golang.org/x/text/width`、端末幅に `golang.org/x/term`、MCP に公式の Go SDK。structure ファイルと ignore は標準ライブラリだけで読む | 表やプロトコルの追従を自前で持たない。公式・準公式のものだけにする |
-| 曖昧な幅の文字 | 表示幅で 1 桁と数える(○・① など)。結合文字・書式文字(U+0301・U+200D など)は 0 桁 | 多くの端末の既定に合わせる |
-| メッセージの言語 | crube 自身が出す文字は英語だけ。`CRUBE_LANG` は structure ファイルの選択にだけ効く | 翻訳の仕組みを持たない |
-| `CRUBE_LANG` の照合 | `structure_<CRUBE_LANG の値>.txt` があるかだけを見る。`ja-JP` から `ja` へのような寄せ方はしない | フォールバックの規則を持たない |
-| find の照合 | 大文字・小文字を区別しない部分一致。空白で区切った語は AND。結果は structure ファイルの順 | 人間も AI も、書き方を気にせず引けるようにする |
-| ignore の書式 | gitignore の規則一式(`**`、先頭・途中の `/`、`!`)。標準ライブラリだけで実装する | 書き慣れた書式のまま使えるようにする |
-| JSON の形 | パスはルートからの相対で `/` 区切り。desc・detail のキーは常に出し、なければ `""` | OS によらず同じ出力にし、使う側がキーの有無を気にしないで済むようにする |
-| 配布物の作り方 | goreleaser で 3 OS のバイナリを作り、下書きの Release に添付する | ビルド・チェックサム・添付を任せられる |
-| CLI の引数 | オプションは位置引数の前後どこでもよく、`--` 以降は位置引数。標準ライブラリだけで解析する。find の複数の引数は 1 つの検索語にする | docs の例どおり `crube ls src --full` と書け、`-` で始まる desc も渡せるようにする |
-| テキストの桁揃え | ls・tree・find は、いちばん広い名前の後ろに空白 3 つで desc を揃える。端末に出すときだけ desc を `…` で切り詰め、tree の `(here: …)` は残す | 3 コマンドで見た目をそろえ、パイプに流す出力は欠けないようにする |
-| 書き込みの結果 | set は書いたエントリ、rm・mv は配下を含めたエントリの数を返す。CLI の `--json` と MCP で同じ形 | 書いた結果を確かめられるようにし、CLI と MCP をずらさない |
-| Windows の `\` | エントリのパスの `\` を、Windows でだけ `/` として読む。出力はどの OS でも `/` | Windows の利用者が `\` で打っても、どれにも当たらないエントリが黙ってできないようにする(Windows の名前に `\` は使えない) |
-| MCP のパス | `ls`・`show` のパスはプロジェクトルートからの相対。tree に現在地の印を付けない | MCP には現在地がなく、返したパスをそのまま次の呼び出しに渡せるようにする |
-| 編集のパス | `tree`・`set`・`rm`・`mv` のエントリのパスは、各段を名前の完全一致で探す。パターンとして照合しない | `crube rm "src/*.go"` が、当たるファイルの説明でなく、そのパターンのエントリだけを指すようにする |
-| 孤立の範囲 | 孤立したエントリの下と、ignore したディレクトリの下は、孤立として出さない。ignore したパスや空ディレクトリに当たるエントリは孤立にしない | ディレクトリ 1 つの移動を 1 行で知らせ、除外しただけで孤立が出ないようにする |
-| `.crube/` の除外 | ルート直下の `.crube/` は常に除外し、`!` でも `--no-ignore` でも戻せない | structure ファイル自身が未説明として出ないようにする |
-| 既定の ignore | `init` が書くのは `.git/`・`.hg/`・`.svn/`・`node_modules/` だけ | `dist/`・`vendor/` のように、プロジェクトによって意味のあるものを勝手に隠さない |
-| 同時の書き込み | 排他しない。書き込みは `.crube/` の中の一時ファイルに書いてから置き換える | 読む側が書きかけのファイルを見ないようにし、ロックの管理を持たない |
-| シェル補完 | `crube completion <shell>` が bash・zsh・fish・PowerShell の固定のスクリプトを出し、スクリプトは TAB のたびに隠しコマンド `crube __complete` に候補を聞く。エントリのパスは 1 段ずつ出し、set には説明のない実在のパスも出す | スクリプトがコマンドの一覧を持たず、入っている crube と食い違わないようにする。エントリのパスはルートからの位置なので、現在地からのシェルのファイル補完では出せない |
+| Name | crube | — |
+| Language | Go | A single binary is easy to distribute |
+| License | MIT | — |
+| Format of the structure | A text format of its own that writes the directory structure indented with tabs. One line = name + tab + desc; a line starting with `\|` is the detail | What you see is the tree, easy to read and write. No library needed |
+| File names | `structure.txt`, and `structure_<language tag>.txt` per language | They open as text |
+| Patterns | The name of an entry can be a `path.Match` pattern. It matches only names directly in the same directory. An exact match wins, then the order written | Matching needs only the standard library, and the rule of priority is simple |
+| How it writes | It outputs the whole file again in the canonical form. The order is kept; alignment, empty lines and comments are not | Writing stays simple |
+| Where it writes | Only inside `.crube/`. It never creates, changes or deletes the project's files | So that it is safe to bring in and to run |
+| Git | Not depended on. Neither Git's information nor `.gitignore` is used | A simple specification, and the same result in every environment |
+| Number of `.crube/` | One per project, not nested | No rules on what each one covers or on inheriting settings |
+| Fields | Only desc and detail (both optional) | Entry points, other names and related paths can be written as text in the detail |
+| Settings file | None. The language is the `CRUBE_LANG` environment variable; everything else is a command option | No machinery to manage settings |
+| Languages | Just one independent file per language. The file of the `CRUBE_LANG` language is read and edited; without it, the English `structure.txt`. What matches what between languages is not managed | No tracking of translations, no fallback rules |
+| Detecting moves | Not done. They are reported as orphans and untracked paths; the user moves the description with `mv` | The tool does not guess |
+| Search index | None. Every search reads the structure | No cache to manage |
+| Coverage | No default. status reports whether all / dirs match, and the user picks how far to require | The tool has no policy |
+| Symbolic links | Not followed. One is a single entry like a file, and the description is attached to the link itself | No loops, duplicates or walking outside |
+| Length of desc | Only limits (desc 256 columns with no newline, detail 4096 columns). What is recommended is up to the user | Keeps the one-line view. A recommendation is a policy, so the tool has none |
+| Role | Only descriptions of "what is where". No order of reading for a purpose, no calling AI, no taking in from other tools | Not taking on many roles. Steps and knowledge are left to the agent's rules (`.claude/` and the like) |
+| MCP | Provided, as a thin wrapper of the same core as the CLI. The writing tools are offered only when started with `crube mcp --allow-write` | AI without a shell can use it too, and gets structured data |
+| Names of MCP tools | Reading and maintenance tools have the CLI's names (`show` and so on). Only the writing tools have other names, such as `set_description` | No drift in behavior. The writing tools get names that cannot be taken for file operations |
+| Libraries | `golang.org/x/text/width` for display width, `golang.org/x/term` for the terminal width, the official Go SDK for MCP. Structure files and ignore are read with the standard library only | No tables or protocols of its own to keep up to date. Only official or near-official libraries |
+| Ambiguous width | Counted as 1 column (○, ① and the like). Combining and format characters (U+0301, U+200D and the like) are 0 columns | The default of most terminals |
+| Language of messages | crube itself prints only English. `CRUBE_LANG` only picks the structure file | No machinery for translations |
+| Matching `CRUBE_LANG` | Only whether `structure_<the value of CRUBE_LANG>.txt` exists. `ja-JP` is not brought to `ja` | No fallback rules |
+| Matching of find | A case-insensitive substring match. Words separated by spaces are ANDed. Results are in the order of the structure file | People and AI can look things up without minding how they are written |
+| Format of ignore | All the rules of gitignore (`**`, `/` at the start or in the middle, `!`), implemented with the standard library only | A format people already know how to write |
+| Shape of JSON | Paths are relative to the root, separated by `/`. The desc and detail keys are always there, `""` when empty | The same output on every OS, and users need not mind whether a key is there |
+| How releases are built | goreleaser builds binaries for 3 OSes and attaches them to a draft Release | Building, checksums and attaching are taken care of |
+| Arguments of the CLI | Options can go anywhere before or after the positional arguments, and everything after `--` is positional. Parsed with the standard library only. The arguments of find are one query | So that `crube ls src --full` works as the docs show, and a desc starting with `-` can be given |
+| Aligning text | ls, tree and find align the descs 3 spaces after the widest name. Only on a terminal is a desc cut with `…`; tree's `(here: …)` is kept | The same look for the 3 commands, and nothing lost in output sent to a pipe |
+| Result of writing | set returns the entry written; rm and mv return the number of entries, those below included. The same shape for the CLI's `--json` and MCP | So that the result can be checked, and the CLI and MCP do not drift |
+| `\` on Windows | `\` in an entry path is read as `/`, on Windows only. Output is `/` on every OS | So that a Windows user typing `\` does not silently make an entry that matches nothing (`\` cannot be in a Windows name) |
+| Paths of MCP | The paths of `ls` and `show` are relative to the project root. tree marks no current place | MCP has no current place, and a path it returned can be passed to the next call as it is |
+| Paths for editing | The entry paths of `tree`, `set`, `rm` and `mv` look up each level by the exact name. They are not matched as patterns | So that `crube rm "src/*.go"` means that pattern entry, not the descriptions of the files it matches |
+| Reach of orphans | Below an orphan, and below an ignored directory, nothing is reported as an orphan. An entry matching an ignored path or an empty directory is not an orphan | Moving one directory is reported in one line, and ignoring something does not make orphans |
+| Leaving out `.crube/` | `.crube/` at the root is always left out; neither `!` nor `--no-ignore` brings it back | So that the structure files do not show as untracked |
+| Default ignore | `init` writes only `.git/`, `.hg/`, `.svn/` and `node_modules/` | Things such as `dist/` and `vendor/`, which mean something in some projects, are not hidden on their own |
+| Writing at the same time | No locking. Writing goes to a temporary file in `.crube/`, which then replaces the file | Readers never see a half-written file, and there are no locks to manage |
+| Language of the docs | README and docs are pairs of English (`X.md`) and Japanese (`X_ja.md`). Neither is the master: one change fixes both. Examples are written with descriptions in each language, and tests check both against the real output | Readers of English and of Japanese both see the examples in their own language, and neither side goes stale |
+| Shell completion | `crube completion <shell>` prints a fixed script for bash, zsh, fish or PowerShell, and the script asks the hidden command `crube __complete` for candidates on every TAB. Entry paths are offered one level at a time, and set also offers real paths without a description | The script holds no list of commands, so it never disagrees with the crube installed. Entry paths are positions from the root, which the shell's file completion from the current place cannot offer |

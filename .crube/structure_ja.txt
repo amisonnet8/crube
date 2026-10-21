@@ -10,7 +10,7 @@
 		datetime.md	日時の扱い：UTC で持ち、表示だけ利用者のタイムゾーンに直す
 		directory-structure.md	ファイルの置き場所と、リポジトリの構成
 		distribution.md	配布の流れ（タグと下書きの Release は人間が扱う）
-		documentation.md	docs/ の書き方：例の値は道具で求める
+		documentation.md	README と docs/ の書き方：英語と日本語の対、例の値は道具で求める
 		mtqg-usage.md	mtqg でメモ・todo・質問・不具合・決まり事を記録する方法
 		naming.md	名前：製品名・用語・コマンド
 		qsoku-usage.md	ビルド・テスト・lint の qsoku の名前と呼び方
@@ -47,7 +47,7 @@
 cmd/	実行ファイル
 	crube/	crube コマンド
 		main.go	入口：引数を internal/cli に渡すだけ
-docs/	設計と仕様（日本語）
+docs/	設計と仕様。各ページが英語（X.md）と日本語（X_ja.md）の対
 	README.md	docs の目次
 	design/	なぜこの形なのか
 		architecture.md	アーキテクチャ：コア・CLI・MCP サーバー、書き込みガード
@@ -55,6 +55,7 @@ docs/	設計と仕様（日本語）
 		decisions.md	決定事項とその理由の表
 		freshness.md	鮮度と充足度：status が報告するもの、status --require
 		overview.md	概要・基本方針・用語
+		*_ja.md	X.md の日本語のページ（X_ja.md）。英語のページと同じ変更で直す
 	examples/	使い方の例
 		ai-workflow.md	AI エージェントが status・set・mv・rm で説明を保つ手順
 		getting-started.md	はじめての crube：init・status・set・tree・find
@@ -62,13 +63,17 @@ docs/	設計と仕様（日本語）
 			ignore	ignore ファイルのサンプル
 			structure.txt	英語の structure ファイルのサンプル
 			structure_ja.txt	日本語の structure ファイルのサンプル
+		*_ja.md	X.md の日本語のページ（X_ja.md）。英語のページと同じ変更で直す
 	reference/	正確な仕様
 		cli.md	CLI リファレンス：コマンド・オプション・出力・終了コード
 		file-format.md	.crube/ のファイル形式：structure ファイルと ignore ファイル
 		mcp.md	MCP サーバーのリファレンス：ツールとその返す内容
+		*_ja.md	X.md の日本語のページ（X_ja.md）。英語のページと同じ変更で直す
 	assets/	README の画像
 		header.svg	README のヘッダー（手で書いた SVG）
-		demo.svg	README のデモ（qsoku demo が crube の実際の出力から作る、動く端末の画像）
+		demo.svg	README.md のデモ（英語の説明。qsoku demo が crube の実際の出力から作る、動く端末の画像）
+		demo_ja.svg	README_ja.md のデモ（日本語の説明。qsoku demo が crube の実際の出力から作る、動く端末の画像）
+	*_ja.md	X.md の日本語のページ（X_ja.md）。英語のページと同じ変更で直す
 internal/	crube のパッケージ：コアと、その上の CLI
 	cli/	コマンドライン：引数を解析し、core を呼び、JSON かテキストで出す
 		args.go	オプションの解析（引数の前後どちらに書いてもよい）
@@ -123,14 +128,15 @@ internal/	crube のパッケージ：コアと、その上の CLI
 .srwrignore	srwr がテープに記録しないファイル
 CLAUDE.md	このリポジトリでの Claude Code のルールと、読むべきルールファイルの案内
 LICENSE	MIT ライセンス
-README.md	crube とは何か（例つき）
+README.md	crube とは何か（例つき。英語。日本語は README_ja.md）
 go.mod	Go モジュールと依存
 go.sum	依存のチェックサム
 qsokufile	ビルド・テスト・lint の名前つきコマンド（qsoku）
 trivy.yaml	Trivy の設定：何を脆弱性・ライセンスの失敗とみなすか
 e2e/	docs と実際の動きの突き合わせ、MCP サーバーと CLI の一致の確認
 	helpers_test.go	Markdown のコードブロックの読み込み、$ の行を動かす小さなシェル、例のプロジェクト
-	docs_test.go	getting-started、cli.md と README の例、JSON の例、エラー文の確認
+	docs_test.go	getting-started、cli.md と README の例、JSON の例、エラー文の確認（両方の言語）と、ページの対の確認
 	mcp_test.go	MCP の各ツールが CLI の --json と同じものを返し、同じ文で失敗すること
-	demo_test.go	実際の出力から docs/assets/demo.svg を描き、古くなっていないか確かめる
+	demo_test.go	実際の出力から docs/assets/demo.svg と demo_ja.svg を描き、古くなっていないか確かめる
 	completion_test.go	補完スクリプトを、入っている本物のシェルで動かす
+*_ja.md	X.md の日本語のページ（README_ja.md）

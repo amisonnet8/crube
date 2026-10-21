@@ -1,50 +1,52 @@
-# 概要と基本方針
+*[日本語](overview_ja.md) | **English***
 
-## crube とは
+# Overview and principles
 
-crube は、プロジェクト内のファイルとディレクトリに説明を付けて `.crube/` に保存し、説明付きの `ls` / `tree` / `find` で目的の場所へすぐたどり着けるようにするツールです。
+## What crube is
 
-説明の作成・更新には AI を使えますが、参照するときに AI は必要ありません。
+crube attaches descriptions to the files and directories of a project, keeps them in `.crube/`, and lets you reach the place you want quickly with `ls` / `tree` / `find` that show those descriptions.
 
-## 解決する問題
+AI can write and update the descriptions, but reading them needs no AI.
 
-人間や AI エージェントが作業するとき、目的のファイルを探すために、ディレクトリ構造の調査やソースコードの読解を何度も繰り返しています。プロジェクトが大きく複雑になるほど、この探索コストは増えます。
+## The problem
 
-crube は「何がどこにあるか」の説明を一度作って保存し、以後は誰でも(AI を使わずに)それを引けるようにします。
+When people or AI agents work on a project, they explore the directory structure and read source code again and again to find the file they need. The bigger and more complex the project, the more this search costs.
 
-## 範囲
+crube writes down "what is where" once and keeps it, so that anyone can look it up afterwards (without AI).
 
-| 扱う | 扱わない |
+## Scope
+
+| In scope | Out of scope |
 | --- | --- |
-| プロジェクト構成の説明(structure) | 目的別の参照順序 |
-| その参照・保守のための CLI コマンド群 | ツール本体からの AI 呼び出し |
-| 同じ機能を提供する MCP サーバー | 他ツールからの情報の取り込み |
+| Descriptions of the project's structure (structure) | An order in which to read things for a purpose |
+| The CLI commands to read and maintain them | Calling AI from the tool itself |
+| An MCP server that offers the same | Taking in information from other tools |
 
-作業手順や知識は、エージェント側のルール(`.claude/` など)に任せます。
+How to work and what to know are left to the agent's own rules (`.claude/` and the like).
 
-## 基本方針
+## Principles
 
-- **生成と参照の分離**: AI は説明の作成・更新だけに使う。参照(ls / tree / find / status)は保存済みデータだけで動く。
-- **パスがアンカー**: 説明はパスに結び付けるので、実ディレクトリとの差分を取ればそのまま鮮度チェックになる。
-- **人間が読めるテキスト**: データはディレクトリ構成をそのままインデントで書いたテキストで保存する。人間が直接読み書きでき、差分も取りやすい。
-- **独立している**: Git、特定の AI プロバイダー、他のツールのいずれにも依存せず、単独で動く。
-- **書き込むのは `.crube/` の中だけ**: crube はプロジェクトのファイルを読み取るだけで、`.crube/` の外は絶対に作成・変更・削除しない。
-- **シンプルさを優先する**: `.crube/` はプロジェクトに 1 つだけ置く。推測や自動修正は行わず、事実の報告にとどめる。
-- **慣れたインターフェース**: 既存のコマンド名(ls / tree / find)に合わせ、学習コストを下げる。
-- **CLI と MCP は同じコアの薄いラッパー**: 機能差や挙動のズレを出さない。
-- **役割を絞る**: crube が扱うのは「何がどこにあるか」の説明だけ。多くの役割を背負い込まない。
-- **判断は使う側に委ねる**: 「どこまで説明があれば十分か」「説明は何文字が望ましいか」といったポリシーを、ツールは持たない。事実を報告し、合否は使う側が決める。
+- **Writing and reading are separate**: AI is used only to write and update descriptions. Reading (ls / tree / find / status) works on the saved data alone.
+- **Paths are the anchor**: descriptions are tied to paths, so comparing them with the real directories is the freshness check.
+- **Text people can read**: the data is text that writes the directory structure as it is, with indentation. People can read and write it directly, and diffs are easy to take.
+- **Independent**: it depends on neither Git, nor a particular AI provider, nor any other tool, and works on its own.
+- **Writes only inside `.crube/`**: crube only reads the files of the project, and never creates, changes or deletes anything outside `.crube/`.
+- **Simplicity first**: a project has only one `.crube/`. crube does not guess or fix things by itself; it reports the facts.
+- **A familiar interface**: the commands follow existing names (ls / tree / find), so there is little to learn.
+- **The CLI and MCP are thin wrappers of the same core**: no difference in features or behavior between them.
+- **A narrow role**: crube deals only with descriptions of "what is where". It does not take on many roles.
+- **Decisions are left to the user**: the tool has no policy on "how many descriptions are enough" or "how long a description should be". It reports the facts, and the user decides what passes.
 
-## 用語
+## Terms
 
-| 用語 | 意味 |
+| Term | Meaning |
 | --- | --- |
-| structure | プロジェクト構成の説明データ全体。言語ごとのファイルで構成される |
-| エントリ | structure ファイルの 1 行。名前(ファイル名・ディレクトリ名、またはパターン)と、説明(desc と detail)の組 |
-| プロジェクトルート | `.crube/` を置いたディレクトリ |
-| パターン | `*.csv` のように、同じディレクトリ直下の複数の名前にまとめて当たるエントリの名前 |
-| 対象言語 | 環境変数 `CRUBE_LANG` で指定された言語。参照・編集はこの言語のファイルに対して行う |
-| デフォルト言語 | 英語。`structure.txt` に書く。対象言語のファイルがないときはこちらを使う |
-| 未説明パス | 実在するが、説明が付いていないパス |
-| 孤立エントリ | 説明はあるが、対応するパスが実在しないエントリ |
-| 充足度 | 説明がどこまで揃っているか(all 一致 / dirs 一致) |
+| structure | All the descriptions of the project's structure. It is made of one file per language |
+| entry | One line of a structure file: a name (of a file or directory, or a pattern) with its description (desc and detail) |
+| project root | The directory where `.crube/` is |
+| pattern | The name of an entry, such as `*.csv`, that matches several names directly in the same directory |
+| target language | The language given by the `CRUBE_LANG` environment variable. Reading and editing use the file of this language |
+| default language | English, written in `structure.txt`. It is used when there is no file for the target language |
+| untracked path | A path that exists but has no description |
+| orphan entry | An entry with a description whose path does not exist |
+| coverage | How far the descriptions go (all match / dirs match) |

@@ -1,130 +1,132 @@
-# ファイル形式リファレンス
+*[日本語](file-format_ja.md) | **English***
 
-## .crube/ の構成
+# File format reference
+
+## What is in .crube/
 
 ```
 .crube/
-├── structure.txt        # 説明(英語、デフォルト)
-├── structure_ja.txt     # 説明(日本語、任意)。言語ごとに 1 ファイル
-└── ignore               # 除外設定
+├── structure.txt        # descriptions (English, the default)
+├── structure_ja.txt     # descriptions (Japanese, optional). One file per language
+└── ignore               # what to leave out
 ```
 
-- `.crube/` はプロジェクトルートに 1 つだけ置く。入れ子にはしない。
-- `.crube/` の中身はすべて共有してよいデータで、再生成が必要なキャッシュなどは置かない。
-- 英語以外の言語のファイル名は `structure_<言語タグ>.txt`。言語タグは BCP 47(`ja`、`zh-CN` など)。
-- `.crube/` 自体は常に走査対象から除外する。
-- 文字コードは UTF-8。改行は LF(CRLF も読めるが、書き込みは LF)。
+- There is only one `.crube/`, at the project root. They are not nested.
+- Everything in `.crube/` is data that can be shared. Nothing such as a cache that has to be made again is kept there.
+- The file of a language other than English is named `structure_<language tag>.txt`. The language tag is BCP 47 (`ja`, `zh-CN` and so on).
+- `.crube/` itself is always left out of the walk.
+- The encoding is UTF-8. Newlines are LF (CRLF can be read, but writing uses LF).
 
 ## structure.txt
 
-プロジェクトの構成をタブのインデントで書いた、ツリー形式のテキストです。以下の例では、インデントも、名前と desc の区切りも、すべてタブです。
+Text written as a tree: the structure of the project indented with tabs. In the example below, the indentation and the separator between name and desc are all tabs.
 
 ```
-src/	アプリケーションのソースコード
-	auth/	認証(ログイン、セッション、トークン更新)
-		| 入口は index.ts。
-		| 設定は config/auth.yaml にある。
-		index.ts	モジュールの入口
-		session.ts	セッションの保存と有効期限の管理
-		*_test.go	同名ファイルのテスト
-	my  file.txt	名前に空白が含まれていてもそのまま書ける
-data/	データ格納場所
-	*.csv	CSVデータ
+src/	Application source code
+	auth/	Authentication (login, sessions, token refresh)
+		| The entry point is index.ts.
+		| Settings are in config/auth.yaml.
+		index.ts	Entry point of the module
+		session.ts	Session storage and expiry
+		*_test.go	Tests of the file of the same name
+	my  file.txt	A name with spaces is written as it is
+data/	Data files
+	*.csv	CSV data
 tmp/
-	cache/	一時キャッシュ
+	cache/	Temporary cache
 ```
 
-### 文法
+### Grammar
 
 ```
-行          = インデント 本体
-インデント  = タブ × 深さ
-本体        = detail行 | エントリ行
-detail行    = "|" | "| " テキスト
-エントリ行  = 名前 [ タブ desc ]
+line         = indentation body
+indentation  = tab × depth
+body         = detail-line | entry-line
+detail-line  = "|" | "| " text
+entry-line   = name [ tab desc ]
 ```
 
-- **インデント**: 1 段あたりタブ 1 つ。スペースでのインデントは使えない。
-- **エントリ行**: インデントのあと、最初のタブまでが名前、その後ろが desc(前後の空白を除く)。タブがなければ、行全体が名前で、desc はなし。名前の中の空白は、すべて名前の一部として扱う。
-- **行末の空白**: 読み込み時に取り除く。
-- **名前**: 末尾が `/` ならディレクトリ、それ以外はファイル(シンボリックリンクを含む)。名前の途中に `/` は書けない。
-- **desc なしの行**: 説明のない、構造だけのエントリ。深い場所に説明を書くために親を置く場合などに使う。
-- **detail 行**: `|` だけ、または `| ` で始まる行。直前のエントリの detail の 1 行になる(`|` だけの行は空行)。インデントは、そのエントリの子と同じ深さ。
-- **空行**: 読むときは無視する。
+- **Indentation**: one tab per level. Spaces cannot be used to indent.
+- **Entry line**: after the indentation, the name runs up to the first tab, and the desc is what follows (without spaces around it). Without a tab, the whole line is the name, with no desc. Spaces in a name are all part of the name.
+- **Spaces at the end of a line**: removed when read.
+- **Name**: ending in `/`, a directory; otherwise a file (symbolic links included). A name cannot have `/` in the middle.
+- **Line without a desc**: an entry with no description, for structure only. It is used, for example, as the parent of a description deep down.
+- **Detail line**: a line that is `|` alone, or starts with `| `. It is one line of the detail of the entry above (a line of `|` alone is an empty line). It is indented as deep as the children of that entry.
+- **Empty lines**: ignored when read.
 
-### 書けない名前
+### Names that cannot be written
 
-この文法では、次の名前は表せません。いずれも実在することはまれです。
+This grammar cannot express the names below. None of them is common.
 
-- タブを含む名前
-- 空白で始まる名前(インデントのスペースと区別できないため)、空白で終わる名前(行末の空白を取り除くため)
-- `|` だけの名前、`| ` で始まる名前
+- A name with a tab in it
+- A name starting with a space (it cannot be told from indentation with spaces), or ending with one (spaces at the end of a line are removed)
+- A name that is `|` alone, or starts with `| `
 
-### 照合の規則
+### Matching
 
-実在のパスに、どのエントリが当たるかは、ディレクトリごとに次の順で決めます。
+Which entry matches a real path is decided, directory by directory, in this order:
 
-1. 同じディレクトリに、名前が完全に一致するエントリがあれば、それ。
-2. なければ、同じディレクトリのエントリを上から順に Go の `path.Match` で照合し、最初に当たったもの。
+1. If the same directory has an entry whose name is exactly the name, that one.
+2. Otherwise, the first of the entries of the same directory, from the top, that matches with Go's `path.Match`.
 
-- 照合するのは、そのディレクトリの直下の名前だけ。
-- 末尾 `/` のエントリはディレクトリにだけ、それ以外はファイルにだけ当たる。照合時は末尾 `/` を除いて比べる。
-- パターンとして当たったディレクトリの下も、その子のエントリで続けて照合する。
-- `path.Match` のパターンとして不正な名前(`[` など)は、パターンとしては何にも当たらない。名前の完全一致では当たる。
+- Only the names directly in that directory are matched.
+- An entry ending in `/` matches only directories; the others only files. The trailing `/` is dropped when comparing.
+- Below a directory matched by a pattern, matching goes on with the children of that entry.
+- A name that is not a valid `path.Match` pattern (such as `[`) matches nothing as a pattern. It still matches as an exact name.
 
-### エラー
+### Errors
 
-次の場合は、ファイル全体を読み込みエラーにします(行番号付きで報告)。
+In these cases the whole file fails to load (reported with the line number).
 
-- インデントにスペースが含まれている(エディタなどでタブがスペースに置き換わった場合を含む)
-- 親より 2 段以上深いインデント(タブが 2 つ以上多い)
-- ファイル(末尾 `/` なし)のエントリの下に子がある
-- 同じディレクトリに、同じ名前のエントリが 2 つある
-- 前にエントリのない detail 行
-- 名前の途中に `/` がある
+- The indentation has a space in it (including when an editor turned tabs into spaces)
+- The indentation is two or more levels deeper than the parent (two or more tabs too many)
+- A file entry (not ending in `/`) has children
+- One directory has two entries of the same name
+- A detail line with no entry before it
+- A name has `/` in the middle
 
-### 長さの上限
+### Length limits
 
-長さは表示幅(全角 = 2、半角 = 1)で数えます。
+Lengths are counted in display width (full width = 2, half width = 1).
 
-| フィールド | 上限 |
+| Field | Limit |
 | --- | --- |
-| desc | 256 桁 |
-| detail | 全行の合計で 4096 桁 |
+| desc | 256 columns |
+| detail | 4096 columns, all lines together |
 
-上限を超える値は、set / MCP の書き込みでエラーにします。手で編集されたファイルにあれば status で報告します。
+A value over the limit is an error for set and for writing through MCP. In a file edited by hand, status reports it.
 
-### 書き込み時の規則(正規形)
+### How crube writes (the canonical form)
 
-crube が書き込むときは、ファイル全体を次の形で出力し直します。
+When crube writes, it outputs the whole file again in this form:
 
-- エントリの順序は保つ。新しいエントリは、兄弟の末尾に追加する。
-- インデントはタブ。名前と desc の区切りはタブ 1 つ。桁揃えはしない。
-- detail 行は `| ` + テキスト(空行は `|`)。
-- 空行と行末の空白は出力しない。
+- The order of the entries is kept. A new entry goes after its siblings.
+- Indentation is tabs. The name and the desc are separated by one tab. Nothing is aligned.
+- A detail line is `| ` + text (an empty one is `|`).
+- No empty lines, and no spaces at the end of lines.
 
-手で整えた桁揃えや空行は、crube で書き込んだ時点で消えます。
+Alignment and empty lines made by hand are gone once crube writes the file.
 
-## structure_<言語タグ>.txt
+## structure_<language tag>.txt
 
-英語以外の言語のファイルです。形式は `structure.txt` とまったく同じです。
+The file of a language other than English. The format is exactly that of `structure.txt`.
 
-- 各言語のファイルは独立している。`structure.txt` との対応関係は持たず、エントリが揃っている必要もない。
-- 参照・編集に使うのは、`CRUBE_LANG` の言語のファイル 1 つだけ。そのファイルがなければ(通常のファイルでなければ) `structure.txt` を使う。
-- `CRUBE_LANG` が未設定か `en` なら、`structure_en.txt` があっても `structure.txt` を使う。
-- `crube init` で空のファイルを作れる(`CRUBE_LANG=ja crube init`)。
+- The file of each language is independent. It has no tie to `structure.txt`, and the entries need not be the same.
+- Reading and editing use only one file: that of the `CRUBE_LANG` language. If it is not there (not a regular file), `structure.txt` is used.
+- With `CRUBE_LANG` unset or `en`, `structure.txt` is used even if `structure_en.txt` exists.
+- `crube init` can make an empty one (`CRUBE_LANG=ja crube init`).
 
 ## ignore
 
-除外するパスのパターンを 1 行に 1 つ書きます。書式は gitignore と同じです。読むのはこのファイルだけで、`.gitignore` は参照しません。
+One pattern of paths to leave out per line. The format is that of gitignore. Only this file is read; `.gitignore` is not.
 
-- `#` で始まる行はコメント、空行は無視。パターンとして不正な行も、git と同じく飛ばす。
-- 行末の空白は取り除く(`\ ` と書いた空白は残る)。
-- 末尾 `/` はディレクトリにだけ当たる。
-- `!` で始まる行は、それより前の行で除外したものを取り消す(後の行が優先)。ただし、除外したディレクトリの中は取り消せない。
-- 先頭か途中に `/` があるパターンは、プロジェクトルートからの相対。なければ、どの深さの名前にも当たる。
-- `*`・`?`・`[…]` は `/` をまたがない。`**` は 0 個以上のディレクトリに当たる(`**/x`、`a/**`、`a/**/b`)。
-- `\` で次の 1 文字をそのままの文字として扱う(`\#`、`\!`)。
+- A line starting with `#` is a comment, and empty lines are ignored. A line that is not a valid pattern is skipped, as git does.
+- Spaces at the end of a line are removed (a space written as `\ ` stays).
+- A trailing `/` matches only directories.
+- A line starting with `!` takes back what an earlier line left out (later lines win). But nothing inside a directory left out can be taken back.
+- A pattern with `/` at the start or in the middle is relative to the project root. Otherwise it matches a name at any depth.
+- `*`, `?` and `[…]` do not cross `/`. `**` matches zero or more directories (`**/x`, `a/**`, `a/**/b`).
+- `\` makes the next character a plain character (`\#`, `\!`).
 
 ```
 # .crube/ignore
@@ -134,8 +136,8 @@ dist/
 !dist/README.md
 ```
 
-- プロジェクトルート直下の `.crube/` は常に除外する。`!` でも `--no-ignore` でも戻せない。サブディレクトリにある `.crube` は、ほかの名前と同じに扱う。
-- `ignore` がなければ、`.crube/` のほかは何も除外しない。
-- `crube init` は、どのプロジェクトでもたいてい除外したいもの(`.git/`・`.hg/`・`.svn/`・`node_modules/`)を書いた既定の ignore を作る。`dist/`・`vendor/` のように、プロジェクトによっては意味のあるものは入れない。中身は自由に編集してよい。
-- 除外されたパスは ls / tree / find / status のすべてで対象外になる。
-- 除外は表示・検査の対象外にするだけで、structure 内の説明は削除しない。
+- `.crube/` directly in the project root is always left out; neither `!` nor `--no-ignore` brings it back. A `.crube` in a subdirectory is treated like any other name.
+- Without `ignore`, nothing but `.crube/` is left out.
+- `crube init` writes a default ignore with what almost every project wants to leave out (`.git/`, `.hg/`, `.svn/`, `node_modules/`). Things such as `dist/` and `vendor/`, which mean something in some projects, are not in it. Edit it as you like.
+- A path left out is out of scope for ls, tree, find and status alike.
+- Leaving a path out only hides it from views and checks; it does not remove descriptions from the structure.

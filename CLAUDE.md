@@ -26,7 +26,7 @@ crube（「しるべ（道標）」を縮めた名前）は、プロジェクト
 
 ## ドキュメントの言語
 
-`CLAUDE.md`・`.claude/rules/`・`docs/`は日本語。
+`CLAUDE.md`・`.claude/rules/`は日本語。README と`docs/`は、英語（`X.md`）と日本語（`X_ja.md`）の対で、片方を直したら同じ変更でもう片方も直す（`.claude/rules/documentation.md`）。
 
 <!-- TODO: コード・コメント・コミットメッセージの言語を決めて書く（CLI出力は英語だけと決まった。`docs/reference/cli.md`「出力の共通の決まり」）。詳しい書き方は`.claude/rules/documentation.md` -->
 

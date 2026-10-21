@@ -1,36 +1,38 @@
-# CLI リファレンス
+*[日本語](cli_ja.md) | **English***
 
-どのコマンドも、カレントディレクトリ(または `-C` で指定したディレクトリ)から上位へ `.crube/` を探して動作します。`init` だけは例外で、指定ディレクトリに `.crube/` を作ります。
+# CLI reference
 
-## コマンド一覧
+Every command looks for `.crube/` from the current directory (or the directory given with `-C`) upwards, and works on it. Only `init` is different: it makes `.crube/` in the given directory.
 
-| コマンド | 種別 | 内容 |
+## Commands
+
+| Command | Kind | What it does |
 | --- | --- | --- |
-| [`crube init`](#crube-init) | 準備 | `.crube/` を作る |
-| [`crube ls`](#crube-ls) | 参照 | 実在するファイルの一覧を、説明付きで表示 |
-| [`crube tree`](#crube-tree) | 参照 | structure の内容を表示し、現在地に印を付ける |
-| [`crube find`](#crube-find) | 参照 | パス・説明で検索 |
-| [`crube show`](#crube-show) | 参照 | 1 パスの全情報 |
-| [`crube status`](#crube-status) | 保守 | 実ディレクトリと structure の差分 |
-| [`crube set`](#crube-set) | 編集 | 説明の追加・更新 |
-| [`crube rm`](#crube-rm) | 編集 | エントリの削除(配下も含む) |
-| [`crube mv`](#crube-mv) | 編集 | エントリの移動(配下も含む) |
-| [`crube mcp`](#crube-mcp) | 連携 | MCP サーバーとして起動 |
-| [`crube completion`](#crube-completion) | 連携 | シェルの補完スクリプトを出力 |
+| [`crube init`](#crube-init) | Setup | Makes `.crube/` |
+| [`crube ls`](#crube-ls) | Read | Lists the real files, with descriptions |
+| [`crube tree`](#crube-tree) | Read | Shows the structure, marking the current place |
+| [`crube find`](#crube-find) | Read | Searches paths and descriptions |
+| [`crube show`](#crube-show) | Read | Everything about one path |
+| [`crube status`](#crube-status) | Maintain | The difference between the real directories and the structure |
+| [`crube set`](#crube-set) | Edit | Adds or changes a description |
+| [`crube rm`](#crube-rm) | Edit | Removes an entry (with those below it) |
+| [`crube mv`](#crube-mv) | Edit | Moves an entry (with those below it) |
+| [`crube mcp`](#crube-mcp) | Integration | Runs as an MCP server |
+| [`crube completion`](#crube-completion) | Integration | Prints a shell completion script |
 
-## 共通オプション
+## Common options
 
-| オプション | 内容 |
+| Option | What it does |
 | --- | --- |
-| `--json` | 構造化出力(JSON) |
-| `-C <dir>` | 指定したディレクトリで実行したものとして動作する |
-| `--no-ignore` | 除外設定を無効にする(`.crube/` は除外したまま) |
+| `--json` | Structured output (JSON) |
+| `-C <dir>` | Works as if run in the given directory |
+| `--no-ignore` | Turns the ignore settings off (`.crube/` stays left out) |
 
-- オプションは、位置引数の前後どこに書いてもよい(`crube ls src --full`)。値をとるオプションは `--limit 3` でも `--limit=3` でもよい。
-- `--` より後ろは、すべて位置引数として読む(`crube set -- note.txt "-v flag help"`)。
-- `init` が受け付けるのは `-C` だけ。`set`・`rm`・`mv` は `--json` と `-C`(と各自のオプション)。`mcp` は `--allow-write` だけ。`completion` はオプションを受け付けない。
+- Options can go anywhere before or after the positional arguments (`crube ls src --full`). An option with a value takes `--limit 3` or `--limit=3`.
+- Everything after `--` is read as positional arguments (`crube set -- note.txt "-v flag help"`).
+- `init` takes only `-C`. `set`, `rm` and `mv` take `--json` and `-C` (and their own options). `mcp` takes only `--allow-write`. `completion` takes no options.
 
-## 使い方と版
+## Usage and version
 
 ```
 $ crube --help
@@ -58,46 +60,46 @@ $ crube --version
 crube v0.1.0
 ```
 
-- `--help`・`-h`・`help` は標準出力に出して終了コード 0。引数なしの `crube` は、同じものを標準エラー出力に出して終了コード 2。
-- 各コマンドの `-h`・`--help` は、その書式を 1 行で出す。
-- `--version` は配布物に埋めた版を出す。配布物でないビルドでは `crube (devel)`。
+- `--help`, `-h` and `help` print to standard output, with exit code 0. `crube` with no arguments prints the same to standard error, with exit code 2.
+- `-h` and `--help` of a command print its usage in one line.
+- `--version` prints the version built into the release. A build that is not a release prints `crube (devel)`.
 
-## 言語
+## Language
 
-設定ファイルはありません。言語は環境変数 `CRUBE_LANG`(BCP 47。`ja`、`zh-CN` など)だけで指定します。
+There is no settings file. The language is given only by the `CRUBE_LANG` environment variable (BCP 47: `ja`, `zh-CN` and so on).
 
-どのコマンドも、環境変数 `CRUBE_LANG` の言語のファイル(`.crube/structure_<言語タグ>.txt`)を参照・編集します。`CRUBE_LANG` が未設定か `en` の場合、またはその言語のファイルがない場合は `.crube/structure.txt`(英語)を使います。使うファイルは常に 1 つです。
+Every command reads and edits the file of the `CRUBE_LANG` language (`.crube/structure_<language tag>.txt`). When `CRUBE_LANG` is unset or `en`, or there is no file for that language, `.crube/structure.txt` (English) is used. Only one file is ever used.
 
-`CRUBE_LANG` の値はそのまま使います(`ja-JP` を `ja` に寄せたり、大文字・小文字をそろえたりしない)。言語タグの形(英数字 1〜8 字を `-` でつなぐ)でない値は、どのコマンドでもエラーです(`crube: invalid CRUBE_LANG "ja_JP" (use a language tag such as ja or zh-CN)`)。
+The value of `CRUBE_LANG` is used as it is (`ja-JP` is not brought to `ja`, and case is not changed). A value not in the form of a language tag (1 to 8 letters or digits, joined with `-`) is an error for every command (`crube: invalid CRUBE_LANG "ja_JP" (use a language tag such as ja or zh-CN)`).
 
-## エントリのパス
+## Entry paths
 
-`tree` / `set` / `rm` / `mv` に渡すパスは、structure ファイル上のエントリの位置を、ルートからの名前を `/` でつないで表したものです。最後の名前はパターンでもかまいません。どこで実行しても、ルートからの位置です。
+The path given to `tree` / `set` / `rm` / `mv` is the position of an entry in the structure file: the names from the root, joined with `/`. The last name can be a pattern. Wherever it is run, it is the position from the root.
 
 ```
-data/*.csv        # data/ の下の「*.csv」というエントリ
-src/auth/         # ディレクトリのエントリ(末尾 /)
+data/*.csv        # the entry "*.csv" under data/
+src/auth/         # a directory entry (ending in /)
 ```
 
-- エントリのパスは、各段を名前の完全一致で探してエントリを指す。パターンとして照合はしない(`crube rm "src/*.go"` が消すのは、`src/` の下の「`*.go`」というエントリだけ)。
-- structure ファイルに書けない名前([file-format.md](file-format.md#書けない名前)、と `.`・`..`)や、空の段(`a//b`)を含むパスはエラー。
+- An entry path finds an entry by the exact name at each level. It is not matched as a pattern (`crube rm "src/*.go"` removes only the entry "`*.go`" under `src/`).
+- A path with a name that a structure file cannot hold ([file-format.md](file-format.md#names-that-cannot-be-written), and `.`, `..`), or with an empty level (`a//b`), is an error.
 
-`ls` / `show` に渡すパスは、実在するパスです。カレントディレクトリ(`-C` を付けたらそのディレクトリ)からの相対で読み、プロジェクトの外を指すとエラー(`crube: ../: outside the project`)です。
+The path given to `ls` / `show` is a real path. It is read relative to the current directory (with `-C`, that directory), and one that points outside the project is an error (`crube: ../: outside the project`).
 
-Windows では、エントリのパスの `\` も `/` として読みます(`src\auth\` は `src/auth/` と同じ)。Windows の名前には `\` を使えないためです。そのほかの OS では `\` は名前の文字です。結果やエラーに出るエントリのパスは、どの OS でも `/` 区切りです。
+On Windows, `\` in an entry path is read as `/` too (`src\auth\` is the same as `src/auth/`), since Windows names cannot have `\`. On other OSes, `\` is a character of a name. Entry paths in results and errors are separated by `/` on every OS.
 
-## 終了コード
+## Exit codes
 
-| コード | 意味 |
+| Code | Meaning |
 | --- | --- |
-| 0 | 正常 |
-| 1 | status で問題あり(孤立・上限超え、または `--require` で指定した充足度に未達) |
-| 2 | エラー(引数の誤り、`.crube/` が見つからない、structure ファイルの文法エラー、書き込みの検証エラーなど) |
+| 0 | Success |
+| 1 | status found a problem (orphans, invalid values, or the coverage given with `--require` is not met) |
+| 2 | An error (wrong arguments, no `.crube/` found, a syntax error in the structure file, a value rejected when writing, and so on) |
 
-## 出力の共通の決まり
+## Output conventions
 
-- crube 自身が出す文字(印・見出し・メッセージ)は英語だけです。`CRUBE_LANG` は structure ファイルの選択にだけ効きます。
-- エラーは標準エラー出力に `crube: <内容>` の 1 行で出し、終了コード 2 で終わります。`--json` を付けたときも同じです。structure ファイルの読み込みエラーには、ファイルと行番号を付けます。
+- What crube itself prints (marks, headings, messages) is English only. `CRUBE_LANG` only picks the structure file.
+- An error is one line `crube: <what>` on standard error, with exit code 2. The same with `--json`. A load error of the structure file comes with the file and the line number.
 
 ```
 crube: .crube/structure.txt:12: indentation must be tabs
@@ -108,7 +110,7 @@ crube: build/x: ignored by .crube/ignore (use --no-ignore)
 crube: .crube: .crube/ is always left out, even with --no-ignore
 ```
 
-引数の誤りは、コマンド名を付けて `crube: <コマンド>: <内容>` の 1 行で出します(終了コード 2)。引数の数の誤りには、そのコマンドの書式を添えます。
+Wrong arguments are one line with the command's name, `crube: <command>: <what>` (exit code 2). A wrong number of arguments comes with the usage of the command.
 
 ```
 crube: unknown command "lss" (see crube --help)
@@ -121,10 +123,10 @@ crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--
 
 ### JSON
 
-- パスは `/` 区切りで、プロジェクトルートからの相対。ディレクトリは末尾 `/`。
-- `desc`・`detail` のキーは常に出し、ないときは `""`。`detail` は改行を `\n` で含む 1 つの文字列。
-- `type` は `dir` か `file`。シンボリックリンクは `file`。
-- 2 字下げで出す。`<`・`>`・`&` はエスケープしない(説明は人が読む文字なので)。
+- Paths are separated by `/` and relative to the project root. Directories end in `/`.
+- The `desc` and `detail` keys are always there, `""` when empty. `detail` is one string, with newlines as `\n`.
+- `type` is `dir` or `file`. A symbolic link is `file`.
+- Indented by 2 spaces. `<`, `>` and `&` are not escaped (descriptions are text for people).
 
 ---
 
@@ -134,12 +136,12 @@ crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--
 crube init [-C <dir>]
 ```
 
-`.crube/` と、対象言語の structure ファイルを作ります。作成するのは `.crube/` とその中身だけです。
+Makes `.crube/` and the structure file of the target language. It makes only `.crube/` and what is in it.
 
-- 上位へ探しても `.crube/` がなければ、指定ディレクトリに `.crube/` を作り、既定の `ignore` と空の `structure.txt` を置く。
-- `CRUBE_LANG` が英語以外なら、その言語の空ファイル `structure_<言語タグ>.txt` も作る。
-- すでに `.crube/` がある場合は、対象言語のファイルがなければそれだけを作る。言語ファイルを追加するときはこの使い方をする。
-- 作るものが何もなければエラー(終了コード 2)。
+- If no `.crube/` is found upwards, it makes `.crube/` in the given directory, with the default `ignore` and an empty `structure.txt`.
+- If `CRUBE_LANG` is not English, it also makes an empty file for that language, `structure_<language tag>.txt`.
+- If `.crube/` is already there, it makes only the file of the target language, if that is missing. This is how to add a language file.
+- If there is nothing to make, it is an error (exit code 2).
 
 ```
 $ CRUBE_LANG=ja crube init
@@ -152,30 +154,30 @@ created .crube/structure_ja.txt
 crube ls [path] [--full] [--json]
 ```
 
-`path`(省略時はカレントディレクトリ)の直下を、説明付きで一覧表示します。
+Lists what is directly in `path` (the current directory if left out), with descriptions.
 
 ```
 $ crube ls src
-auth/     認証(ログイン、セッション、トークン更新)
+auth/     Authentication (login, sessions, token refresh)
 db/       ! no description
-main.go   エントリポイント
+main.go   Entry point
 ```
 
-- 説明のないパスは `! no description` と表示する。
-- 名前の順に並べる(ディレクトリを先にしない)。
-- desc の開始位置を、いちばん長い名前の後ろに空白 3 つで揃える(幅は表示幅)。
-- desc は端末幅に合わせて `…` で切り詰める。`--full` で全文を表示する。
-- ignore されたパスは一覧に出さない。ignore されたパスや実在しないパスを `path` に指定するとエラー。ファイルを指定してもエラー(`crube: go.mod: not a directory (use crube show)`)。
-- エントリが当たらないディレクトリの中は、どれも説明なしになる(照合は親から順にたどるため)。
-- `--json` では、`entry` に当たったエントリのパス(なければ `""`)を出す。
+- A path without a description shows `! no description`.
+- Sorted by name (directories do not come first).
+- The descs start at the same column: 3 spaces after the longest name (in display width).
+- A desc is cut with `…` to fit the terminal width. `--full` shows it whole.
+- Ignored paths are not listed. An ignored or missing path given as `path` is an error. So is a file (`crube: go.mod: not a directory (use crube show)`).
+- Inside a directory that no entry matches, nothing has a description (matching goes down from the parent).
+- With `--json`, `entry` is the path of the entry that matched (`""` for none).
 
 ```json
 {
   "path": "src/",
   "items": [
-    { "name": "auth/",   "type": "dir",  "entry": "src/auth/",   "desc": "認証(ログイン、セッション、トークン更新)" },
+    { "name": "auth/",   "type": "dir",  "entry": "src/auth/",   "desc": "Authentication (login, sessions, token refresh)" },
     { "name": "db/",     "type": "dir",  "entry": "",            "desc": "" },
-    { "name": "main.go", "type": "file", "entry": "src/main.go", "desc": "エントリポイント" }
+    { "name": "main.go", "type": "file", "entry": "src/main.go", "desc": "Entry point" }
   ]
 }
 ```
@@ -186,48 +188,48 @@ main.go   エントリポイント
 crube tree [path] [-d N] [--json]
 ```
 
-structure ファイルの内容を、ファイルと同じ入れ子の形で見やすく表示し、現在地に印を付けます。
+Shows what is in the structure file, nested as in the file and easy to read, and marks the current place.
 
 ```
 $ cd src/auth
 $ crube tree
-  src/             アプリケーションのソースコード
->   auth/          認証(ログイン、セッション、トークン更新)
-      session.ts   セッションの保存と有効期限の管理
-      *_test.go    同名ファイルのテスト
-    main.go        エントリポイント
-  data/            データ格納場所
-    *.csv          CSVデータ
+  src/             Application source code
+>   auth/          Authentication (login, sessions, token refresh)
+      session.ts   Session storage and expiry
+      *_test.go    Tests of the file of the same name
+    main.go        Entry point
+  data/            Data files
+    *.csv          CSV data
 ```
 
-- **表示するもの**: structure ファイルのエントリ(パターンもそのまま)。実際のファイルシステムは走査しない。実在するファイルの一覧は `ls`、説明の過不足は `status` で確認する。
-- **インデント**: 1 段あたりスペース 2 つで表示する(ファイルのタブとは違い、端末で幅が一定になるように)。
-- **desc の桁揃え**: desc の開始位置を、表示全体で揃える。位置は、いちばん広い行の名前(印の欄と字下げを含む)の後ろに空白 3 つ。名前の幅は表示幅(全角 = 2)で数える。
-- **detail**: 表示しない。detail は `show` で見る。
-- **desc なしの行**: 名前だけを表示する。
-- **現在地の印**: 行頭の欄に `>` を付ける。付けるのは、現在のディレクトリに当たるエントリ。そのエントリがなければ、当たる中でいちばん深い祖先の行に付け、行末に `(here: src/db/)` のように現在のディレクトリを添える(desc の後ろに空白 2 つ。desc がなければ desc の桁に)。プロジェクトルートにいるときは付けない。印の欄は、印がなくても常に 2 桁分空けておく。
-- **長い desc**: 出力先が端末のときは、端末の幅に合わせて `…` で切り詰める。切るのは desc だけで、`(here: …)` は残す。パイプやファイルへの出力では切り詰めない。
+- **What it shows**: the entries of the structure file (patterns as they are). It does not walk the real file system. Use `ls` for the real files, and `status` for missing or extra descriptions.
+- **Indentation**: 2 spaces per level (unlike the tabs of the file, so that the width is the same on any terminal).
+- **Aligned descs**: the descs start at the same column across the whole view: 3 spaces after the name of the widest line (the mark column and the indentation included). The width of names is counted in display width (full width = 2).
+- **detail**: not shown. Use `show` for the detail.
+- **Lines without a desc**: only the name is shown.
+- **Mark of the current place**: `>` in the column at the start of the line, on the entry that matches the current directory. Without such an entry, it goes on the line of the deepest ancestor that matches, and the current directory is added at the end of the line, as in `(here: src/db/)` (2 spaces after the desc; at the desc column if there is no desc). At the project root there is no mark. The mark column always takes 2 columns, mark or not.
+- **Long descs**: when the output is a terminal, a desc is cut with `…` to fit its width. Only the desc is cut; `(here: …)` stays. Output to a pipe or a file is not cut.
 
 ```
-$ cd src/db          # src/db/ のエントリがない
+$ cd src/db          # there is no entry for src/db/
 $ crube tree src/ -d 2
-> src/        アプリケーションのソースコード  (here: src/db/)
-    auth/     認証(ログイン、セッション、トークン更新)
-    main.go   エントリポイント
+> src/        Application source code  (here: src/db/)
+    auth/     Authentication (login, sessions, token refresh)
+    main.go   Entry point
 ```
 
-- `path`(エントリのパス)を指定すると、そのエントリの部分木だけを表示する。エントリがなければエラー(`crube: no entry src/x/`)。`-d` で表示する段の数を制限する(`-d 1` は最上段だけ。省略時は制限なし)。
-- `--json` では、エントリを入れ子の JSON で出力する。最上位の `here` は現在のディレクトリ(プロジェクトルートなら `""`)、各エントリの `here` は印を付ける行かどうか。次の例は、`src/auth` で `crube tree src/ -d 2 --json` を実行したときの出力。
+- With `path` (an entry path), only the subtree of that entry is shown. Without such an entry, it is an error (`crube: no entry src/x/`). `-d` limits the number of levels shown (`-d 1` is the top level only; no limit if left out).
+- With `--json`, the entries are output as nested JSON. The `here` at the top is the current directory (`""` at the project root), and the `here` of each entry tells whether it is the line with the mark. The example below is the output of `crube tree src/ -d 2 --json` run in `src/auth`.
 
 ```json
 {
   "here": "src/auth/",
   "entries": [
-    { "name": "src/", "path": "src/", "desc": "アプリケーションのソースコード", "detail": "", "here": false,
+    { "name": "src/", "path": "src/", "desc": "Application source code", "detail": "", "here": false,
       "children": [
-        { "name": "auth/", "path": "src/auth/", "desc": "認証(ログイン、セッション、トークン更新)",
-          "detail": "入口は index.ts。", "here": true, "children": [] },
-        { "name": "main.go", "path": "src/main.go", "desc": "エントリポイント",
+        { "name": "auth/", "path": "src/auth/", "desc": "Authentication (login, sessions, token refresh)",
+          "detail": "The entry point is index.ts.", "here": true, "children": [] },
+        { "name": "main.go", "path": "src/main.go", "desc": "Entry point",
           "detail": "", "here": false, "children": [] }
       ] }
   ]
@@ -240,30 +242,30 @@ $ crube tree src/ -d 2
 crube find <query> [--limit N] [--json]
 ```
 
-structure ファイルのエントリを、パス・desc・detail で検索します。結果はエントリのパスで表示します(パターンのエントリは `data/*.csv` のように表示)。
+Searches the entries of the structure file by path, desc and detail. Results are shown as entry paths (a pattern entry as `data/*.csv`).
 
 ```
-$ crube find セッション
-src/auth/             認証(ログイン、セッション、トークン更新)
-src/auth/session.ts   セッションの保存と有効期限の管理
+$ crube find session
+src/auth/             Authentication (login, sessions, token refresh)
+src/auth/session.ts   Session storage and expiry
 ```
 
-- **照合**: 大文字・小文字を区別しない部分一致。空白で区切った複数の語は、すべてを含むもの(AND)だけに当たる。語はパス・desc・detail のどこに含まれていてもよい。
-- **複数の引数**: 空白でつないで 1 つの `query` にする(`crube find auth session` は `crube find "auth session"` と同じ)。
-- **順序**: structure ファイルの順。
-- **表示**: パスと desc の 2 列。desc の開始位置を、いちばん長いパスの後ろに空白 3 つで揃える。出力先が端末のときは、`ls`・`tree` と同じく desc を `…` で切り詰める。当たりがなければ何も出さない(終了コード 0)。
-- ignore されたエントリとその下は、結果に出さない。空白だけの検索語はエラー(`crube: empty query`)。
-- `--limit N` で件数を絞る(省略時は制限なし)。省いたものがあれば、最後に `… 3 more (use --limit)` のように件数を出す。
-- `--json` では、`more` に省いた件数を出す。
+- **Matching**: case-insensitive substring match. Several words separated by spaces match only what contains all of them (AND). Each word can be anywhere in the path, desc or detail.
+- **Several arguments**: joined with spaces into one `query` (`crube find auth session` is the same as `crube find "auth session"`).
+- **Order**: that of the structure file.
+- **View**: two columns, path and desc. The descs start 3 spaces after the longest path. When the output is a terminal, descs are cut with `…`, as with `ls` and `tree`. With no match, nothing is printed (exit code 0).
+- Ignored entries and those below them are not in the results. A query of only spaces is an error (`crube: empty query`).
+- `--limit N` limits the number of results (no limit if left out). If some were left out, the count comes last, as in `… 3 more (use --limit)`.
+- With `--json`, `more` is the number left out.
 
 ```json
 {
-  "query": "セッション",
+  "query": "session",
   "more": 0,
   "items": [
-    { "path": "src/auth/",           "desc": "認証(ログイン、セッション、トークン更新)", "detail": "入口は index.ts。" },
-    { "path": "src/auth/session.ts", "desc": "セッションの保存と有効期限の管理",
-      "detail": "セッションは Redis に保存し、アクセスのたびに有効期限を延長する。\n有効期限は config/auth.yaml の session.ttl で設定する。" }
+    { "path": "src/auth/",           "desc": "Authentication (login, sessions, token refresh)", "detail": "The entry point is index.ts." },
+    { "path": "src/auth/session.ts", "desc": "Session storage and expiry",
+      "detail": "Sessions are kept in Redis; each access extends the expiry.\nThe expiry is set by session.ttl in config/auth.yaml." }
   ]
 }
 ```
@@ -274,19 +276,19 @@ src/auth/session.ts   セッションの保存と有効期限の管理
 crube show <path> [--json]
 ```
 
-実在する 1 パスについて、当たったエントリの desc と detail を表示します。パターンで当たった場合はそのエントリのパス(`data/*.csv` など)を、シンボリックリンクならリンク先も表示します。
+Shows, for one real path, the desc and detail of the entry that matches it. When a pattern matched, it shows the path of that entry (such as `data/*.csv`); for a symbolic link, also its target.
 
 ```
 $ crube show data/2026.csv
 data/2026.csv
   entry   data/*.csv
-  desc    CSVデータ
+  desc    CSV data
 
 $ crube show src/auth/session.ts
 src/auth/session.ts
-  desc    セッションの保存と有効期限の管理
-  detail  セッションは Redis に保存し、アクセスのたびに有効期限を延長する。
-          有効期限は config/auth.yaml の session.ttl で設定する。
+  desc    Session storage and expiry
+  detail  Sessions are kept in Redis; each access extends the expiry.
+          The expiry is set by session.ttl in config/auth.yaml.
 
 $ crube show current
 current
@@ -294,16 +296,16 @@ current
   desc    ! no description
 ```
 
-- 1 行目は実在のパス。続けて、見出しつきで縦に並べる。
-- `entry` は、当たったエントリのパスが実在のパスと違うとき(パターンで当たったとき)だけ出す。
-- `link` は、シンボリックリンクのときだけ出す。
-- `detail` は、ないときは出さない。2 行目以降は字下げして揃える。
-- 説明がなければ、desc を `! no description` とする(終了コード 0)。
-- 実在しないパス、ignore されたパスはエラー。プロジェクトルートそのものもエラー(ルートに当たるエントリはない)。
-- `--json` では、すべてのキーを常に出す(`entry`・`link` はないとき `""`)。
+- The first line is the real path. Then the fields, one per line, with their labels.
+- `entry` is shown only when the path of the entry that matched differs from the real path (when a pattern matched).
+- `link` is shown only for a symbolic link.
+- `detail` is not shown when there is none. Its second and later lines are indented to line up.
+- Without a description, the desc is `! no description` (exit code 0).
+- A missing path or an ignored path is an error. So is the project root itself (no entry matches the root).
+- With `--json`, every key is always there (`entry` and `link` are `""` when there is none).
 
 ```json
-{ "path": "data/2026.csv", "type": "file", "entry": "data/*.csv", "desc": "CSVデータ", "detail": "", "link": "" }
+{ "path": "data/2026.csv", "type": "file", "entry": "data/*.csv", "desc": "CSV data", "detail": "", "link": "" }
 ```
 
 ## crube status
@@ -312,13 +314,13 @@ current
 crube status [--require all|dirs] [--json]
 ```
 
-実ディレクトリと structure を突き合わせ、未説明・孤立・不正な値を報告し、最後に充足度を表示します。報告するだけで、何も書き換えません。どこで実行しても、プロジェクト全体を検査します。
+Compares the real directories with the structure, reports untracked paths, orphans and invalid values, and shows the coverage last. It only reports; it changes nothing. Wherever it runs, it checks the whole project.
 
-| 表示 | 意味 |
+| Shown | Meaning |
 | --- | --- |
-| `untracked` | 未説明(`dir` / `file` の種別付き) |
-| `orphan` | 孤立 |
-| `invalid` | desc / detail が上限を超えている |
+| `untracked` | Untracked (with the type, `dir` / `file`) |
+| `orphan` | Orphan |
+| `invalid` | A desc / detail over the limit |
 
 ```
 $ crube status
@@ -330,19 +332,19 @@ invalid     src/x.go  desc 300/256
 coverage    all: no (2)   dirs: no (1)
 ```
 
-- **表の形**: 種類の欄は 12 桁、untracked の `dir`・`file` の欄は 6 桁。invalid の行は「パス、空白 2 つ、`desc 300/256`」で、行どうしは揃えない。
-- **coverage の行**: 満たしていれば `yes`、未達なら `no (件数)`。報告するものがなければ、coverage の行だけを出す(空行も出さない)。
+- **Layout**: the kind column is 12 columns wide, and the `dir` / `file` column of untracked is 6. An invalid line is "path, 2 spaces, `desc 300/256`", not aligned with the other lines.
+- **The coverage line**: `yes` when met, `no (count)` when not. With nothing to report, only the coverage line is printed (no empty line either).
 
 ```
 $ crube status
 coverage    all: yes   dirs: yes
 ```
 
-- **並び順**(テキストも JSON も): untracked の dir → untracked の file → orphan → invalid。
-  - untracked は走査の順。各ディレクトリで、ファイルを先に、次にサブディレクトリを、どちらも名前の順にたどる。
-  - orphan と invalid は structure ファイルの順。
-- invalid の行は、どのフィールドが何桁か(上限)を `desc 300/256` の形で出す。
-- `--json` では、`structure` に検査したファイルを出す。
+- **Order** (text and JSON): untracked dirs → untracked files → orphans → invalid.
+  - Untracked paths are in the order of the walk. In each directory, files first, then subdirectories, both by name.
+  - Orphans and invalid values are in the order of the structure file.
+- An invalid line shows which field is how many columns wide (and the limit), as in `desc 300/256`.
+- With `--json`, `structure` is the file checked.
 
 ```json
 {
@@ -360,12 +362,12 @@ coverage    all: yes   dirs: yes
 }
 ```
 
-| オプション | 内容 |
+| Option | What it does |
 | --- | --- |
-| `--require all\|dirs` | 指定した充足度を満たさなければ終了コード 1 にする。省略時は充足度は終了コードに影響しない |
-| `--json` | 各項目のパス・種類を JSON で出力する |
+| `--require all\|dirs` | Exit code 1 if the given coverage is not met. Without it, the coverage does not change the exit code |
+| `--json` | Outputs the path and kind of each item as JSON |
 
-判定の詳細は [design/freshness.md](../design/freshness.md) を参照してください。
+For the details of what is reported, see [design/freshness.md](../design/freshness.md).
 
 ## crube set
 
@@ -373,23 +375,23 @@ coverage    all: yes   dirs: yes
 crube set <path> <desc> [--detail <text>] [--json]
 ```
 
-エントリの説明を追加・更新します。
+Adds or changes the description of an entry.
 
 ```
-$ crube set data/ "データ格納場所"
-$ crube set "data/*.csv" "CSVデータ"
+$ crube set data/ "Data files"
+$ crube set "data/*.csv" "CSV data"
 ```
 
-- 書き込み先は、対象言語で使っているファイル。
-- エントリがなければ、兄弟の末尾に追加する。途中の親がなければ、desc なしの行として作る。
-- desc の前後の空白は取り除く。desc を `""` にすると、desc なしの行になる。
-- `--detail` の改行は、そのまま detail の複数行になる(CRLF・CR は LF にし、各行の行末の空白は取り除く)。`--detail` を省くと detail はそのまま、`--detail ""` で detail を消す。
-- desc が 256 桁を超える、改行を含む、または detail が 4096 桁を超える場合はエラー。
-- 書き込みは、`.crube/` の中の一時ファイルに書いてから置き換える。読む側が書きかけのファイルを見ることはない。複数の crube が同時に同じファイルへ書き込む場合の排他はしない(`rm`・`mv` も同じ)。
-- 成功したときは何も出力しない(`rm`・`mv` も同じ)。`--json` を付けたときだけ、書いた結果を出す。形は MCP の書き込みツールが返すものと同じ。
+- It writes to the file used for the target language.
+- A new entry goes after its siblings. Missing parents on the way are made as lines without a desc.
+- Spaces around the desc are removed. A desc of `""` makes a line without a desc.
+- Newlines in `--detail` become the lines of the detail as they are (CRLF and CR become LF, and spaces at the end of each line are removed). Without `--detail`, the detail stays as it is; `--detail ""` removes it.
+- A desc over 256 columns or with a newline, or a detail over 4096 columns, is an error.
+- It writes to a temporary file in `.crube/`, which then replaces the file. Readers never see a half-written file. Several crubes writing the same file at the same time are not kept from each other (the same for `rm` and `mv`).
+- On success it prints nothing (the same for `rm` and `mv`). Only with `--json` does it print what it wrote, in the same shape as the MCP writing tools return.
 
 ```json
-{ "path": "data/*.csv", "desc": "CSVデータ", "detail": "" }
+{ "path": "data/*.csv", "desc": "CSV data", "detail": "" }
 ```
 
 ## crube rm
@@ -398,7 +400,7 @@ $ crube set "data/*.csv" "CSVデータ"
 crube rm <path> [--json]
 ```
 
-対象言語で使っているファイルから、エントリを削除します。ディレクトリのエントリなら、その下のエントリもすべて削除します。実際のファイルは削除しません。エントリがなければエラー(`crube: no entry src/x.go`)です。
+Removes an entry from the file used for the target language. For a directory entry, every entry below it is removed too. The real files are not removed. Without such an entry, it is an error (`crube: no entry src/x.go`).
 
 ## crube mv
 
@@ -406,12 +408,12 @@ crube rm <path> [--json]
 crube mv <from> <to> [--json]
 ```
 
-対象言語で使っているファイルの中で、エントリを別の位置へ移します。ディレクトリのエントリなら、その下のエントリも一緒に移ります。実際のファイルは移動しません。ファイルを移動したあとで、説明を新しいパスへ付け替えるために使います。
+Moves an entry to another position in the file used for the target language. For a directory entry, the entries below it move with it. The real files are not moved. Use it after moving files, to move their descriptions to the new paths.
 
-- 移動先の親がなければ、desc なしの行として作る。
-- 移動元にエントリがなければエラー。移動先にすでにエントリがあればエラー(`from` と `to` が同じときも)。
-- ディレクトリのエントリ(末尾 `/`)とファイルのエントリの間の移動、自分の下への移動はエラー。
-- 移動したエントリは、新しい兄弟の末尾に置く。
+- Missing parents of the new position are made as lines without a desc.
+- Without an entry at `from`, it is an error. An entry already at `to` is an error too (also when `from` and `to` are the same).
+- Moving between a directory entry (ending in `/`) and a file entry, or into itself, is an error.
+- The entry moved goes after its new siblings.
 
 ## crube mcp
 
@@ -419,7 +421,7 @@ crube mv <from> <to> [--json]
 crube mcp [--allow-write]
 ```
 
-stdio の MCP サーバーとして起動します。`--allow-write` を付けたときだけ、書き込み系ツールを公開します。詳しくは [mcp.md](mcp.md) を参照してください。
+Starts an MCP server on stdio. Only with `--allow-write` are the writing tools offered. See [mcp.md](mcp.md) for more.
 
 ## crube completion
 
@@ -427,7 +429,7 @@ stdio の MCP サーバーとして起動します。`--allow-write` を付け�
 crube completion <shell>
 ```
 
-シェルの補完スクリプトを標準出力に出します。`<shell>` は `bash`・`zsh`・`fish`・`powershell` のどれかです。ほかの語はエラー(`crube: completion: unknown shell "tcsh" (use bash, zsh, fish or powershell)`)です。スクリプトは、シェルが補完を探す場所に置きます。
+Prints a shell completion script to standard output. `<shell>` is one of `bash`, `zsh`, `fish` and `powershell`. Any other word is an error (`crube: completion: unknown shell "tcsh" (use bash, zsh, fish or powershell)`). Put the script where the shell looks for completions.
 
 ```
 crube completion bash > ~/.local/share/bash-completion/completions/crube
@@ -436,34 +438,34 @@ crube completion fish > ~/.config/fish/completions/crube.fish
 crube completion powershell >> $PROFILE
 ```
 
-スクリプトはコマンドの一覧を持たない、短い固定のテキストです。TAB を押すたびに `crube __complete` に候補を聞きます。そのため、出る候補が入っている crube と食い違うことはありません。その場所のプロジェクトのエントリのパスも出せます。
+The script is a short, fixed text with no list of commands. On every TAB it asks `crube __complete` for candidates. So the candidates never disagree with the crube installed, and the entry paths of the project in that place can be offered too.
 
-補完するもの:
+What is completed:
 
-| 場所 | 候補 |
+| Where | Candidates |
 | --- | --- |
-| 1 語目 | コマンド(要約付き) |
-| `-` で始まる語 | そのコマンドが受け付けるオプションのうち、行にまだないものと `--help`(1 語目なら `--help`・`--version`) |
-| `--require` の値 | `all`・`dirs` |
-| `tree` のパス、`set` のパス、`rm` のパス、`mv` の `from`・`to` | エントリのパス |
-| `completion` の次 | 4 つのシェル |
+| The first word | Commands (with a summary) |
+| A word starting with `-` | The options the command takes that are not on the line yet, and `--help` (for the first word, `--help` and `--version`) |
+| The value of `--require` | `all`, `dirs` |
+| The path of `tree`, `set` and `rm`, and `from` / `to` of `mv` | Entry paths |
+| After `completion` | The 4 shells |
 
-- エントリのパスは 1 段ずつ出す。打ちかけの語の最後の `/` までのエントリの直下にあるエントリを、ルートからのパスで、desc 付きで出す(`crube tree src/<TAB>` で `src/auth/`・`src/main.go`)。ディレクトリのエントリは末尾 `/` で、後ろに空白を入れない。除外されたエントリは出さない(`tree` と同じ)。
-- `set` のパスには、エントリに加えて、説明のない実在のパス(同じディレクトリの直下で、名前が完全に一致するエントリがないもの)も出す。ルートからのパスで、除外設定に従う。新しく説明を付けるときのため。
-- パターンのエントリ(`data/*.csv`)は、シェルに展開させないよう、引用符を付けて入れる(zsh と fish はエスケープする)。打ちかけの語の引用符とバックスラッシュは、取り除いてから候補を探す。
-- 等号の形(`--require=`)の後ろの値は、補完しないシェルがある。`--require <TAB>` と書く。
-- `-C` の値と、`ls`・`show` のパス(実在のパス)は、シェルのファイル補完に任せる。`-d`・`--limit`・`--detail` の値、desc、`find` の語は補完しない。
-- 行に `-C <dir>` があればそのディレクトリから、なければカレントディレクトリから `.crube/` を探す。desc は `CRUBE_LANG` の言語のファイルから出す。行の `--no-ignore` に従う。
-- `.crube/` がない、structure ファイルが読めないなどのときは、エントリのパスを出さないだけで、何も言わない(TAB のたびに警告が出ると、打っている行が崩れるため)。
+- Entry paths are offered one level at a time: the entries directly under the entry up to the last `/` of the word being typed, as paths from the root, with their descs (`crube tree src/<TAB>` gives `src/auth/` and `src/main.go`). A directory entry ends in `/`, with no space after it. Ignored entries are not offered (as with `tree`).
+- For the path of `set`, real paths without a description (directly in the same directory, with no entry of exactly that name) are offered too, besides the entries: as paths from the root, following the ignore settings. This is for adding new descriptions.
+- A pattern entry (`data/*.csv`) is inserted in quotes so that the shell does not expand it (zsh and fish escape it instead). The quotes and backslashes of the word being typed are removed before looking for candidates.
+- Some shells do not complete a value after `=` (`--require=`). Write `--require <TAB>`.
+- The value of `-C` and the path of `ls` and `show` (real paths) are left to the shell's file completion. The values of `-d`, `--limit` and `--detail`, descs, and the words of `find` are not completed.
+- `.crube/` is looked for from the directory of `-C <dir>` if it is on the line, or else from the current directory. Descs come from the file of the `CRUBE_LANG` language. `--no-ignore` on the line is followed.
+- When there is no `.crube/`, the structure file cannot be read, and so on, entry paths are simply not offered, and nothing is said (a warning on every TAB would break the line being typed).
 
 ### __complete
 
 ```
-crube __complete [--word=<打ちかけの語>] -- <語>...
+crube __complete [--word=<word being typed>] -- <words>...
 ```
 
-スクリプトが呼ぶコマンドです。打つためのものではないので、`crube --help` には出しません。
+The command the scripts call. It is not for typing, so `crube --help` does not show it.
 
-- `--` の後ろの語は、それまでに打った行(`crube` 自身は含まない)を、シェルが区切ったまま渡す。`--word` は今打っている語で、カーソルが新しい語の先頭にあるときは空。語の並びに入れないのは、シェルが空の引数を落とすことがあるため。
-- 出力は 1 行に 1 件。値と、説明があれば、タブと説明(コマンドなら要約、エントリなら desc を表示幅 60 桁で切ったもの)。`--word` で始まるものだけを出す。
-- どんな語でも、終了コード 0 で終わり、標準エラー出力に何も出さない。
+- The words after `--` are the line typed so far (without `crube` itself), as the shell split it. `--word` is the word being typed, empty when the cursor is at the start of a new word. It is not among the words because shells may drop an empty argument.
+- The output is one candidate per line: the value, and if there is a description, a tab and the description (the summary of a command, or the desc of an entry cut at 60 columns of display width). Only those starting with `--word` are printed.
+- Whatever the words, it ends with exit code 0 and prints nothing to standard error.

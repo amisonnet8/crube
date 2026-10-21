@@ -1,54 +1,56 @@
-# アーキテクチャ
+*[日本語](architecture_ja.md) | **English***
 
-## 全体構成
+# Architecture
 
-ロジックはすべてコアライブラリに集め、CLI と MCP サーバーはその薄いラッパーにします。コアは AI も Git も呼び出しません。
+## The whole
+
+All the logic is in a core library, and the CLI and the MCP server are thin wrappers of it. The core calls neither AI nor Git.
 
 ```
-  利用者(人間)            AI エージェント
+    User (a person)            AI agent
        │                    │        │
        ▼                    ▼        ▼
      ┌─────┐              ┌──────────────┐
-     │ CLI │◀─────────────│  (CLI 経由)  │
-     └──┬──┘              │ MCP サーバー │
+     │ CLI │◀─────────────│ (via the CLI)│
+     └──┬──┘              │  MCP server  │
         │                 └──────┬───────┘
         ▼                        ▼
-  ┌───────────────────────────────────────────────────────────┐
-  │ コアライブラリ(AI を呼び出さない)                         │
-  │ ストア │ 言語選択 │ 照合 │ 除外判定 │ 差分エンジン │ 検索 │
-  └───────┬──────────────────────────────┬────────────────────┘
-          │ 読み書き                     │ 読み取りのみ
+  ┌──────────────────────────────────────────────────────────────┐
+  │ Core library (does not call AI)                              │
+  │ Store │ Language │ Matching │ Ignore │ Diff engine │ Search  │
+  └───────┬──────────────────────────────┬───────────────────────┘
+          │ reads and writes             │ only reads
           ▼                              ▼
-     .crube/                       プロジェクトのファイル
-   (structure・ignore)              (走査のみ、変更しない)
+     .crube/                       The project's files
+   (structure, ignore)             (only walked, never changed)
 ```
 
-## コアのモジュール
+## Modules of the core
 
-| モジュール | 役割 |
+| Module | Role |
 | --- | --- |
-| ストア | structure ファイルを行単位で読み、ツリーに組み立てる。書き込みはファイル全体を正規形で出力し直す |
-| 言語選択 | `CRUBE_LANG` から、参照・編集に使う structure ファイルを 1 つ決める |
-| 照合 | 実在のパスに当たるエントリを決める(完全一致、なければ `path.Match` で上から順に) |
-| 除外判定 | `.crube/ignore` を評価する |
-| 差分エンジン | 実ディレクトリと structure を突き合わせ、未説明・孤立・充足度を求める |
-| 検索 | パス・desc・detail を対象に検索する。インデックスは持たず、毎回 structure を読んで検索する |
+| Store | Reads a structure file line by line and builds the tree. Writing outputs the whole file again in the canonical form |
+| Language | Picks, from `CRUBE_LANG`, the one structure file to read and edit |
+| Matching | Finds the entry that matches a real path (an exact match, or else the first `path.Match` from the top) |
+| Ignore | Evaluates `.crube/ignore` |
+| Diff engine | Compares the real directories with the structure, and finds untracked paths, orphans and coverage |
+| Search | Searches paths, descs and details. It keeps no index: it reads the structure for every search |
 
-## 実装
+## Implementation
 
-- **言語**: Go。単一バイナリで配布する。
-- **structure ファイル**: 独自のテキスト形式。標準ライブラリ(`strings`、`path`)だけで読み書きする。
-- **ライセンス**: MIT。依存ライブラリがあれば、そのライセンス文を配布物に同梱する。
+- **Language**: Go, distributed as a single binary.
+- **Structure files**: a text format of its own, read and written with the standard library only (`strings`, `path`).
+- **License**: MIT. The license texts of the libraries it uses are shipped with it.
 
-## 書き込みの範囲(不変条件)
+## What it writes (an invariant)
 
-crube が書き込むのは `.crube/` の中だけです。これはどのコマンド・どのツールでも例外がありません。
+crube writes only inside `.crube/`. No command and no tool is an exception.
 
-- プロジェクトのファイルとディレクトリは、走査して読み取るだけ。作成・変更・削除・移動はしない。
-- `crube mv` / `crube rm` は説明(エントリ)を動かす・消すだけで、実際のファイルには触れない。
-- `crube init` が作るのは `.crube/` とその中身だけ。
-- 書き込みの直前に、書き込み先が `.crube/` の中であることをコアで検証する。シンボリックリンク経由で外に出る場合も拒否する。
+- The files and directories of the project are only walked and read. They are never created, changed, deleted or moved.
+- `crube mv` / `crube rm` only move or remove descriptions (entries); they do not touch the real files.
+- `crube init` creates only `.crube/` and what is in it.
+- Right before writing, the core checks that the place written to is inside `.crube/`. One that leads outside through a symbolic link is refused too.
 
-## .crube/ の探索
+## Finding .crube/
 
-`.crube/` はプロジェクトに 1 つだけ置きます。どのコマンドも、カレントディレクトリ(または `-C` で指定したディレクトリ)から上位へ `.crube/` を探し、最初に見つかったものを使います。そのディレクトリがプロジェクトルートです。
+A project has only one `.crube/`. Every command looks for `.crube/` from the current directory (or the directory given with `-C`) upwards, and uses the first one it finds. That directory is the project root.

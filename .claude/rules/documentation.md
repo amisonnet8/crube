@@ -4,7 +4,13 @@
 
 ## 言語と置き場
 
-- `docs/`は日本語で書く。目次は`docs/README.md`で、ページを足したら目次にも足す
+- **README と`docs/`は、英語（`X.md`）と日本語（`X_ja.md`）の対で書く**。どちらかを正とせず、**片方を直したら、同じ変更でもう片方も直す**（`docs/design/decisions.md`「ドキュメントの言語」、mtqg q 058eb7067a）
+  - 各ページの1行目は言語の切り替え。英語は`*[日本語](X_ja.md) | **English***`、日本語は`*[English](X.md) | **日本語***`（ページの名前だけ。同じディレクトリにある）
+  - ほかのページへのリンクは、同じ言語のページへ張る（日本語のページからは`_ja.md`）。アンカー（`#…`）は、その言語の見出しから作られるものを書く
+  - 対がそろっていること、1行目の切り替え、他の言語へのリンクが無いことは、`e2e/docs_test.go`の`TestDocPairs`が確かめる
+  - 中身（節の並び、コードブロックの数と順）は、両方でそろえる。例のテストが、JSON の例をページの中の順番で見分けるため
+- 目次は`docs/README.md`（と`docs/README_ja.md`）で、ページを足したら両方の目次に足す
+- `CLAUDE.md`・`.claude/rules/`・mtqg の記録は、今までどおり日本語だけで書く（利用者向けの文書ではない）
 - `docs/design/`：なぜこの形なのか（今の設計とその理由）。決めたことは`docs/design/decisions.md`の表にも1行で足す
 - `docs/reference/`：正確な仕様（CLI・MCP・ファイル形式）。実装はこれに合わせる
 - `docs/examples/`：使い方の例と、サンプルの`.crube/`（`docs/examples/sample-crube/`）
@@ -16,11 +22,11 @@
 - **docs の例の値（ハッシュ・出力・件数など）は、推測で書かず、道具で求めるか、実際に動かして確かめて書く**（`.claude/rules/testing.md`「期待値は、テストを書く前に決める」と同じ考え方）。実装より先に docs を書くときも同じ
 - 例はコードブロックで書く。**`e2e/`のテストが、docs の Markdown を直接読んで実際の出力と突き合わせる**（`qsoku check`に入っている）。docs の例を書く・直したら、`qsoku check`で確かめる
   - コマンドの例は、1行目から`$ `で始まるブロックにする。`$ `の行が実際に動かされ、その下の行と比べられる（`...`の行は「何行でも」）。使えるのは`crube …`・`cd`・`export`・`unset`・行末の`; echo $?`・`  # コメント`だけ
-  - cli.md と README の例は、1つの架空のプロジェクト（`src/`・`data/`。`e2e/helpers_test.go`の`cliProject`）を前提にする。statusの例だけは別のプロジェクト（`statusProject`）。例を足すときは、このプロジェクトで実際に出る値を書く
-  - JSON の例（```json）は、どのコマンドの出力かを`e2e/docs_test.go`の`TestJSONExamples`の表に足す。足さないと「知らない例」としてテストが落ちる。コマンドの出力でない JSON（クライアントの設定など）は、同じテストの`notOutput`に足す
-  - cli.md「出力の共通の決まり」のエラー文は、1行ずつ`TestErrorExamples`の表に、それを出す場面を足す
-  - README.md と docs/README.md の`$ `の例も、`cliProject`で動かして突き合わせる（`TestREADMEExample`）。どの OS でも同じ出力になる例だけを書く（`cliProject`のシンボリックリンク`current`は、Windows で作れないことがあるので、ルートの`ls`や`status`は README の`$ `の例にしない）
-  - README のデモの画像（`docs/assets/demo.svg`）は、`e2e/demo_test.go`の`TestDemoSVG`が、実際の出力から作る。出力が変わると、このテストが落ちる。`qsoku demo`で作り直し、画像を見てからコミットする。手で書き換えない
+  - cli.md と README の例は、1つの架空のプロジェクト（`src/`・`data/`。`e2e/helpers_test.go`の`cliProjectIn`）を前提にする。**説明はページの言語で書かれていて**、英語のページは英語の説明、日本語のページは日本語の説明のプロジェクトで動かす（どちらも`structure.txt`に書く。言語ごとに違う値は`docLang`）。statusの例だけは別のプロジェクト（`statusProject`。両言語で同じ）。例を足すときは、その言語のプロジェクトで実際に出る値を書く
+  - JSON の例（```json）は、どのコマンドの出力かを`e2e/docs_test.go`の`TestJSONExamples`の表に足す。表は、英語のページの名前と、ページの中の JSON の例の順番（`docs/reference/cli.md#2`）で引く（見出しは言語で違うため）。例を途中に足すと、後ろの番号がずれる。足さないと「知らない例」としてテストが落ちる。コマンドの出力でない JSON（クライアントの設定など）は、同じテストの`notOutput`に足す
+  - cli.md「Output conventions」（cli_ja.md「出力の共通の決まり」）のエラー文は、1行ずつ`TestErrorExamples`の表に、それを出す場面を足す。見出しを変えたら`docLang`の`errors`も直す
+  - README と docs/README の`$ `の例も、その言語の`cliProjectIn`で動かして突き合わせる（`TestREADMEExample`）。どの OS でも同じ出力になる例だけを書く（`cliProject`のシンボリックリンク`current`は、Windows で作れないことがあるので、ルートの`ls`や`status`は README の`$ `の例にしない）
+  - README のデモの画像（英語は`docs/assets/demo.svg`、日本語は`demo_ja.svg`）は、`e2e/demo_test.go`の`TestDemoSVG`が、それぞれの言語のプロジェクトの実際の出力から作る。出力が変わると、このテストが落ちる。`qsoku demo`で作り直し、画像を見てからコミットする。手で書き換えない
   - ヘッダーの画像（`docs/assets/header.svg`）は手で書いた SVG。中の例は飾りで、テストしない
 
 ## `docs/design/`に書く経緯

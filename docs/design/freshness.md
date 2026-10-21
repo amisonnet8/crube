@@ -1,48 +1,50 @@
-# 鮮度と充足度
+*[日本語](freshness_ja.md) | **English***
 
-## 考え方
+# Freshness and coverage
 
-参照時に AI を使わない以上、古くなった説明を信じてしまうリスクが一番大きくなります。crube は説明をパスに結び付けているので、実ディレクトリと structure を突き合わせるだけで、AI を使わずに鮮度を検査できます。
+## The idea
 
-この検査を行うのが `crube status` です。判定はファイルの走査だけで行い、Git などの外部の情報は使いません。また、status は報告するだけで、structure もファイルも書き換えません。
+Since reading uses no AI, the biggest risk is trusting a description that has gone stale. crube ties descriptions to paths, so comparing the real directories with the structure is enough to check freshness, without AI.
 
-検査するのは、対象言語で使っている structure ファイル 1 つだけです(言語の決め方は [データモデル](data-model.md#多言語-言語ごとに独立したファイル) を参照)。
+`crube status` does this check. It only walks the files, and uses no outside information such as Git. status only reports: it changes neither the structure nor the files.
 
-## status が報告するもの
+It checks only the one structure file used for the target language (for how the language is chosen, see the [data model](data-model.md#languages-one-independent-file-per-language)).
 
-| 種類 | 判定方法 | 対処 |
+## What status reports
+
+| Kind | How it is found | What to do |
 | --- | --- | --- |
-| 未説明 | 実在するが、desc のあるエントリ(パターンを含む)が当たらない。種別(dir / file)を付けて報告 | `set` で説明を追加 |
-| 孤立 | エントリに当たる実在のパスがない(パターンなら直下の名前に 1 件も当たらない) | `mv` か `rm` |
-| 上限超え | 手で編集されたファイルに、上限を超える desc / detail がある | 値を直す |
+| untracked | It exists, but no entry with a desc (patterns included) matches it. Reported with its type (dir / file) | Add a description with `set` |
+| orphan | No real path matches the entry (for a pattern: it matches no name directly in its directory) | `mv` or `rm` |
+| invalid | A file edited by hand has a desc / detail over the limit | Fix the value |
 
-ファイルの移動は推測しません。移動すると、元のパスは「孤立」、新しいパスは「未説明」として報告されます。どれとどれが同じファイルかの判断は、使う側(人間や AI)が行い、`crube mv` で説明を付け替えます。
+Moves are not guessed. After a move, the old path is reported as an orphan and the new path as untracked. Which is the same file as which is for the user (a person or AI) to decide, and `crube mv` moves the description.
 
-## 充足度: 既定値を持たない
+## Coverage: no default
 
-「どこまで説明があれば十分か」はプロジェクトや場面によって違います。そこで crube はポリシーを持たず、次の 2 段階それぞれを満たしているか(未説明の件数)を報告するだけにします。
+"How many descriptions are enough" differs by project and by situation. So crube has no policy, and only reports whether each of these two levels is met (with the number of untracked paths).
 
-| 段階 | 満たす条件 |
+| Level | Met when |
 | --- | --- |
-| all 一致 | 対象のすべてのファイルとディレクトリに説明がある |
-| dirs 一致 | 対象のすべてのディレクトリに説明がある(ファイルは問わない) |
+| all match | Every file and directory in scope has a description |
+| dirs match | Every directory in scope has a description (files do not count) |
 
-合否が必要なときは、使う側が `crube status --require all|dirs` で段階を選びます。指定しなければ、未説明があっても終了コードには影響しません。
+When a pass or fail is needed, the user picks the level with `crube status --require all|dirs`. Without it, untracked paths do not change the exit code.
 
-例えば、CI では `--require dirs` で構成の説明漏れだけを止め、個人では all 一致を目指す、という使い分けができます。
+For example, CI can stop only missing descriptions of the structure with `--require dirs`, while a person aims at all match.
 
-## 判定の規則
+## Rules
 
-- パターンのエントリに当たるパスは、説明ありとみなす。
-- desc のない行(構造だけの行)に当たるパスは、説明なしとみなす。
-- 空ディレクトリと、ignore されたパスは対象外。空ディレクトリとは、下のどこにも対象のファイル(ignore されていないファイルとシンボリックリンク)がないディレクトリのこと。中身が ignore されたものや空のディレクトリだけでも、空とみなす。
-- 親ディレクトリに説明があっても、子は説明ありとみなさない(みなすと、ルートに 1 つ書けば全部通ってしまうため)。
-- シンボリックリンクはファイルとして数える(dirs 一致の対象外、all 一致の対象)。ディレクトリのエントリ(末尾 `/`)はリンクに当たらない。
-- ignore されたパスや空ディレクトリも実在はしているので、それに当たるエントリは孤立にしない。
-- 孤立したエントリの下と、ignore されて中を見なかったディレクトリの下のエントリは、孤立として出さない。ディレクトリを 1 つ移すと、上の 1 行だけが孤立として出る。
-- 上限超えのエントリも、当たるパスは説明ありのまま数える(上限超えは充足度に影響しない。終了コードは 1 になる)。
-- 読めないディレクトリがあれば、そのパスを示すエラーで止まる(終了コード 2)。
+- A path matched by a pattern entry counts as described.
+- A path matched by a line without a desc (a line for structure only) counts as not described.
+- Empty directories and ignored paths are out of scope. An empty directory is one with no file in scope anywhere below it (no file or symbolic link that is not ignored). A directory with only ignored or empty things in it is empty too.
+- A description of the parent directory does not count for its children (otherwise one line at the root would pass everything).
+- A symbolic link counts as a file (not in scope of dirs match; in scope of all match). A directory entry (ending in `/`) does not match a link.
+- Ignored paths and empty directories do exist, so an entry that matches one is not an orphan.
+- Entries below an orphan, and below an ignored directory whose inside was not looked at, are not reported as orphans. Moving one directory reports only the line on top as an orphan.
+- A path matched by an invalid entry still counts as described (invalid does not change coverage; the exit code is 1).
+- A directory that cannot be read stops status with an error naming its path (exit code 2).
 
-## AI による更新との関係
+## Updating with AI
 
-`crube status --json` は、説明が必要な箇所をそのまま AI への入力に使える形で出力します。AI はその一覧をもとに説明を書き込み、もう一度 status を実行して問題がなくなったことを確かめます。手順は [examples/ai-workflow.md](../examples/ai-workflow.md) を参照してください。
+`crube status --json` outputs the places that need a description in a form that can be fed to AI as it is. The AI writes descriptions from that list, and runs status again to make sure no problem is left. The steps are in [examples/ai-workflow.md](../examples/ai-workflow.md).

@@ -1,8 +1,10 @@
-# はじめての crube
+*[日本語](getting-started_ja.md) | **English***
 
-小さな Go プロジェクトに crube を導入し、説明を付けて引くまでの流れです。
+# Getting started
 
-## 1. 初期化
+How to bring crube into a small Go project, describe it, and look things up.
+
+## 1. Initialize
 
 ```
 $ cd myapp
@@ -11,9 +13,9 @@ created .crube/structure.txt
 created .crube/ignore
 ```
 
-crube が作るのは `.crube/` の中身だけです。以後のどのコマンドも、`.crube/` の外は書き換えません。
+crube creates only what is in `.crube/`. No command after this changes anything outside `.crube/`.
 
-## 2. 説明が必要な箇所を確認する
+## 2. See what needs a description
 
 ```
 $ crube status
@@ -28,7 +30,7 @@ untracked   file  internal/store/store.go
 coverage    all: no (7)   dirs: no (4)
 ```
 
-## 3. 説明を付ける
+## 3. Describe
 
 ```
 $ crube set cmd/ "Executables"
@@ -37,7 +39,7 @@ $ crube set internal/ "Private packages"
 $ crube set internal/store/ "Persistence layer (SQLite)" --detail "Also called: db, database"
 ```
 
-この時点の `.crube/structure.txt` はこうなっています(インデントと、名前と説明の区切りはタブ)。
+At this point `.crube/structure.txt` looks like this (the indentation, and the separator between name and description, are tabs).
 
 ```
 cmd/	Executables
@@ -47,7 +49,7 @@ internal/	Private packages
 		| Also called: db, database
 ```
 
-このファイルは直接編集してもかまいません。たとえば、同じ種類のファイルがたくさんある場所には、パターンで 1 行だけ書けます。
+You may edit this file directly. For example, where there are many files of the same kind, one line with a pattern is enough.
 
 ```
 internal/	Private packages
@@ -55,9 +57,9 @@ internal/	Private packages
 		*_test.go	Unit tests for the file of the same name
 ```
 
-## 4. 参照する
+## 4. Look things up
 
-`tree` は structure の内容を同じ入れ子の形で表示し、今いるディレクトリの行に `>` の印を付けます。実在するファイルを説明付きで見たいときは `ls` を使います。
+`tree` shows the structure, nested in the same way, and puts the mark `>` on the line of the directory you are in. To see the real files with descriptions, use `ls`.
 
 ```
 $ cd internal/store
@@ -72,9 +74,9 @@ $ crube find sqlite
 internal/store/   Persistence layer (SQLite)
 ```
 
-## (任意)日本語のファイルを作る
+## (Optional) Make a Japanese file
 
-言語ごとに独立したファイルを持てます。`CRUBE_LANG` を設定して `init` を実行すると、その言語の空ファイルができます。
+Each language can have a file of its own. Set `CRUBE_LANG` and run `init`, and an empty file for that language is made.
 
 ```
 $ export CRUBE_LANG=ja
@@ -87,15 +89,15 @@ $ crube tree
     store/    永続化レイヤー(SQLite)
 ```
 
-`CRUBE_LANG=ja` の間は、参照も編集も `structure_ja.txt` だけを使います。英語のファイルの説明が混ざることはありません。`structure_ja.txt` を作っていなければ、`CRUBE_LANG=ja` でも英語の `structure.txt` が使われます。
+While `CRUBE_LANG=ja`, reading and editing use only `structure_ja.txt`. Descriptions of the English file never mix in. If `structure_ja.txt` has not been made, the English `structure.txt` is used even with `CRUBE_LANG=ja`.
 
-以下は `CRUBE_LANG` を外した(英語の)状態で続けます。
+The rest goes on without `CRUBE_LANG` (in English).
 
 ```
 $ unset CRUBE_LANG
 ```
 
-## 5. 充足度を確認する
+## 5. Check the coverage
 
 ```
 $ crube status
@@ -110,8 +112,8 @@ $ crube status --require dirs; echo $?
 0
 ```
 
-ディレクトリには説明が揃ったので、dirs 一致を満たしています。どこまで求めるかはプロジェクトで決めてください。
+Every directory now has a description, so dirs match is met. How far to require is up to your project.
 
-## 6. 共有する
+## 6. Share
 
-`.crube/` の中身はテキストファイルだけなので、プロジェクトと一緒にバージョン管理や配布をすれば、ほかの人や AI エージェントも同じ説明を使えます。
+`.crube/` holds only text files, so if you keep them under version control or ship them with the project, other people and AI agents can use the same descriptions.

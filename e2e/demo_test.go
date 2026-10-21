@@ -12,46 +12,54 @@ import (
 
 // demoSession is what docs/assets/demo.svg (the animated terminal at the top
 // of README.md) shows, run in the project of cli.md: each scene is a screen,
-// and each line of it a command typed in the same shell.
-var demoSession = [][]string{
-	{"cd src/auth", "crube tree"},
-	{"crube find セッション"},
-	{"crube show session.ts"},
-	{"crube status"},
+// and each line of it a command typed in the same shell. demo_ja.svg, of
+// README_ja.md, shows the same in the project described in Japanese.
+func demoSession(l docLang) [][]string {
+	return [][]string{
+		{"cd src/auth", "crube tree"},
+		{"crube find " + l.findWord},
+		{"crube show session.ts"},
+		{"crube status"},
+	}
 }
 
-// TestDemoSVG keeps docs/assets/demo.svg the same as what crube prints: it runs
-// demoSession and draws it. With UPDATE_DEMO=1 (qsoku demo), it writes the file
-// instead of comparing.
+// TestDemoSVG keeps docs/assets/demo.svg and demo_ja.svg the same as what
+// crube prints: it runs demoSession and draws it. With UPDATE_DEMO=1 (qsoku
+// demo), it writes the files instead of comparing.
 func TestDemoSVG(t *testing.T) {
-	root, link := cliProject(t)
-	if !link {
-		t.Skip("symbolic links cannot be made here, and the status of the demo shows one")
-	}
-	s := newShell(t, root)
-	var scenes [][]demoStep
-	for _, cmds := range demoSession {
-		var scene []demoStep
-		for _, cmd := range cmds {
-			scene = append(scene, demoStep{cmd: cmd, out: splitOutput(s.exec(cmd))})
-		}
-		scenes = append(scenes, scene)
-	}
-	got := drawDemo(scenes)
+	for _, l := range docLangs {
+		name := "docs/assets/demo" + l.suffix + ".svg"
+		t.Run(name, func(t *testing.T) {
+			root, link := cliProjectIn(t, l)
+			if !link {
+				t.Skip("symbolic links cannot be made here, and the status of the demo shows one")
+			}
+			s := newShell(t, root)
+			var scenes [][]demoStep
+			for _, cmds := range demoSession(l) {
+				var scene []demoStep
+				for _, cmd := range cmds {
+					scene = append(scene, demoStep{cmd: cmd, out: splitOutput(s.exec(cmd))})
+				}
+				scenes = append(scenes, scene)
+			}
+			got := drawDemo(scenes)
 
-	path := filepath.Join("..", "docs", "assets", "demo.svg")
-	if os.Getenv("UPDATE_DEMO") == "1" {
-		if err := os.WriteFile(path, []byte(got), 0o644); err != nil {
-			t.Fatal(err)
-		}
-		return
-	}
-	want, err := os.ReadFile(path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(want) != got {
-		t.Error("docs/assets/demo.svg is not what crube prints now: run qsoku demo, and look at the new image before committing it")
+			path := filepath.Join("..", filepath.FromSlash(name))
+			if os.Getenv("UPDATE_DEMO") == "1" {
+				if err := os.WriteFile(path, []byte(got), 0o644); err != nil {
+					t.Fatal(err)
+				}
+				return
+			}
+			want, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if string(want) != got {
+				t.Errorf("%s is not what crube prints now: run qsoku demo, and look at the new image before committing it", name)
+			}
+		})
 	}
 }
 

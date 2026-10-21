@@ -258,26 +258,78 @@ func project(t *testing.T, files map[string]string, structure string) string {
 	return root
 }
 
+// docLang is one language of the docs: the pages of English are X.md, those
+// of Japanese X_ja.md. The examples of each are written with descriptions in
+// that language, so each runs in a project described in it.
+type docLang struct {
+	suffix    string // added to the name of a page before ".md"
+	structure string // the structure file of cliProject
+	findWord  string // the word the find examples look for
+	csvDesc   string // the desc of data/*.csv
+	errors    string // the heading of the error examples in cli.md
+	snapshot  string // the text before the structure file shown in getting-started.md
+}
+
+var (
+	english = docLang{
+		suffix: "",
+		structure: "src/\tApplication source code\n" +
+			"\tauth/\tAuthentication (login, sessions, token refresh)\n" +
+			"\t\t| The entry point is index.ts.\n" +
+			"\t\tsession.ts\tSession storage and expiry\n" +
+			"\t\t\t| Sessions are kept in Redis; each access extends the expiry.\n" +
+			"\t\t\t| The expiry is set by session.ttl in config/auth.yaml.\n" +
+			"\t\t*_test.go\tTests of the file of the same name\n" +
+			"\tmain.go\tEntry point\n" +
+			"data/\tData files\n" +
+			"\t*.csv\tCSV data\n",
+		findWord: "session",
+		csvDesc:  "CSV data",
+		errors:   "Output conventions",
+		snapshot: "At this point `.crube/structure.txt`",
+	}
+	japanese = docLang{
+		suffix: "_ja",
+		structure: "src/\tアプリケーションのソースコード\n" +
+			"\tauth/\t認証(ログイン、セッション、トークン更新)\n" +
+			"\t\t| 入口は index.ts。\n" +
+			"\t\tsession.ts\tセッションの保存と有効期限の管理\n" +
+			"\t\t\t| セッションは Redis に保存し、アクセスのたびに有効期限を延長する。\n" +
+			"\t\t\t| 有効期限は config/auth.yaml の session.ttl で設定する。\n" +
+			"\t\t*_test.go\t同名ファイルのテスト\n" +
+			"\tmain.go\tエントリポイント\n" +
+			"data/\tデータ格納場所\n" +
+			"\t*.csv\tCSVデータ\n",
+		findWord: "セッション",
+		csvDesc:  "CSVデータ",
+		errors:   "出力の共通の決まり",
+		snapshot: "この時点の `.crube/structure.txt`",
+	}
+	docLangs = []docLang{english, japanese}
+)
+
+// page is the name of the page name ("docs/reference/cli.md") in l.
+func (l docLang) page(name string) string {
+	return strings.TrimSuffix(name, ".md") + l.suffix + ".md"
+}
+
 // cliProject is the project of the examples of docs/reference/cli.md and
-// README.md. It tells whether the symbolic link "current" could be made (not
-// always on Windows).
+// README.md, described in English. It tells whether the symbolic link
+// "current" could be made (not always on Windows).
 func cliProject(t *testing.T) (root string, link bool) {
+	t.Helper()
+	return cliProjectIn(t, english)
+}
+
+// cliProjectIn is cliProject described in the language of l.
+func cliProjectIn(t *testing.T, l docLang) (root string, link bool) {
 	t.Helper()
 	root = project(t, map[string]string{
 		"src/main.go":         "",
 		"src/auth/session.ts": "",
 		"src/db/conn.go":      "",
 		"data/2026.csv":       "",
-	}, "src/\tアプリケーションのソースコード\n"+
-		"\tauth/\t認証(ログイン、セッション、トークン更新)\n"+
-		"\t\t| 入口は index.ts。\n"+
-		"\t\tsession.ts\tセッションの保存と有効期限の管理\n"+
-		"\t\t\t| セッションは Redis に保存し、アクセスのたびに有効期限を延長する。\n"+
-		"\t\t\t| 有効期限は config/auth.yaml の session.ttl で設定する。\n"+
-		"\t\t*_test.go\t同名ファイルのテスト\n"+
-		"\tmain.go\tエントリポイント\n"+
-		"data/\tデータ格納場所\n"+
-		"\t*.csv\tCSVデータ\n")
+	}, l.structure)
 	link = os.Symlink("releases/v2", filepath.Join(root, "current")) == nil
 	return root, link
 }
