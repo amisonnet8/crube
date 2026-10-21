@@ -111,3 +111,7 @@ go.mod	Go module and its dependencies
 go.sum	Checksums of the dependencies
 qsokufile	Named commands for build, test and lint (qsoku)
 trivy.yaml	Trivy settings: what counts as a vulnerability or license failure
+e2e/	Checks of the docs against what crube really does, and of the MCP server against the CLI
+	helpers_test.go	Reading Markdown code blocks, a small shell for the $ lines, and the example projects
+	docs_test.go	getting-started, the cli.md and README examples, the JSON examples and the error lines
+	mcp_test.go	Each MCP tool returns what the CLI --json gives, and fails with the same message

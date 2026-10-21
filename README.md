@@ -9,6 +9,7 @@ $ crube tree
 >   auth/          認証(ログイン、セッション、トークン更新)
       session.ts   セッションの保存と有効期限の管理
       *_test.go    同名ファイルのテスト
+    main.go        エントリポイント
   data/            データ格納場所
     *.csv          CSVデータ
 ```

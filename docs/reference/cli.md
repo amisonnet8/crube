@@ -183,6 +183,7 @@ $ crube tree
 >   auth/          認証(ログイン、セッション、トークン更新)
       session.ts   セッションの保存と有効期限の管理
       *_test.go    同名ファイルのテスト
+    main.go        エントリポイント
   data/            データ格納場所
     *.csv          CSVデータ
 ```
@@ -198,12 +199,13 @@ $ crube tree
 ```
 $ cd src/db          # src/db/ のエントリがない
 $ crube tree src/ -d 2
-> src/      アプリケーションのソースコード  (here: src/db/)
-    auth/   認証(ログイン、セッション、トークン更新)
+> src/        アプリケーションのソースコード  (here: src/db/)
+    auth/     認証(ログイン、セッション、トークン更新)
+    main.go   エントリポイント
 ```
 
 - `path` を指定すると、そのエントリの部分木だけを表示する。`-d` で深さを制限する(省略時は制限なし)。
-- `--json` では、エントリを入れ子の JSON で出力する。最上位の `here` は現在のディレクトリ(プロジェクトルートなら `""`)、各エントリの `here` は印を付ける行かどうか。
+- `--json` では、エントリを入れ子の JSON で出力する。最上位の `here` は現在のディレクトリ(プロジェクトルートなら `""`)、各エントリの `here` は印を付ける行かどうか。次の例は、`src/auth` で `crube tree src/ -d 2 --json` を実行したときの出力。
 
 ```json
 {
@@ -212,7 +214,9 @@ $ crube tree src/ -d 2
     { "name": "src/", "path": "src/", "desc": "アプリケーションのソースコード", "detail": "", "here": false,
       "children": [
         { "name": "auth/", "path": "src/auth/", "desc": "認証(ログイン、セッション、トークン更新)",
-          "detail": "入口は index.ts。", "here": true, "children": [] }
+          "detail": "入口は index.ts。", "here": true, "children": [] },
+        { "name": "main.go", "path": "src/main.go", "desc": "エントリポイント",
+          "detail": "", "here": false, "children": [] }
       ] }
   ]
 }
@@ -245,7 +249,8 @@ src/auth/session.ts   セッションの保存と有効期限の管理
   "more": 0,
   "items": [
     { "path": "src/auth/",           "desc": "認証(ログイン、セッション、トークン更新)", "detail": "入口は index.ts。" },
-    { "path": "src/auth/session.ts", "desc": "セッションの保存と有効期限の管理",          "detail": "" }
+    { "path": "src/auth/session.ts", "desc": "セッションの保存と有効期限の管理",
+      "detail": "セッションは Redis に保存し、アクセスのたびに有効期限を延長する。\n有効期限は config/auth.yaml の session.ttl で設定する。" }
   ]
 }
 ```
@@ -264,8 +269,8 @@ data/2026.csv
   entry   data/*.csv
   desc    CSVデータ
 
-$ crube show internal/auth/session.go
-internal/auth/session.go
+$ crube show src/auth/session.ts
+src/auth/session.ts
   desc    セッションの保存と有効期限の管理
   detail  セッションは Redis に保存し、アクセスのたびに有効期限を延長する。
           有効期限は config/auth.yaml の session.ttl で設定する。

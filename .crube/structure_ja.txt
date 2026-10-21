@@ -111,3 +111,7 @@ go.mod	Go モジュールと依存
 go.sum	依存のチェックサム
 qsokufile	ビルド・テスト・lint の名前つきコマンド（qsoku）
 trivy.yaml	Trivy の設定：何を脆弱性・ライセンスの失敗とみなすか
+e2e/	docs と実際の動きの突き合わせ、MCP サーバーと CLI の一致の確認
+	helpers_test.go	Markdown のコードブロックの読み込み、$ の行を動かす小さなシェル、例のプロジェクト
+	docs_test.go	getting-started、cli.md と README の例、JSON の例、エラー文の確認
+	mcp_test.go	MCP の各ツールが CLI の --json と同じものを返し、同じ文で失敗すること
