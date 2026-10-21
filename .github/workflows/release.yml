@@ -1,0 +1,35 @@
+name: Release
+
+# A tag pushed by a person (v0.1.0) runs the checks of ci.yml, then builds the
+# archives with goreleaser (.goreleaser.yaml) and attaches them to a draft
+# Release. The person reads the draft and publishes it
+# (.claude/rules/distribution.md).
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to make the draft Release
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # goreleaser reads the earlier tags for the changelog
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - uses: goreleaser/goreleaser-action@v7
+        with:
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

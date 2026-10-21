@@ -1,0 +1,52 @@
+# The release archives of crube (.claude/rules/distribution.md). On a tag,
+# .github/workflows/release.yml runs this and attaches the archives to a draft
+# Release; a person reads the draft and publishes it. Locally: qsoku snapshot.
+version: 2
+
+project_name: crube
+
+before:
+  hooks:
+    # The license texts of what is built into crube, put into every archive.
+    - go run ./tools/licenses bin/licenses
+
+builds:
+  - main: ./cmd/crube
+    binary: crube
+    env:
+      - CGO_ENABLED=0
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    flags:
+      - -trimpath
+    # The tag as it is (v0.1.0), the same as go install shows.
+    ldflags:
+      - -s -w -X main.version={{ .Tag }}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  - formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+      - README_ja.md
+      - src: bin/licenses/**/*
+        dst: licenses
+        strip_parent: false
+
+checksum:
+  name_template: checksums.txt
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-snapshot"
+
+changelog:
+  sort: asc
+
+release:
+  draft: true
+  replace_existing_draft: true

@@ -35,6 +35,7 @@
 .github/	GitHub の設定
 	workflows/	GitHub Actions のワークフロー
 		ci.yml	CI：Linux・macOS・Windows での qsoku check、race、ShellCheck、Trivy
+		release.yml	タグで動くリリース。ci.yml を通してから、goreleaser の配布物を下書きの Release に添付する
 .mtqg/	mtqg の作業記録：メモ・todo・質問・不具合・用語・決まり事
 	.gitattributes	journal.jsonl を merge=union でマージする
 	.gitignore	.local/ を git に入れない
@@ -140,3 +141,10 @@ e2e/	docs と実際の動きの突き合わせ、MCP サーバーと CLI の一�
 	demo_test.go	実際の出力から docs/assets/demo.svg と demo_ja.svg を描き、古くなっていないか確かめる
 	completion_test.go	補完スクリプトを、入っている本物のシェルで動かす
 *_ja.md	X.md の日本語のページ（README_ja.md）
+.goreleaser.yaml	配布物の作り方（goreleaser）
+	| タグで .github/workflows/release.yml が、手元では qsoku snapshot が使う。.claude/rules/distribution.md を参照。
+tools/	プロジェクトを作るための道具（crube には組み込まれない）
+	licenses/	配布物に入れる依存のライセンス文を集める
+		| go run ./tools/licenses <dir>。goreleaser がビルドの前に動かす。ライセンスのファイルが無いモジュールがあれば失敗する。
+		main.go	crube に組み込まれるモジュールを go list -deps で求め、ライセンス文を写す
+		main_test.go	ライセンス文を集める処理のテスト。crube 自身のライセンスの一覧を丸ごと比べる

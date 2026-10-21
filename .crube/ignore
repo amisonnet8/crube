@@ -24,6 +24,7 @@ node_modules/
 !/.gitattributes
 !/.srwrignore
 !/.golangci.yaml
+!/.goreleaser.yaml
 !/.mcp.json
 !/.devcontainer/
 !/.github/

@@ -17,6 +17,7 @@
 | `qsoku shellcheck` | 追跡中の`*.sh`・`*.bash`をShellCheckにかける | シェルスクリプトを足したとき |
 | `qsoku hook` | `.claude/hooks/require-bcuz.test.sh`（bcuz を強制するフックの判定の表。`jq`が要る） | `require-bcuz.sh`を変えたとき |
 | `qsoku demo` | README のデモの画像（`docs/assets/demo.svg`・`demo_ja.svg`）を、今の crube の出力から作り直す（e2e の`TestDemoSVG`に`UPDATE_DEMO=1`を付けて動かす） | crube の出力を変えて、`TestDemoSVG`が落ちたとき。作り直したら、画像を見てからコミットする |
+| `qsoku snapshot` | `goreleaser check`のあと、タグなしで配布物を`dist/`に作る（`.goreleaser.yaml`。goreleaser が要る） | タグを打つ前、`.goreleaser.yaml`や`tools/licenses`を変えたとき。中身を見てからタグを打つ（`.claude/rules/distribution.md`） |
 | `qsoku crube <引数>` | 今のソースを`bin/crube`にビルドして、その場で動かす（引数を受ける。居場所は呼んだところのまま） | このリポジトリの`.crube/`を保つとき（`qsoku crube status --require all`、`qsoku crube set …`）、場所を引くとき（`qsoku crube find …`） |
 
 **`qsoku cross`（最初は無効）**：`GOOS=windows`・`darwin`で`go vet`と`golangci-lint run`を動かす。`qsokufile`にコメントで置いてある。**OSごとのファイル（`_windows.go`・`_unix.go`、ビルドタグ）を足したら**、行頭の`# `を外して有効にし、`check`に`&& qsoku cross`を足し、上の表にも足す。Linuxだけで動かしていると、Windows向けのファイルが壊れていてもCIのWindowsで初めて落ちる（`syscall.Flock`のようなUnix専用の呼び出しなど）

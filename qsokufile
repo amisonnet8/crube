@@ -34,3 +34,6 @@ shellcheck: (cd //; git ls-files '*.sh' '*.bash' | xargs -r shellcheck)
 hook: (cd //; bash .claude/hooks/require-bcuz.test.sh)
 crube: (cd //; go build -o bin/crube ./cmd/crube) && "$QSOKU_ROOT/bin/crube" "$@"
 demo: (cd //; mkdir -p docs/assets && env UPDATE_DEMO=1 go test -count=1 -run "^TestDemoSVG$" ./e2e/)
+# The release archives of .goreleaser.yaml, made without a tag into dist/, to
+# look at before tagging (needs goreleaser: .claude/rules/distribution.md).
+snapshot: (cd //; goreleaser check && goreleaser release --snapshot --clean)

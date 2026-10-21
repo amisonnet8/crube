@@ -14,6 +14,7 @@
 ├── .gitattributes          （`* text=auto eol=lf`）
 ├── .gitignore
 ├── .golangci.yaml          ← lintの設定
+├── .goreleaser.yaml        ← 配布物の作り方（goreleaser。`release.yml`と`qsoku snapshot`が使う。`.claude/rules/distribution.md`）
 ├── trivy.yaml              ← 脆弱性・ライセンス検査の設定
 ├── .mcp.json               ← mtqgとsrwrのMCPサーバーの配線
 ├── .srwrignore             ← srwrがテープに記録しないファイル（`.mtqg/`・`.bcuz/`など）
@@ -34,6 +35,7 @@
 │   ├── status/             ← 走査と差分エンジン（未説明・孤立・上限超え・充足度）。読むだけ
 │   ├── structure/          ← structure ファイルの読み込みと正規形での書き出し、desc・detail の上限の検証
 │   └── textwidth/          ← 表示幅（全角2・半角1・曖昧1・結合文字0）
+├── tools/licenses/         ← 配布物に入れる依存のライセンス文を集める道具（goreleaser が`go run`で動かす。crube には組み込まれない）
 ├── docs/                   ← 設計と仕様（各ページが英語`X.md`と日本語`X_ja.md`の対。目次は`docs/README.md`）
 │   ├── design/             ← なぜこの形なのか
 │   ├── reference/          ← 正確な仕様（CLI・MCP・ファイル形式）
@@ -41,7 +43,7 @@
 │   └── assets/             ← README の画像（`header.svg`は手で書いたもの、`demo.svg`・`demo_ja.svg`は`qsoku demo`がテストで作るもの）
 ├── .devcontainer/          ← 開発環境（devcontainer.json、postCreate.sh）
 ├── .claude/                ← rules/（ルール）、skills/（commit-with-tape：テープを閉じてコミットする手順。mutation-check：壊して確かめる手順と、変異の道具`mutants/`（別の Go モジュール）・crube の仕様の変異の一覧）、hooks/（build.sh、require-bcuz.sh とそのテスト）、settings.json（人間が管理する）
-├── .github/workflows/      ← CI
+├── .github/workflows/      ← CI（`ci.yml`）と、タグで動くリリース（`release.yml`。`ci.yml`を呼んでから下書きの Release を作る）
 └── .mtqg/                  ← mtqgの記録
 ```
 
