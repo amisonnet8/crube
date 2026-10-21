@@ -25,6 +25,40 @@
 | `-C <dir>` | 指定したディレクトリで実行したものとして動作する |
 | `--no-ignore` | 除外設定を無効にする |
 
+- オプションは、位置引数の前後どこに書いてもよい(`crube ls src --full`)。値をとるオプションは `--limit 3` でも `--limit=3` でもよい。
+- `--` より後ろは、すべて位置引数として読む(`crube set -- note.txt "-v flag help"`)。
+- `set`・`rm`・`mv`・`init` は `--json` をまだ受け付けない(形は MCP の書き込みツールと合わせて決める)。`init` が受け付けるのは `-C` だけ、`set`・`rm`・`mv` は `-C` に加えて各自のオプション。
+
+## 使い方と版
+
+```
+$ crube --help
+usage: crube <command> [arguments]
+
+commands:
+  init     create .crube/
+  ls       list a directory with descriptions
+  tree     show the descriptions as a tree
+  find     search paths and descriptions
+  show     show the description of one path
+  status   report undescribed, orphan and invalid entries
+  set      add or change a description
+  rm       remove a description
+  mv       move a description
+
+common options: --json  -C <dir>  --no-ignore
+
+$ crube ls -h
+usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore]
+
+$ crube --version
+crube v0.1.0
+```
+
+- `--help`・`-h`・`help` は標準出力に出して終了コード 0。引数なしの `crube` は、同じものを標準エラー出力に出して終了コード 2。
+- 各コマンドの `-h`・`--help` は、その書式を 1 行で出す。
+- `--version` は配布物に埋めた版を出す。配布物でないビルドでは `crube (devel)`。
+
 ## 言語
 
 設定ファイルはありません。言語は環境変数 `CRUBE_LANG`(BCP 47。`ja`、`zh-CN` など)だけで指定します。
@@ -61,6 +95,17 @@ crube: no .crube/ found (run crube init)
 crube: desc is 300 columns wide (limit 256)
 crube: src/foo.go: no such file
 crube: build/x: ignored by .crube/ignore (use --no-ignore)
+```
+
+引数の誤りは、コマンド名を付けて `crube: <コマンド>: <内容>` の 1 行で出します(終了コード 2)。引数の数の誤りには、そのコマンドの書式を添えます。
+
+```
+crube: unknown command "lss" (see crube --help)
+crube: ls: unknown option --foo
+crube: ls: -C needs a value
+crube: find: invalid --limit "x" (use a number of 1 or more)
+crube: ls: too many arguments (usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore])
+crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [-C <dir>])
 ```
 
 ### JSON
@@ -178,6 +223,7 @@ src/auth/session.ts  セッションの保存と有効期限の管理
 ```
 
 - **照合**: 大文字・小文字を区別しない部分一致。空白で区切った複数の語は、すべてを含むもの(AND)だけに当たる。語はパス・desc・detail のどこに含まれていてもよい。
+- **複数の引数**: 空白でつないで 1 つの `query` にする(`crube find auth session` は `crube find "auth session"` と同じ)。
 - **順序**: structure ファイルの順。
 - **表示**: パスと desc の 2 列。desc の開始位置を揃える。
 - `--limit N` で件数を絞る(省略時は制限なし)。省いたものがあれば、最後に `… 3 more (use --limit)` のように件数を出す。

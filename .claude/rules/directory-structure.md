@@ -17,7 +17,9 @@
 ├── .srwrignore             ← srwrがテープに記録しないファイル（`.mtqg/`・`.bcuz/`など）
 ├── .bcuz/                  ← bcuzの記録（`history.jsonl`）。`postCreate.sh`が`bcuz --init`で作る。**コミットする**（`merge=union`）
 ├── .srwr/                  ← srwrの鍵・ロック・テープ（最初のhook・MCPの呼び出しでできる。**閉じた`tapes/*.gz`だけコミットする**）
+├── cmd/crube/              ← CLIの`main.go`（引数・環境を`internal/cli`に渡すだけ。リリースの版を受け取る`version`）
 ├── internal/               ← このモジュールの中だけで使うコード（コア）
+│   ├── cli/                ← CLI（引数の解析、`core`の呼び出し、出力・エラー文・終了コード）。判定は`core`に任せる
 │   ├── core/               ← CLIとMCPが呼ぶ操作（init・set・rm・mv、参照の操作）。ほかのパッケージを組み合わせる
 │   ├── ignore/             ← `.crube/ignore`の除外判定（gitignore と同じ書式）と、init が書く既定の中身
 │   ├── lang/               ← `CRUBE_LANG`から使う structure ファイルを1つ決める
@@ -48,7 +50,8 @@
 
 ## 各ファイル・ディレクトリの補足
 
-- **`cmd/`**: まだ無い。CLIの`crube`を実装するときに`cmd/crube/main.go`を作る。`main.go`は引数を`internal/`に渡すだけにする
+- **`cmd/crube/`**: `main.go`は、引数・環境変数・標準出力を`internal/cli`の`Run`に渡し、その終了コードで終わるだけにする。テストは`internal/cli`に書く
+- **`internal/cli/`**: 引数をどう読むか、結果をどう見せるか（JSON・テキスト）、エラーを`crube: …`の1行と終了コードにすることだけを持つ。値の検証・合否の判定（`status --require`など）は`core`にあり、ここには書かない。MCP（[4-1]）も同じ`core`を呼ぶ
 - **`internal/`**: Goの仕組みとして、モジュールの外からimportできない。外へ公開するパッケージは`internal/`に置かない
 - **`internal/core/`**: CLI・MCPから呼ばれる操作の入口。引数の検証・判定はここか、ここが呼ぶパッケージに置き、CLI・MCPには書かない。書き込みは`internal/project`の関数だけを通す
 - **`internal/structure/`**: structure ファイルのバイト列と木（`Tree`・`Entry`）の変換だけを持つ。ファイルの探索・ディスクへの書き込み・照合は持たない（ほかのコアのパッケージに置く）
