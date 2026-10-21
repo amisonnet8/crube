@@ -2,6 +2,8 @@
 
 新しいファイルを追加する際は、どこに置くかをここで確かめる。**構成を変えたら、この文書も同じ変更の中で直す。**
 
+**このリポジトリ自身の説明（`.crube/`）も保つ。** ファイル・ディレクトリを足す・動かす・消すときは、同じ変更の中で`qsoku crube set`／`mv`／`rm`で説明を直し、コミットの前に`qsoku crube status --require all`を通す（説明は英語で`.crube/structure.txt`に書く。`.crube/`の中は srwr で直接直してもよい）。コミットしないものを`.gitignore`に足したら、`.crube/ignore`にも足す（crube は`.gitignore`を読まない）
+
 ```
 .
 ├── CLAUDE.md               ← プロジェクトルール（参照先の案内）
@@ -17,6 +19,7 @@
 ├── .srwrignore             ← srwrがテープに記録しないファイル（`.mtqg/`・`.bcuz/`など）
 ├── .bcuz/                  ← bcuzの記録（`history.jsonl`）。`postCreate.sh`が`bcuz --init`で作る。**コミットする**（`merge=union`）
 ├── .srwr/                  ← srwrの鍵・ロック・テープ（最初のhook・MCPの呼び出しでできる。**閉じた`tapes/*.gz`だけコミットする**）
+├── .crube/                 ← このリポジトリ自身の説明（crube の dogfooding。`structure.txt`は英語、`ignore`は`.gitignore`に合わせて手で保つ）。**コミットする**
 ├── cmd/crube/              ← CLIの`main.go`（引数・環境を`internal/cli`に渡すだけ。リリースの版を受け取る`version`）
 ├── internal/               ← このモジュールの中だけで使うコード（コア）
 │   ├── cli/                ← CLI（引数の解析、`core`の呼び出し、出力・エラー文・終了コード）。判定は`core`に任せる
@@ -68,5 +71,5 @@
 - **`.gitignore`のドットファイル**: ルート直下のドットファイル・ドットディレクトリは**許可リスト方式**（`/.*`を無視し、追跡するものだけ`!`で戻す。`.claude/`の中は`/.claude/*`を無視して`settings.json`・`rules/`・`skills/`・`hooks/`だけ戻す）。サンドボックスが作業ディレクトリ直下に出すダミーファイルを`git add -A`で混ぜないため（`.claude/rules/testing.md`）。**追跡するドットファイルを新しく足すときは、`.gitignore`に`!`の行を足すこと**。足さないと`git add`が無視する
 - **配布物（ビルド済みバイナリ）**: リポジトリにコミットしない。`.gitignore`には**ルート直下に限定して**書く（`/名前`）。名前だけを書くと、同名のソースディレクトリまで無視される
 - **`docs/`**: 設計と仕様。書き方は`.claude/rules/documentation.md`
-- **`docs/examples/sample-crube/`**: 説明用のサンプル。このリポジトリ自身の`.crube/`ではない（ドットで始まらないので`.gitignore`の許可リストの対象外）。このリポジトリ自身に`.crube/`を置くときは、`.gitignore`に`!/.crube/`を足す
+- **`docs/examples/sample-crube/`**: 説明用のサンプル。このリポジトリ自身の`.crube/`（ルート直下。`.gitignore`の`!/.crube/`で戻している）とは別物。ドットで始まらないので`.gitignore`の許可リストの対象外
 - **シェルスクリプト**: 最小限にする。追跡中のものは`qsoku shellcheck`の対象になる（`.claude/rules/testing.md`）

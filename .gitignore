@@ -18,6 +18,8 @@
 !/.devcontainer/
 !/.github/
 !/.mtqg/
+# This repository's own descriptions of its files (crube dogfooding).
+!/.crube/
 # bcuz's record of the commands run (.claude/rules/bcuz-usage.md). Shared, like
 # .mtqg/; .gitattributes merges it with merge=union.
 !/.bcuz/

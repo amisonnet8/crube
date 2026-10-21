@@ -1,0 +1,110 @@
+.bcuz/	Record of the commands run through bcuz (committed)
+	history.jsonl	One JSON line per command: when, why, what and the exit code
+.claude/	Claude Code settings shared in the repository
+	hooks/	Hooks that Claude Code runs around its tools
+		build.sh	Runs qsoku build after a .go, go.mod or go.sum file is changed with srwr
+		require-bcuz.sh	PreToolUse hook that refuses Bash commands not run through bcuz
+		require-bcuz.test.sh	Table of the commands require-bcuz.sh allows and refuses (qsoku hook)
+	rules/	Rules for working in this repository (Japanese); CLAUDE.md says when to read each
+		bcuz-usage.md	How to run Bash commands through bcuz, and keeping secrets out of them
+		datetime.md	Dates and times: keep UTC, show in the local time zone
+		directory-structure.md	Where each file goes, and the layout of the repository
+		distribution.md	How crube is released (tags and draft releases made by people)
+		documentation.md	How to write docs/: example values come from tools
+		mtqg-usage.md	How to record memos, todos, questions, bugs and rules with mtqg
+		naming.md	Names: the product, the terms and the commands
+		qsoku-usage.md	The qsoku names for build, test and lint, and how to call them
+		srwr-usage.md	Editing files only through srwr (strict mode), and closing tapes
+		testing.md	Test policy, and pitfalls of the sandbox and of CI on each OS
+		working-with-human.md	How to ask people: small blockers, checks, and approval of what users see
+	settings.json	Permissions, sandbox and hooks of Claude Code (managed by people)
+	skills/	Skills of Claude Code
+		commit-with-tape/	Skill: close the srwr tape and commit
+			SKILL.md	The steps of the skill
+.devcontainer/	Development container
+	devcontainer-lock.json	Versions of the features the container was built with
+	devcontainer.json	Container definition and VS Code settings
+	postCreate.sh	Installs the tools (qsoku, mtqg, srwr, bcuz, golangci-lint, Trivy) after the container is made
+.github/	GitHub settings
+	workflows/	GitHub Actions workflows
+		ci.yml	CI: qsoku check on Linux, macOS and Windows, the race detector, ShellCheck and Trivy
+.mtqg/	Process record kept with mtqg: memos, todos, questions, bugs, glossary and rules
+	.gitattributes	Merges journal.jsonl with merge=union
+	.gitignore	Keeps .local/ out of git
+	SCHEMA.md	Data format of journal.jsonl
+	journal.jsonl	The records, one JSON line each (written only through mtqg)
+	version	Version of the mtqg data format
+.srwr/	srwr: tapes of the file edits made by AI, each with its reason
+	tapes/	Closed tapes (committed); replay them with srwr view
+		*.tape.jsonl.gz	One tape for each unit of work, compressed
+cmd/	Executables
+	crube/	The crube command
+		main.go	Entry point: hands the arguments to internal/cli
+docs/	Design and specification (Japanese)
+	README.md	Table of contents of the docs
+	design/	Why crube is shaped as it is
+		architecture.md	Architecture: the core, the CLI and the MCP server, and the write guard
+		data-model.md	Data model: the tree text format, names and patterns, desc and detail
+		decisions.md	Table of the decisions made, with their reasons
+		freshness.md	Freshness and coverage: what status reports, and status --require
+		overview.md	Overview, basic policies and terms
+	examples/	Examples of use
+		ai-workflow.md	How an AI agent keeps the descriptions up to date with status, set, mv and rm
+		getting-started.md	First steps: init, status, set, tree, find
+		sample-crube/	A sample .crube/ (not the one of this repository)
+			ignore	Sample ignore file
+			structure.txt	Sample structure file in English
+			structure_ja.txt	Sample structure file in Japanese
+	reference/	Exact specification
+		cli.md	CLI reference: commands, options, output and exit codes
+		file-format.md	File format of .crube/: structure files and the ignore file
+		mcp.md	MCP server reference: the tools and what they return
+internal/	Packages of crube: the core, and the CLI on top of it
+	cli/	Command line: parses arguments, calls core, writes JSON or text
+		args.go	Option parser (options may come before or after the arguments)
+		cli.go	Commands, help, version, exit codes and error lines
+		text.go	Text output: aligned columns, cutting to the terminal width, the status table
+		*_test.go	Tests of the file of the same name
+	core/	The operations that the CLI and the MCP server call
+		core.go	Opening a project, loading the structure file of the language, reading the ignore file
+		edit.go	set, rm and mv
+		init.go	init
+		read.go	ls, tree and show, and the wiring of find and status
+		*_test.go	Tests of the file of the same name
+	ignore/	.crube/ignore: the rules of .gitignore, and the default file written by init
+		ignore.go	Parsing and matching of the ignore rules
+		*_test.go	Tests, with the expected values taken from git check-ignore
+	lang/	Choosing the structure file from CRUBE_LANG
+		lang.go	Language tags and file names (structure_<tag>.txt)
+		*_test.go	Tests of the file of the same name
+	match/	Matching real paths to entries (exact name first, then patterns in order)
+		match.go	Child, Walk and Find
+		*_test.go	Tests of the file of the same name
+	project/	Finding .crube/, and the only code that writes into it (the write guard)
+		project.go	FindRoot, and writes that refuse anything outside .crube/ or through a symbolic link
+		*_test.go	Tests of the file of the same name
+	search/	find: search of entry paths, desc and detail, without an index
+		search.go	Case-insensitive search; all the words must be found
+		*_test.go	Tests of the file of the same name
+	status/	status: walks the project and compares it with the structure file (read only)
+		status.go	Untracked paths, orphan entries, invalid values and coverage
+		*_test.go	Tests of the file of the same name
+	structure/	Structure files: parsing, writing in the canonical form, limits of desc and detail
+		limits.go	Limits of desc (256 columns) and detail (4096), and names that cannot be written
+		structure.go	Parse and Format of the tab-indented tree
+		*_test.go	Tests of the file of the same name
+	textwidth/	Display width: wide characters 2, combining characters 0, the rest 1
+		textwidth.go	Width of a rune and of a string
+		*_test.go	Tests, with the expected widths taken from Python's unicodedata
+.gitattributes	Line endings (LF everywhere) and merge=union for the record files
+.gitignore	Files kept out of git; dot entries in the root are an allowlist
+.golangci.yaml	golangci-lint settings
+.mcp.json	MCP servers of mtqg and srwr for Claude Code
+.srwrignore	Files srwr does not put on its tapes
+CLAUDE.md	Rules for Claude Code in this repository, and the rule files to read
+LICENSE	MIT license
+README.md	What crube is, with an example
+go.mod	Go module and its dependencies
+go.sum	Checksums of the dependencies
+qsokufile	Named commands for build, test and lint (qsoku)
+trivy.yaml	Trivy settings: what counts as a vulnerability or license failure
