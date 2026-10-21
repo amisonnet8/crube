@@ -1,0 +1,134 @@
+# crube の仕様の約束を、1つずつ壊す変異の一覧（SKILL.md の②。mutants -spec で使う）
+# 1行が1つ：名前 | ファイル | 元の文字列 | 新しい文字列（⏎ は改行、⇥ はタブ。元の文字列はファイルに1回だけ出てくること）
+# 名前は仕様の言葉で書く。実装が変わって元の文字列が見つからなくなったら、mutants が行番号つきで知らせるので、直す
+# 照合
+照合: 完全一致をパターンより優先しない | internal/match/match.go | ⇥⇥if e.Name == exact {⏎⇥⇥⇥return e | ⇥⇥if false && e.Name == exact {⏎⇥⇥⇥return e
+照合: パターンは後に書いたものが勝つ | internal/match/match.go | ⇥for _, e := range entries {⏎⇥⇥if e.IsDir() != isDir { | ⇥for i := range entries {⏎⇥⇥e := entries[len(entries)-1-i]⏎⇥⇥if e.IsDir() != isDir {
+照合: パターンの照合でディレクトリ用とファイル用を区別しない | internal/match/match.go | ⇥⇥if e.IsDir() != isDir {⏎⇥⇥⇥continue | ⇥⇥if false {⏎⇥⇥⇥continue
+照合: 途中の名前もファイルとして照合する | internal/match/match.go | isDir || i < len(names)-1 | isDir || i < 0
+照合: パス途中で当たらなくても最後まで進む | internal/match/match.go | ⇥⇥if e == nil {⏎⇥⇥⇥break | ⇥⇥if e == nil {⏎⇥⇥⇥continue
+# 書き込みガード
+ガード: .crube がシンボリックリンクでも書く | internal/project/project.go | if fi.Mode()&fs.ModeSymlink != 0 {⏎⇥⇥return "", &GuardError{Path: rel, Reason: DirName + " is a symbolic link"} | if false {⏎⇥⇥return "", &GuardError{Path: rel, Reason: DirName + " is a symbolic link"}
+ガード: .crube がディレクトリでなくても書く | internal/project/project.go | if !fi.IsDir() {⏎⇥⇥return "", &GuardError | if false {⏎⇥⇥return "", &GuardError
+ガード: 書き込み先がシンボリックリンクでも書く | internal/project/project.go | case fi.Mode()&fs.ModeSymlink != 0: | case false:
+ガード: 書き込み先が通常のファイルでなくても書く | internal/project/project.go | case !fi.Mode().IsRegular(): | case false:
+ガード: 書き込み前の名前の検査をしない | internal/project/project.go | ⇥rel := DirName + "/" + name⏎⇥if err := checkName(name); err != nil { | ⇥rel := DirName + "/" + name⏎⇥if err := checkName("x"); err != nil {
+ガード: 名前に区切りを含んでも通す | internal/project/project.go | strings.ContainsAny(name, `/\`) || filepath.Base(name) != name | strings.ContainsAny(name, "")
+ガード: 名前の .. を通す | internal/project/project.go | name == "" || name == "." || name == ".." | name == ""
+ガード: 読むときに名前を検査しない | internal/project/project.go | ⇥if err := checkName(name); err != nil {⏎⇥⇥return nil, err | ⇥if err := checkName("x"); err != nil {⏎⇥⇥return nil, err
+ガード: CreateFile が既存のファイルを上書きする | internal/project/project.go | os.O_WRONLY|os.O_CREATE|os.O_EXCL | os.O_WRONLY|os.O_CREATE|os.O_TRUNC
+ガード: MakeDir が既存の .crube でも失敗しない | internal/project/project.go | return os.Mkdir(Dir(root), 0o755) | return os.MkdirAll(Dir(root), 0o755)
+ガード: .crube がファイルでもプロジェクトルートとする | internal/project/project.go | err == nil && fi.IsDir() { | err == nil && fi != nil {
+ガード: WriteFile が一時ファイルを残す | internal/project/project.go | ⇥if err := os.Rename(tmp.Name(), filepath.Join(dir, name)); err != nil { | ⇥if err := os.WriteFile(filepath.Join(dir, name), data, 0o644); err != nil {
+# 差分エンジン
+差分: desc の無いエントリも説明済みとする | internal/status/status.go | return e != nil && e.Desc != "" | return e != nil
+差分: 中身の無いディレクトリも未説明に出す | internal/status/status.go | ⇥⇥if !sub {⏎⇥⇥⇥w.dirs = w.dirs[:at] | ⇥⇥if !sub && false {⏎⇥⇥⇥w.dirs = w.dirs[:at]
+差分: 除外したディレクトリの下も調べる | internal/status/status.go | ⇥⇥if w.ign.Ignored(p, true) { | ⇥⇥if false {
+差分: 除外したファイルも未説明に出す | internal/status/status.go | ⇥⇥if w.ign.Ignored(p, false) { | ⇥⇥if false {
+差分: シンボリックリンクをたどる | internal/status/status.go | isDir := de.IsDir() && de.Type()&os.ModeSymlink == 0 | isDir := de.IsDir() || de.Type()&os.ModeSymlink != 0
+差分: 調べなかったディレクトリの下も孤立とする | internal/status/status.go | ⇥⇥if !w.reached[e] {⏎⇥⇥⇥continue | ⇥⇥if false {⏎⇥⇥⇥continue
+# 同じ意味なので外す（孤立の子は reached にならず、もともと出ない）
+# 差分: 孤立の下も孤立として出す | internal/status/status.go | Path: prefix + e.Name})⏎⇥⇥⇥continue | Path: prefix + e.Name})
+差分: 除外したパスに当たるエントリを孤立にする | internal/status/status.go | ⇥⇥if e != nil {⏎⇥⇥⇥w.hit[e] = true | ⇥⇥if e != nil && !w.ign.Ignored(append(names[:len(names):len(names)], de.Name()), isDir) {⏎⇥⇥⇥w.hit[e] = true
+差分: 未説明のファイルをディレクトリより先に出す | internal/status/status.go | ⇥r.Items = append(r.Items, w.dirs...)⏎⇥r.Items = append(r.Items, w.files...) | ⇥r.Items = append(r.Items, w.files...)⏎⇥r.Items = append(r.Items, w.dirs...)
+差分: 充足度 dirs にファイルも数える | internal/status/status.go | r.Coverage.Dirs = level(len(w.dirs)) | r.Coverage.Dirs = level(len(w.dirs) + len(w.files))
+差分: 充足度 all にディレクトリを数えない | internal/status/status.go | r.Coverage.All = level(len(w.dirs) + len(w.files)) | r.Coverage.All = level(len(w.files))
+差分: detail の上限超えを見ない | internal/status/status.go | structure.CheckDesc(e.Desc), structure.CheckDetail(e.Detail)} | structure.CheckDesc(e.Desc)}
+差分: 子の上限超えを見ない | internal/status/status.go | ⇥⇥invalid(e.Children, p, r) | 
+差分: 上限超えを問題としない | internal/status/status.go | it.Kind == Orphan || it.Kind == Invalid | it.Kind == Orphan
+差分: 孤立を問題としない | internal/status/status.go | it.Kind == Orphan || it.Kind == Invalid | it.Kind == Invalid
+# structure ファイル
+形式: 空白のインデントを受け入れる | internal/structure/structure.go | if strings.HasPrefix(body, " ") { | if false {
+形式: 重複したエントリを受け入れる | internal/structure/structure.go | if first, ok := parent.names[name]; ok { | if first, ok := parent.names[name]; false && ok {
+形式: ファイルのエントリに子を許す | internal/structure/structure.go | if parent.entry != nil && !parent.entry.IsDir() { | if false {
+形式: 名前の / を受け入れる | internal/structure/structure.go | if strings.Contains(base, "/") { | if false {
+形式: 2段深いインデントを受け入れる | internal/structure/structure.go | if depth >= len(p.frames) { | if depth >= len(p.frames)+1 {
+形式: CRLF の CR を残す | internal/structure/structure.go | ⇥line = strings.TrimRightFunc(line, unicode.IsSpace)⏎⇥if line == "" { | ⇥line = strings.TrimRight(line, " \t")⏎⇥if line == "" {
+形式: detail の行頭の空白をすべて消す | internal/structure/structure.go | strings.TrimPrefix(body[1:], " ") | strings.TrimLeft(body[1:], " ")
+形式: 読むとき desc の空白を残す | internal/structure/structure.go | Desc: strings.TrimSpace(desc)} | Desc: desc}
+形式: detail の空行を「| 」で書く | internal/structure/structure.go | b.WriteString("|\n") | b.WriteString("| \n")
+形式: detail の行末の空白を残して書く | internal/structure/structure.go | if line = strings.TrimRightFunc(line, unicode.IsSpace); line == "" { | if line == "" {
+形式: 書くとき desc の無いエントリにもタブを付ける | internal/structure/structure.go | if desc := strings.TrimSpace(e.Desc); desc != "" { | if desc := strings.TrimSpace(e.Desc); true {
+形式: desc の改行を許す | internal/structure/limits.go | if strings.ContainsAny(desc, "\r\n") { | if false {
+形式: detail の幅に改行を数える | internal/structure/limits.go | for _, line := range strings.Split(detail, "\n") { | for _, line := range []string{detail} {
+形式: 名前の前後の空白を許す | internal/structure/limits.go | strings.HasPrefix(base, " ") || strings.HasSuffix(base, " ") || | false ||
+形式: 名前「| 」を許す | internal/structure/limits.go | base == "|" || strings.HasPrefix(base, "| ") { | false {
+形式: 名前のタブを許す | internal/structure/limits.go | strings.ContainsAny(base, "/\t\r\n") || | strings.ContainsAny(base, "/") ||
+# ignore
+除外: 否定（!）を無視する | internal/ignore/ignore.go | ⇥⇥r.negate = true | ⇥⇥r.negate = false
+除外: 末尾の / でもファイルに当てる | internal/ignore/ignore.go | ⇥⇥r.dirOnly = true | ⇥⇥r.dirOnly = false
+除外: 途中の / でルートに固定しない | internal/ignore/ignore.go | anchored := strings.Contains(s, "/") | anchored := strings.HasPrefix(s, "/")
+除外: 先頭の / でもどこでも当てる | internal/ignore/ignore.go | anchored := strings.Contains(s, "/") | anchored := strings.Contains(s[min(1, len(s)):], "/")
+除外: 除外したディレクトリの中を ! で戻せる | internal/ignore/ignore.go | for i := 1; i <= len(names); i++ { | for i := len(names); i <= len(names); i++ {
+除外: .crube を常には除外しない | internal/ignore/ignore.go | if len(names) > 0 && names[0] == project.DirName { | if len(names) > 0 && names[0] == project.DirName+"x" {
+除外: a/** が a そのものに当たる | internal/ignore/ignore.go | ⇥⇥⇥⇥return len(names) > 0 | ⇥⇥⇥⇥return true
+除外: 最初に当たった規則が勝つ | internal/ignore/ignore.go | ⇥⇥⇥ignored = !r.negate | ⇥⇥⇥ignored = !r.negate⏎⇥⇥⇥break
+除外: # の行を規則として読む | internal/ignore/ignore.go | if s == "" || strings.HasPrefix(s, "#") { | if s == "" {
+除外: CRLF の CR を残す | internal/ignore/ignore.go | parseLine(strings.TrimSuffix(line, "\r")) | parseLine(line)
+除外: 「\ 」で終わる行の空白も消す | internal/ignore/ignore.go | for strings.HasSuffix(s, " ") && !strings.HasSuffix(s, `\ `) { | for strings.HasSuffix(s, " ") {
+除外: 末尾の空白を消さない | internal/ignore/ignore.go | for strings.HasSuffix(s, " ") && !strings.HasSuffix(s, `\ `) { | for false {
+# 言語
+言語: en を既定の言語としない | internal/lang/lang.go | return tag == "" || tag == "en" | return tag == ""
+言語: タグの終わりを確かめない | internal/lang/lang.go | (-[A-Za-z0-9]{1,8})*$` | (-[A-Za-z0-9]{1,8})*`
+言語: タグの長さを確かめない | internal/lang/lang.go | ^[A-Za-z0-9]{1,8}( | ^[A-Za-z0-9]+(
+言語: 言語のファイルが無くても既定に戻らない | internal/lang/lang.go | ⇥case err == nil || errors.Is(err, fs.ErrNotExist):⏎⇥⇥return DefaultFile, nil | ⇥case err == nil || errors.Is(err, fs.ErrNotExist):⏎⇥⇥return name, nil
+言語: ディレクトリの structure_xx.txt を使う | internal/lang/lang.go | case err == nil && fi.Mode().IsRegular(): | case err == nil && fi != nil:
+# 表示幅
+幅: 曖昧幅を2とする | internal/textwidth/textwidth.go | case width.EastAsianWide, width.EastAsianFullwidth: | case width.EastAsianWide, width.EastAsianFullwidth, width.EastAsianAmbiguous:
+幅: 結合文字（Mn）を1とする | internal/textwidth/textwidth.go | unicode.In(r, unicode.Mn, unicode.Me, unicode.Cf) | unicode.In(r, unicode.Me, unicode.Cf)
+幅: 書式文字（Cf）を1とする | internal/textwidth/textwidth.go | unicode.In(r, unicode.Mn, unicode.Me, unicode.Cf) | unicode.In(r, unicode.Mn, unicode.Me)
+幅: 囲み記号（Me）を1とする | internal/textwidth/textwidth.go | unicode.In(r, unicode.Mn, unicode.Me, unicode.Cf) | unicode.In(r, unicode.Mn, unicode.Cf)
+幅: 全角（F）を1とする | internal/textwidth/textwidth.go | case width.EastAsianWide, width.EastAsianFullwidth: | case width.EastAsianWide:
+# 検索
+検索: 大文字小文字を区別する | internal/search/search.go | if hasAll(strings.ToLower(path+"\n"+e.Desc+"\n"+e.Detail), words) { | if hasAll(path+"\n"+e.Desc+"\n"+e.Detail, words) {
+検索: 1語でも当たれば出す | internal/search/search.go | ⇥⇥if !strings.Contains(text, w) {⏎⇥⇥⇥return false⏎⇥⇥}⏎⇥}⏎⇥return true | ⇥⇥if strings.Contains(text, w) {⏎⇥⇥⇥return true⏎⇥⇥}⏎⇥}⏎⇥return false
+検索: 除外したパスも出す | internal/search/search.go | ⇥⇥⇥if ign.Ignored(p, e.IsDir()) { | ⇥⇥⇥if false {
+検索: 上限を超えた件数を数えない | internal/search/search.go | ⇥⇥⇥⇥⇥f.More++ | ⇥⇥⇥⇥⇥f.More = 0
+検索: 子のエントリを探さない | internal/search/search.go | ⇥⇥⇥walk(e.Children, p) | 
+検索: detail を探さない | internal/search/search.go | path+"\n"+e.Desc+"\n"+e.Detail | path+"\n"+e.Desc
+検索: パスを探さない | internal/search/search.go | path+"\n"+e.Desc+"\n"+e.Detail | e.Desc+"\n"+e.Detail
+検索: 語の境の改行をまたいで当てる | internal/search/search.go | path+"\n"+e.Desc+"\n"+e.Detail | path+e.Desc+e.Detail
+# 編集（core）
+編集: detail を省いたとき既存の detail を消す | internal/core/edit.go | ⇥⇥if detail != nil {⏎⇥⇥⇥e.Detail = d | ⇥⇥{⏎⇥⇥⇥e.Detail = d
+編集: 新しいエントリを兄弟の先頭に入れる | internal/core/edit.go | ⇥⇥⇥*list = append(*list, e) | ⇥⇥⇥*list = append([]*structure.Entry{e}, *list...)
+編集: desc の前後の空白を残す | internal/core/edit.go | ⇥desc = strings.TrimSpace(desc) | ⇥desc = desc + ""
+編集: desc の上限を確かめない | internal/core/edit.go | ⇥if err := structure.CheckDesc(desc); err != nil {⏎⇥⇥return nil, err | ⇥if err := structure.CheckDesc(""); err != nil {⏎⇥⇥return nil, err
+編集: detail の上限を確かめない | internal/core/edit.go | if err := structure.CheckDetail(d); err != nil { | if err := structure.CheckDetail(""); err != nil {
+編集: detail の CR を LF にしない | internal/core/edit.go | ⇥s = strings.ReplaceAll(s, "\r", "\n") | ⇥s = s + ""
+編集: detail の行末の空白を残す | internal/core/edit.go | lines[i] = strings.TrimRight(l, " \t") | lines[i] = l
+編集: rm の件数に下のエントリを数えない | internal/core/edit.go | Removed: count(e)} | Removed: count(&structure.Entry{Name: e.Name})}
+編集: mv の件数に下のエントリを数えない | internal/core/edit.go | Moved: count(e)} | Moved: 1}
+編集: 自分の中への mv を許す | internal/core/edit.go | if len(toNames) > len(fromNames) && slices.Equal(toNames[:len(fromNames)], fromNames) { | if false {
+編集: mv 先が既にあっても動かす | internal/core/edit.go | if _, j := lookup(tree, toNames); j >= 0 { | if _, j := lookup(tree, toNames); false && j >= 0 {
+編集: mv でディレクトリとファイルの種類を変えられる | internal/core/edit.go | if strings.HasSuffix(from, "/") != strings.HasSuffix(to, "/") { | if false {
+編集: 空の名前（a//b）を受け入れる | internal/core/edit.go | ⇥⇥if part == "" {⏎⇥⇥⇥return nil, fmt.Errorf("invalid entry path %q", entryPath) | ⇥⇥if false {⏎⇥⇥⇥return nil, fmt.Errorf("invalid entry path %q", entryPath)
+編集: 名前の検査をしない | internal/core/edit.go | ⇥⇥if err := structure.CheckName(name); err != nil {⏎⇥⇥⇥return nil, err | ⇥⇥if err := structure.CheckName("x"); err != nil {⏎⇥⇥⇥return nil, err
+編集: どの OS でも \ を区切りとする | internal/core/edit.go | ⇥if osSeparator == | ⇥if true || osSeparator ==
+編集: Windows でも \ を区切りとしない | internal/core/edit.go | ⇥if osSeparator == | ⇥if false && osSeparator ==
+編集: 足りない親を足さない（作らずに失敗） | internal/core/edit.go | ⇥⇥⇥*list = append(*list, &structure.Entry{Name: name})⏎⇥⇥⇥j = len(*list) - 1 | ⇥⇥⇥return list
+編集: 失敗しても書き込む | internal/core/core.go | ⇥if err := change(tree); err != nil {⏎⇥⇥return err⏎⇥} | ⇥_ = change(tree)
+編集: 書き込みのガードを通らずに書く | internal/core/core.go | return project.WriteFile(p.Root, name, tree.Format()) | return writeNoGuard(filepath.Join(project.Dir(p.Root), name), tree.Format())⏎}⏎⏎var writeNoGuard = func(string, []byte) error { return nil }⏎⏎func _() {
+# 参照（core）
+参照: ls で除外した名前も出す | internal/core/read.go | ⇥⇥if ign.Ignored(append(names[:len(names):len(names)], de.Name()), isDir) {⏎⇥⇥⇥continue | ⇥⇥if false {⏎⇥⇥⇥continue
+参照: ls でシンボリックリンクをディレクトリとする | internal/core/read.go | isDir := de.IsDir() && de.Type()&fs.ModeSymlink == 0 | isDir := de.IsDir() || de.Type()&fs.ModeSymlink != 0
+参照: ls で除外したディレクトリを開く | internal/core/read.go | ⇥if len(names) > 0 && ign.Ignored(names, true) { | ⇥if false {
+参照: ls でディレクトリが照合されなくても直下のエントリを使う | internal/core/read.go | ⇥⇥entries = nil⏎ | ⇥⇥entries = tree.Entries⏎
+# 同じ意味なので外す（Linux では ToSlash が何もしない。Windows の CI が TestTextShowLink で見る）
+# 参照: show でリンクの宛先を / にそろえない | internal/core/read.go | r.Link = filepath.ToSlash(target) | r.Link = target + ""
+参照: show で除外したパスを出す | internal/core/read.go | ⇥if ign.Ignored(names, isDir) {⏎⇥⇥return nil, ignored(path) | ⇥if ign.Ignored(names, isDir) && false {⏎⇥⇥return nil, ignored(path)
+参照: プロジェクトの外のパスを受け入れる | internal/core/read.go | if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) { | if err != nil {
+参照: tree で除外したエントリも出す | internal/core/read.go | ⇥⇥⇥if ign.Ignored(n, e.IsDir()) { | ⇥⇥⇥if ign.Ignored(n, e.IsDir()) && false {
+参照: tree の深さを1つ多く出す | internal/core/read.go | if o.Depth <= 0 || level < o.Depth { | if o.Depth <= 0 || level <= o.Depth {
+参照: tree で今いる場所に印を付けない | internal/core/read.go | Here:     e == marked, | Here:     e == marked && false,
+参照: tree で上のエントリに付けた印を知らせない | internal/core/read.go | r.Above = len(chain) < len(here) | r.Above = false
+参照: status --kind の絞り込みで充足度も変える | internal/core/read.go | ⇥r.Items = items⏎⇥return nil | ⇥r.Items = items⏎⇥r.Coverage.All.Missing = len(items)⏎⇥return nil
+参照: --require all で dirs を見る | internal/core/read.go | ⇥⇥lv = r.Coverage.All | ⇥⇥lv = r.Coverage.Dirs
+参照: --require でも孤立・上限超えを見ない | internal/core/read.go | return r.HasProblems() || !lv.OK, nil | return !lv.OK, nil
+参照: AtRoot が今いる場所のまま | internal/core/core.go | ⇥q.dir = p.Root | ⇥q.dir = p.dir
+参照: --no-ignore でも ignore を読む | internal/core/core.go | ⇥if p.noIgnore {⏎⇥⇥return ignore.None(), nil | ⇥if false {⏎⇥⇥return ignore.None(), nil
+# 同じ意味なので外す（Parse(nil) と &Matcher{} は中身が同じ）
+# 参照: ignore が無いとき .crube も出す | internal/core/core.go | ⇥⇥return ignore.Parse(nil), nil | ⇥⇥return &ignore.Matcher{}, nil
+# init
+init: 既にある .crube でも言語のファイルを作らない | internal/core/init.go | ⇥⇥if err := project.CreateFile(root, name, nil); err != nil { | ⇥⇥if err := project.CreateFile(root, "structure.txt", nil); err != nil {
+init: 英語以外でも言語のファイルを作らない | internal/core/init.go | ⇥if name != lang.DefaultFile {⏎⇥⇥files = append(files, file{name, ""}) | ⇥if false {⏎⇥⇥files = append(files, file{name, ""})
+init: 既定の ignore を空で書く | internal/core/init.go | file{ignore.FileName, ignore.Default} | file{ignore.FileName, ""}

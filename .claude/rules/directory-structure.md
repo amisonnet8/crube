@@ -39,7 +39,7 @@
 │   ├── reference/          ← 正確な仕様（CLI・MCP・ファイル形式）
 │   └── examples/           ← 使い方の例。`sample-crube/`はサンプルの`.crube/`
 ├── .devcontainer/          ← 開発環境（devcontainer.json、postCreate.sh）
-├── .claude/                ← rules/（ルール）、skills/（commit-with-tape：テープを閉じてコミットする手順）、hooks/（build.sh、require-bcuz.sh とそのテスト）、settings.json（人間が管理する）
+├── .claude/                ← rules/（ルール）、skills/（commit-with-tape：テープを閉じてコミットする手順。mutation-check：壊して確かめる手順と、変異の道具`mutants/`（別の Go モジュール）・crube の仕様の変異の一覧）、hooks/（build.sh、require-bcuz.sh とそのテスト）、settings.json（人間が管理する）
 ├── .github/workflows/      ← CI
 └── .mtqg/                  ← mtqgの記録
 ```

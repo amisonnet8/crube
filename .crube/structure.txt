@@ -21,6 +21,13 @@
 	skills/	Skills of Claude Code
 		commit-with-tape/	Skill: close the srwr tape and commit
 			SKILL.md	The steps of the skill
+		mutation-check/	Skill: break the code on purpose to see that the tests notice
+			SKILL.md	The steps of the skill
+			crube-spec.txt	Mutations that break the promises of crube one by one, in the words of the spec
+			mutants/	The tool that makes the mutations and runs the tests (a Go module of its own)
+				go.mod	Module definition, apart from crube
+				main.go	Makes syntactic mutations, or those of a list, one at a time, and puts the files back
+				main_test.go	Tests of the tool
 .devcontainer/	Development container
 	devcontainer-lock.json	Versions of the features the container was built with
 	devcontainer.json	Container definition and VS Code settings

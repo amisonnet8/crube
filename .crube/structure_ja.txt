@@ -21,6 +21,13 @@
 	skills/	Claude Code のスキル
 		commit-with-tape/	スキル：srwr のテープを閉じてコミットする
 			SKILL.md	スキルの手順
+		mutation-check/	スキル：実装をわざと壊して、テストが気づくか確かめる
+			SKILL.md	スキルの手順
+			crube-spec.txt	crube の仕様の約束を1つずつ壊す変異の一覧（仕様の言葉で書く）
+			mutants/	変異を入れてテストを回す道具（独立した Go モジュール）
+				go.mod	モジュールの定義（crube とは別）
+				main.go	構文の変異、または一覧の変異を1つずつ入れ、ファイルを元に戻す
+				main_test.go	道具のテスト
 .devcontainer/	開発用のコンテナ
 	devcontainer-lock.json	コンテナを作ったときの feature の版
 	devcontainer.json	コンテナの定義と VS Code の設定
