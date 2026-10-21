@@ -130,6 +130,23 @@ func TestLs(t *testing.T) {
 	}
 }
 
+// In a directory that no entry matches, nothing is matched: not even by the
+// entries of the root, whose names may be the same.
+func TestLsUnmatchedDirectory(t *testing.T) {
+	root := readProject(t)
+	if err := os.WriteFile(filepath.Join(root, "src", "db", "go.mod"), nil, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	r, err := open(t, Options{Dir: root}).Ls("src/db")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []LsItem{{"conn.go", "file", "", ""}, {"go.mod", "file", "", ""}}
+	if !reflect.DeepEqual(r.Items, want) {
+		t.Errorf("items = %+v, want %+v", r.Items, want)
+	}
+}
+
 func TestLsRefused(t *testing.T) {
 	root := readProject(t)
 	p := open(t, Options{Dir: root})
@@ -257,6 +274,7 @@ func TestTree(t *testing.T) {
 		{"without the mark (MCP)", "src/auth", TreeOptions{}, "", false, all},
 		{"depth 1", "", TreeOptions{Depth: 1}, "", false, []string{"src/", "data/", "go.mod"}},
 		{"depth 2", "", TreeOptions{Depth: 2}, "", false, []string{"src/", "  src/auth/", "data/", "  data/*.csv", "go.mod"}},
+		{"depth 3: the deepest level", "", TreeOptions{Depth: 3}, "", false, all},
 		{"a subtree", "", TreeOptions{Path: "src/auth/"}, "", false,
 			[]string{"src/auth/", "  src/auth/session.go", "  src/auth/*_test.go"}},
 		{"a subtree with a depth", "", TreeOptions{Path: "src/", Depth: 2}, "", false,

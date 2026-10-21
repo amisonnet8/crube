@@ -85,6 +85,22 @@ func TestParseNormalizes(t *testing.T) {
 	}
 }
 
+// Format trims the desc again, so the trimming done when reading is checked on
+// the tree itself (docs/reference/file-format.md: the desc is without the white
+// space around it).
+func TestParseTrimsDesc(t *testing.T) {
+	tree, err := Parse([]byte("a\t   x y  \nb\t \n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := tree.Entries[0].Desc; got != "x y" {
+		t.Errorf("desc of a = %q, want %q", got, "x y")
+	}
+	if got := tree.Entries[1].Desc; got != "" {
+		t.Errorf("desc of b = %q, want none", got)
+	}
+}
+
 func TestParseErrors(t *testing.T) {
 	tests := []struct {
 		name string

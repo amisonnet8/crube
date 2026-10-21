@@ -223,6 +223,18 @@ func TestTruncate(t *testing.T) {
 		t.Errorf("tree: %d %q\ngot:\n%s\nwant:\n%s", code, errs, out, want)
 	}
 
+	// At 41 columns the line with the note is exactly as wide as the terminal;
+	// counting the 2 spaces before the note wrong would cut "アプ…" to "ア…".
+	want = "" +
+		"> src/             アプ…  (here: src/db/)\n" +
+		"    auth/          認証(ログイン、セッシ…\n" +
+		"      session.ts   セッションの保存と有…\n" +
+		"  data/            データ格納場所\n"
+	code, out, errs = runText(t, 41, "tree", "-C", filepath.Join(dir, "src", "db"))
+	if code != 0 || out != want || errs != "" {
+		t.Errorf("tree at 41: %d %q\ngot:\n%s\nwant:\n%s", code, errs, out, want)
+	}
+
 	// ls cuts on a terminal, but not with --full.
 	code, out, _ = runText(t, 20, "ls", "-C", dir, "src")
 	if want := "auth/   認証(ログイ…\ndb/     ! no descri…\n"; code != 0 || out != want {

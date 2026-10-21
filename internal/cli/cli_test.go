@@ -162,6 +162,9 @@ func TestArgumentErrors(t *testing.T) {
 		{[]string{"ls", "a", "b"}, "crube: ls: too many arguments (usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore])\n"},
 		{[]string{"set", "x"}, "crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--json] [-C <dir>])\n"},
 		{[]string{"find"}, "crube: find: missing <query> (usage: crube find <query> [--limit N] [--json] [-C <dir>] [--no-ignore])\n"},
+		{[]string{"show"}, "crube: show: missing <path> (usage: crube show <path> [--json] [-C <dir>] [--no-ignore])\n"},
+		{[]string{"rm"}, "crube: rm: missing <path> (usage: crube rm <path> [--json] [-C <dir>])\n"},
+		{[]string{"mv", "x"}, "crube: mv: missing <to> (usage: crube mv <from> <to> [--json] [-C <dir>])\n"},
 		{[]string{"init", "--json"}, "crube: init: unknown option --json\n"},
 		{[]string{"find", "-C", dir, "--limit", "0", "q"}, `crube: find: invalid --limit "0" (use a number of 1 or more)` + "\n"},
 		{[]string{"tree", "-C", dir, "-d", "x"}, `crube: tree: invalid -d "x" (use a number of 1 or more)` + "\n"},
@@ -185,6 +188,7 @@ func TestCoreErrors(t *testing.T) {
 		{"", []string{"ls", "--json", "-C", t.TempDir()}, "crube: no .crube/ found (run crube init)\n"},
 		{"", []string{"init", "-C", dir}, "crube: nothing to create: .crube/structure.txt already exists\n"},
 		{"bad_tag", []string{"ls", "--json", "-C", dir}, `crube: invalid CRUBE_LANG "bad_tag" (use a language tag such as ja or zh-CN)` + "\n"},
+		{"bad_tag", []string{"mcp"}, `crube: invalid CRUBE_LANG "bad_tag" (use a language tag such as ja or zh-CN)` + "\n"},
 		{"", []string{"show", "--json", "-C", dir, "nothing"}, "crube: nothing: no such file\n"},
 		{"", []string{"rm", "-C", dir, "nothing"}, "crube: no entry nothing\n"},
 	}

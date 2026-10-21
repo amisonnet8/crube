@@ -20,6 +20,7 @@ func TestString(t *testing.T) {
 		{"precomposed e acute (U+00E9, ambiguous)", "\xc3\xa9", 1},
 		{"e and combining acute (U+0301)", "e\xcc\x81", 1},
 		{"zero width joiner (U+200D)", "a\xe2\x80\x8db", 2},
+		{"a and combining enclosing circle (U+20DD, Me)", "a\xe2\x83\x9d", 1},
 		{"emoji", "😀", 2},
 		{"tab", "\t", 1},
 		{"mixed", "認証(ログイン、セッション、トークン更新)", 40},
@@ -34,7 +35,7 @@ func TestString(t *testing.T) {
 }
 
 func TestRune(t *testing.T) {
-	for r, want := range map[rune]int{'a': 1, 'あ': 2, 'ｱ': 1, '○': 1, 0x0301: 0, 0x200d: 0} {
+	for r, want := range map[rune]int{'a': 1, 'あ': 2, 'ｱ': 1, '○': 1, 0x0301: 0, 0x20dd: 0, 0x200d: 0} {
 		if got := Rune(r); got != want {
 			t.Errorf("Rune(%U) = %d, want %d", r, got, want)
 		}

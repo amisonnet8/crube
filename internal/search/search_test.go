@@ -65,6 +65,8 @@ func TestFind(t *testing.T) {
 		{"auth 有効期限", []string{"src/auth/session.ts"}},
 		{"  data   csv  ", []string{"data/*.csv"}},
 		{"セッション billing", nil},
+		// A word is in one field: it does not run from the path into the desc.
+		{"src/アプリケーション", nil},
 		// An entry without a desc is found by its path.
 		{"docs/", []string{"docs/", "docs/README.md"}},
 		// Ignored entries, and what is below them, are not found.

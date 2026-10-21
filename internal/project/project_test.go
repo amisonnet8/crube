@@ -2,6 +2,7 @@ package project
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -212,6 +213,21 @@ func TestMakeDir(t *testing.T) {
 	}
 }
 
+// ReadFile reads only directly in .crube/: a name that leads elsewhere is
+// refused before anything is read.
+func TestReadFileRefusesBadNames(t *testing.T) {
+	root := tempDir(t)
+	mkdir(t, filepath.Join(root, ".crube", "sub"))
+	writeFile(t, filepath.Join(root, "secret.txt"), "outside")
+	writeFile(t, filepath.Join(root, ".crube", "sub", "x"), "below")
+	for _, name := range []string{"../secret.txt", "sub/x", "..", ".", ""} {
+		b, err := ReadFile(root, name)
+		if err == nil || err.Error() != fmt.Sprintf("invalid file name %q", name) {
+			t.Errorf("%q: got %q, %v; want the error for the name", name, b, err)
+		}
+	}
+}
+
 // Every refused write must leave the file system as it was.
 func TestWriteRefused(t *testing.T) {
 	type write func(root, name string, data []byte) error
@@ -225,8 +241,8 @@ func TestWriteRefused(t *testing.T) {
 				for _, name := range []string{"", ".", "..", "../x", "sub/x", `sub\x`, "/abs"} {
 					err := w(root, name, []byte("x"))
 					var ge *GuardError
-					if !errors.As(err, &ge) {
-						t.Errorf("%q: got %v, want a *GuardError", name, err)
+					if !errors.As(err, &ge) || ge.Reason != fmt.Sprintf("invalid file name %q", name) {
+						t.Errorf("%q: got %v, want a *GuardError for the name", name, err)
 					}
 				}
 				if got := names(t, root); !reflect.DeepEqual(got, []string{".crube"}) {
