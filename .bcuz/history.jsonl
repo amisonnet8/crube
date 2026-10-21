@@ -251,3 +251,6 @@
 {"v":1,"ts":"2026-10-21T06:14:46.560Z","why":"[5-2] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":9}
 {"v":1,"ts":"2026-10-21T06:14:48.888Z","why":"[5-2] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":17}
 {"v":1,"ts":"2026-10-21T06:14:49.082Z","why":"[5-2] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-21T06:14:55.546Z","why":"[5-2] の変更・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".srwr/tapes",".claude/rules/testing.md","docs/design/decisions.md","docs/reference/cli.md","internal/core/edit.go","internal/core/edit_test.go","internal/core/read.go"],"dir":".","exit":0,"ms":5}
+{"v":1,"ts":"2026-10-21T06:22:56.383Z","why":"閉じられる QA を探すため、開いている質問を一覧する","cmd":["mtqg","q","list"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-21T06:23:01.384Z","why":"回答どおり [5-2] で実装・docs に反映しコミット済み（90b4933）なので閉じる","cmd":["mtqg","q","done","8fceb0ee85"],"dir":".","exit":0,"ms":4}
