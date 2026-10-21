@@ -16,7 +16,7 @@
 }
 ```
 
-サーバーは起動したディレクトリから上位へ `.crube/` を探します。言語は、サーバー起動時の環境変数 `CRUBE_LANG` で決まります(クライアント設定の `env` で指定できます)。書き込み系ツールも、書き込むのは `.crube/` の中だけです。`remove_description` / `move_description` は説明を消す・付け替えるだけで、ファイルには触れません。
+サーバーは起動したディレクトリから上位へ `.crube/` を探します。言語は、サーバー起動時の環境変数 `CRUBE_LANG` で決まります(クライアント設定の `env` で指定できます)。言語タグの形でなければ、サーバーは起動せずに終了コード 2 で止まります。書き込み系ツールも、書き込むのは `.crube/` の中だけです。`remove_description` / `move_description` は説明を消す・付け替えるだけで、ファイルには触れません。
 
 ## ツール一覧
 
@@ -33,7 +33,7 @@
 | 書き込み | `remove_description` | path | `{ "path", "removed" }`(`removed` は配下を含めて消えたエントリの数) |
 | 書き込み | `move_description` | from, to | `{ "from", "to", "moved" }`(`moved` は配下を含めて動いたエントリの数) |
 
-- 引数は、書いていないもの(`path`・`depth`・`limit`・`kinds`・`detail`)を省ける。`depth`・`limit` は省略か 0 で制限なし。`set_description` の `detail` は、省略するとそのまま、`""` で消す。
+- 引数は、書いていないもの(`path`・`depth`・`limit`・`kinds`・`detail`)を省ける。`depth`・`limit` は省略か 0 で制限なし、負の数はエラー。`set_description` の `detail` は、省略するとそのまま、`""` で消す。
 - `ls`・`show` の `path` は、**プロジェクトルートからの相対**(サーバーを起動した場所によらない)。MCP には現在地がなく、返すパスもルートからの相対なので、結果のパスをそのまま次の呼び出しに渡せる。
 - `status` の `kinds` は `untracked`・`orphan`・`invalid` の配列。`items` だけを絞り、`coverage` は常にプロジェクト全体。ほかの値はエラー。
 - ツールは呼ばれるたびに `.crube/` を読み直す。サーバーを動かしたまま `.crube/` を直しても、次の呼び出しから反映される。

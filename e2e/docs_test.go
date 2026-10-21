@@ -60,19 +60,23 @@ func TestCLIExamples(t *testing.T) {
 	}
 }
 
-// TestREADMEExample runs the example at the top of README.md, in the project
-// of cli.md.
+// TestREADMEExample runs the example at the top of README.md and of
+// docs/README.md, in the project of cli.md.
 func TestREADMEExample(t *testing.T) {
-	root, _ := cliProject(t)
-	n := 0
-	for _, b := range readBlocks(t, "README.md") {
-		if strings.HasPrefix(b.body, "$ ") {
-			runSession(t, newShell(t, root), b.body)
-			n++
-		}
-	}
-	if n == 0 {
-		t.Error("README.md has no example to run")
+	for _, file := range []string{"README.md", "docs/README.md"} {
+		t.Run(file, func(t *testing.T) {
+			root, _ := cliProject(t)
+			n := 0
+			for _, b := range readBlocks(t, file) {
+				if strings.HasPrefix(b.body, "$ ") {
+					runSession(t, newShell(t, root), b.body)
+					n++
+				}
+			}
+			if n == 0 {
+				t.Errorf("%s has no example to run", file)
+			}
+		})
 	}
 }
 
