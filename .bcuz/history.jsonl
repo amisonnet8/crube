@@ -437,3 +437,4 @@
 {"v":1,"ts":"2026-10-21T15:12:02.098Z","why":"テープに無い devcontainer-lock.json の変更が、リビルドで足された feature の分か確かめる","cmd":["git","diff",".devcontainer/devcontainer-lock.json"],"dir":".","exit":0,"ms":2}
 {"v":1,"ts":"2026-10-21T15:12:11.547Z","why":"README の直しのコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":10}
 {"v":1,"ts":"2026-10-21T15:12:11.700Z","why":"README の直しのコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":2}
+{"v":1,"ts":"2026-10-21T15:12:14.058Z","why":"README の直しの変更・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".srwr/tapes","README.md","docs/README.md","docs/assets/header.svg","docs/design/decisions.md","docs/design/overview.md"],"dir":".","exit":0,"ms":4}
