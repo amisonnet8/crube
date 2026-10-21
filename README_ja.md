@@ -22,9 +22,6 @@
 
 crube は、プロジェクト内のファイルとディレクトリに説明を付けて `.crube/` に保存し、説明付きの `ls` / `tree` / `find` で目的の場所へすぐたどり着けるようにするツールです。説明の作成・更新には AI を使えますが、参照するときに AI は要りません。
 
-> [!NOTE]
-> まだリリース前です（CLI と MCP サーバーは動きます）。ビルド済みのバイナリは、最初のリリースから GitHub Releases で配ります。今は `go install` で入れられます。
-
 <a id="demo"></a>
 
 ## 🎬 デモ
@@ -52,11 +49,13 @@ crube は、プロジェクト内のファイルとディレクトリに説明�
 
 ## 📦 インストール
 
+[Releases](https://github.com/amisonnet8/crube/releases) から、使う OS（Linux・macOS・Windows。amd64 か arm64）のアーカイブを取ってきて、中の `crube`（Windows は `crube.exe`）を `PATH` の通った場所に置きます。同じ場所の `checksums.txt` で、アーカイブを確かめられます。アーカイブには、crube に組み込まれたライブラリのライセンス文（`licenses/`）も入っています。
+
+Go 1.27 以降があれば、自分でビルドして入れることもできます。
+
 ```bash
 go install github.com/amisonnet8/crube/cmd/crube@latest
 ```
-
-Go 1.27 以降が要ります。
 
 <a id="quick-start"></a>
 

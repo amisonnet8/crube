@@ -100,6 +100,12 @@ go install github.com/amisonnet8/bcuz/cmd/bcuz@latest
 # and succeeds if it is there). Without it, commands still run but are not recorded.
 (cd "$(dirname "$0")/.." && bcuz --init)
 
+# goreleaser: builds the release archives (.goreleaser.yaml). Needed here only
+# for `qsoku snapshot`, which makes them without a tag to look at before tagging
+# (.claude/rules/distribution.md); the release workflow installs its own.
+# @latest, like the tools above.
+go install github.com/goreleaser/goreleaser/v2@latest
+
 # crube: built from this repository's own source, so a fresh devcontainer has
 # a `crube` command and its completion (below) to use interactively. It is a
 # snapshot of the source at creation: to work on .crube/ itself, use

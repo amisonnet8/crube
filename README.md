@@ -22,9 +22,6 @@
 
 crube attaches descriptions to the files and directories of a project, keeps them in `.crube/`, and lets you reach the place you want quickly with `ls` / `tree` / `find` that show those descriptions. AI can write and update the descriptions, but reading them needs no AI.
 
-> [!NOTE]
-> Not released yet (the CLI and the MCP server work). Prebuilt binaries will be on GitHub Releases from the first release. For now, install it with `go install`.
-
 <a id="demo"></a>
 
 ## 🎬 Demo
@@ -52,11 +49,13 @@ crube attaches descriptions to the files and directories of a project, keeps the
 
 ## 📦 Install
 
+Download the archive for your OS (Linux, macOS or Windows; amd64 or arm64) from [Releases](https://github.com/amisonnet8/crube/releases), and put `crube` (`crube.exe` on Windows) somewhere on your `PATH`. `checksums.txt` there lets you check the archive. The archive also holds the license texts of the libraries built into crube (`licenses/`).
+
+With Go 1.27 or later, you can also build it yourself:
+
 ```bash
 go install github.com/amisonnet8/crube/cmd/crube@latest
 ```
-
-Requires Go 1.27 or later.
 
 <a id="quick-start"></a>
 

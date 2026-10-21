@@ -541,3 +541,9 @@
 {"v":1,"ts":"2026-10-21T21:54:12.080Z","why":"[6-1] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":1,"ms":10}
 {"v":1,"ts":"2026-10-21T21:54:16.537Z","why":"[6-1] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":15}
 {"v":1,"ts":"2026-10-21T21:54:16.737Z","why":"[6-1] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-21T21:54:19.657Z","why":"[6-1] の変更・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".srwr/tapes",".claude/rules/directory-structure.md",".claude/rules/distribution.md",".claude/rules/qsoku-usage.md",".crube",".github/workflows/ci.yml",".github/workflows/release.yml",".gitignore",".goreleaser.yaml","docs/design/decisions.md","docs/design/decisions_ja.md","qsokufile","tools"],"dir":".","exit":0,"ms":7}
+{"v":1,"ts":"2026-10-21T21:57:28.572Z","why":"postCreate.sh を直したので、決まりどおり ShellCheck を通す","cmd":["qsoku","shellcheck"],"dir":".","exit":0,"ms":220}
+{"v":1,"ts":"2026-10-21T21:57:49.276Z","why":"README の入れ方を直したあと、英日の対と例のテストを含めて確かめる","cmd":["qsoku","check"],"dir":".","exit":0,"ms":3347}
+{"v":1,"ts":"2026-10-21T21:57:57.090Z","why":"提案2つのコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":7}
+{"v":1,"ts":"2026-10-21T21:57:59.782Z","why":"提案2つのコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":12}
+{"v":1,"ts":"2026-10-21T21:57:59.968Z","why":"提案2つのコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
