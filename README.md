@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="docs/assets/header.svg" alt="crube — しるべ。プロジェクトの道標" width="100%">
+<img src="docs/assets/header.svg" alt="crube — a signpost for your project" width="100%">
 
 **ファイルとディレクトリに説明を付けて、説明付きの `ls` / `tree` / `find` で<br>目的の場所へすぐたどり着くための CLI と MCP サーバー**
 
@@ -18,7 +18,7 @@
 
 ---
 
-crube（しるべの略）は、プロジェクト内のファイルとディレクトリに説明を付けて `.crube/` に保存し、説明付きの `ls` / `tree` / `find` で目的の場所へすぐたどり着けるようにするツールです。説明の作成・更新には AI を使えますが、参照するときに AI は要りません。
+crube は、プロジェクト内のファイルとディレクトリに説明を付けて `.crube/` に保存し、説明付きの `ls` / `tree` / `find` で目的の場所へすぐたどり着けるようにするツールです。説明の作成・更新には AI を使えますが、参照するときに AI は要りません。
 
 > [!NOTE]
 > まだリリース前です（CLI と MCP サーバーは動きます）。ビルド済みのバイナリは、最初のリリースから GitHub Releases で配ります。今は `go install` で入れられます。
@@ -189,14 +189,11 @@ AI が説明を書き、人が `.crube/` の差分をレビューする、とい
 
 | | |
 | --- | --- |
+| 💬 [対話形式のガイド](https://notebook.google.com/notebook/201d48b7-45c8-4ba8-8853-d9c3b3181b8d) | 質問しながら crube を調べられる（Gemini Notebook 製） |
 | 📖 [docs/README.md](docs/README.md) | 目次 |
 | 🏛️ [docs/design/](docs/design/) | 設計（概要と基本方針、アーキテクチャ、データモデル、鮮度と充足度、決定事項） |
 | 📐 [docs/reference/](docs/reference/) | 仕様（[CLI](docs/reference/cli.md)、[MCP](docs/reference/mcp.md)、[ファイル形式](docs/reference/file-format.md)） |
 | 🧪 [docs/examples/](docs/examples/) | 使い方の例（[はじめての crube](docs/examples/getting-started.md)、[AI エージェントによる更新](docs/examples/ai-workflow.md)） |
-
-## 🛠️ 開発
-
-devcontainer で開きます。`.devcontainer/postCreate.sh` が、Go・[mtqg](https://github.com/amisonnet8/mtqg)・[qsoku](https://github.com/amisonnet8/qsoku)・[srwr](https://github.com/amisonnet8/srwr)・[bcuz](https://github.com/amisonnet8/bcuz)・golangci-lint・ShellCheck・Trivy を入れます。ビルドと検査は `qsoku check`（名前の一覧は `qsokufile`）。AI エージェント向けの決まりは [CLAUDE.md](CLAUDE.md) と `.claude/rules/` にあります。
 
 ## 📄 ライセンス
 

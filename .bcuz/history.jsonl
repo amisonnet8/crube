@@ -425,3 +425,15 @@
 {"v":1,"ts":"2026-10-21T14:36:52.029Z","why":"devcontainer の直しのコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":6}
 {"v":1,"ts":"2026-10-21T14:36:54.488Z","why":"devcontainer の直しのコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":14}
 {"v":1,"ts":"2026-10-21T14:36:54.654Z","why":"devcontainer の直しのコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":2}
+{"v":1,"ts":"2026-10-21T14:36:57.203Z","why":"devcontainer の直しと記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".srwr/tapes",".claude/rules/testing.md",".devcontainer/devcontainer.json",".devcontainer/postCreate.sh","e2e/completion_test.go"],"dir":".","exit":0,"ms":8}
+{"v":1,"ts":"2026-10-21T14:50:27.372Z","why":"リビルド後に4つのシェルと crube が入ったかを確かめる","cmd":["sh","-c","for s in bash zsh fish pwsh crube mtqg qsoku; do printf \"%s: \" $s; command -v $s || echo none; done; ls ~/.local/share/bash-completion/completions ~/.config/fish/completions; zsh -c \"ls \\$fpath[1]/_crube \\$fpath[1]/_mtqg\"; grep -c \"CommandName\" \"$(pwsh -NoLogo -NoProfile -Command \"\\$PROFILE\")\""],"dir":".","exit":0,"ms":430}
+{"v":1,"ts":"2026-10-21T14:50:30.481Z","why":"リビルド後、fish と PowerShell の補完の e2e が飛ばずに通るか確かめる","cmd":["go","test","./e2e/","-run","Completion","-count=1","-v"],"dir":".","exit":0,"ms":4061}
+{"v":1,"ts":"2026-10-21T14:50:37.692Z","why":"リビルド後の全体の確認","cmd":["sh","-c","qsoku check 2>&1 | tail -3; qsoku shellcheck && echo shellcheck-ok"],"dir":".","exit":0,"ms":6606}
+{"v":1,"ts":"2026-10-21T14:50:46.653Z","why":"check の前半（lint）も通ったかを確かめる","cmd":["sh","-c","qsoku check 2>&1 | grep -E \"issues|FAIL\" ; echo exit=$?"],"dir":".","exit":0,"ms":481}
+{"v":1,"ts":"2026-10-21T15:11:13.501Z","why":"README と docs の直しの前に、しるべ・開発の節の場所を探す","cmd":["grep","-rnE","しるべ|道標|## 開発|開発","README.md","docs","--include=*.md","--include=*.svg"],"dir":".","exit":0,"ms":2}
+{"v":1,"ts":"2026-10-21T15:11:46.062Z","why":"README と docs を直したので、docs の例の突き合わせを含めて確かめる","cmd":["qsoku","check"],"dir":".","exit":0,"ms":3367}
+{"v":1,"ts":"2026-10-21T15:11:56.649Z","why":"人間の README の直しの指示を、README の確認の質問への答えとして残す","cmd":["env","MTQG_AUTHOR_KIND=human","MTQG_AUTHOR_NAME=amisonnet8","mtqg","q","add","6ed285a3aa","開発の節はいったん不要。crube＝しるべの説明は不要で、ただ crube と言えばよい（docs に同じような記載があれば消す）。対話形式のガイド（質問しながら crube を調べられる、Gemini Notebook 製、https://notebook.google.com/notebook/201d48b7-45c8-4ba8-8853-d9c3b3181b8d）への導線を足す。"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-21T15:11:59.118Z","why":"README の直しのコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":1,"ms":9}
+{"v":1,"ts":"2026-10-21T15:12:02.098Z","why":"テープに無い devcontainer-lock.json の変更が、リビルドで足された feature の分か確かめる","cmd":["git","diff",".devcontainer/devcontainer-lock.json"],"dir":".","exit":0,"ms":2}
+{"v":1,"ts":"2026-10-21T15:12:11.547Z","why":"README の直しのコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":10}
+{"v":1,"ts":"2026-10-21T15:12:11.700Z","why":"README の直しのコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":2}

@@ -21,7 +21,7 @@
 
   <rect width="1280" height="360" rx="16" fill="url(#bg)"/>
 
-  <!-- The signpost (しるべ) -->
+  <!-- The signpost -->
   <ellipse cx="157" cy="300" rx="56" ry="9" fill="#30363d"/>
   <rect x="150" y="70" width="14" height="232" rx="4" fill="#8b949e"/>
   <path d="M106 92 H246 L274 120 L246 148 H106 Z" fill="url(#board1)"/>
@@ -30,7 +30,7 @@
 
   <!-- Name and catch copy -->
   <text x="310" y="180" class="sans" font-size="112" font-weight="800" fill="#f0f6fc" letter-spacing="-2">crube</text>
-  <text x="316" y="232" class="sans" font-size="28" fill="#79c0ff">しるべ — a signpost for your project</text>
+  <text x="316" y="232" class="sans" font-size="28" fill="#79c0ff">a signpost for your project</text>
   <text x="316" y="274" class="sans" font-size="22" fill="#c9d1d9">Describe every file once. Find it instantly.</text>
   <text x="316" y="310" class="mono" fill="#8b949e">ls · tree · find · show · status · MCP</text>
 
