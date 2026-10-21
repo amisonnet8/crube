@@ -188,7 +188,8 @@ func TestShow(t *testing.T) {
 
 func TestShowLink(t *testing.T) {
 	root := readProject(t)
-	if err := os.Symlink("src", filepath.Join(root, "current")); err != nil {
+	// The target has a separator: Windows keeps it as \, and Show gives /.
+	if err := os.Symlink("src/auth", filepath.Join(root, "current")); err != nil {
 		t.Skipf("cannot make a symbolic link here: %v", err)
 	}
 	p := open(t, Options{Dir: root})
@@ -199,7 +200,7 @@ func TestShowLink(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := ShowResult{Path: "current", Type: "file", Entry: "current", Desc: "A link to the source", Link: "src"}
+	want := ShowResult{Path: "current", Type: "file", Entry: "current", Desc: "A link to the source", Link: "src/auth"}
 	if *r != want {
 		t.Errorf("got %+v, want %+v", *r, want)
 	}

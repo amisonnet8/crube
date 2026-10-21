@@ -100,7 +100,7 @@ type ShowResult struct {
 	Entry  string `json:"entry"` // the path of the entry that matches it; "" for none
 	Desc   string `json:"desc"`
 	Detail string `json:"detail"`
-	Link   string `json:"link"` // the target of a symbolic link, as written in it; "" otherwise
+	Link   string `json:"link"` // the target of a symbolic link, as written in it but with "/"; "" otherwise
 }
 
 // Show returns the desc and the detail of the entry that matches path (a real
@@ -138,9 +138,12 @@ func (p *Project) Show(path string) (*ShowResult, error) {
 		r.Type = "dir"
 	}
 	if isLink {
-		if r.Link, err = os.Readlink(full); err != nil {
+		target, err := os.Readlink(full)
+		if err != nil {
 			return nil, err
 		}
+		// Windows keeps the target with \ (os.Symlink writes it so).
+		r.Link = filepath.ToSlash(target)
 	}
 	if m := match.Find(tree.Entries, names, isDir); m != nil {
 		r.Entry, r.Desc, r.Detail = m.Path, m.Entry.Desc, m.Entry.Detail

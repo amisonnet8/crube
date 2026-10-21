@@ -155,3 +155,10 @@
 {"v":1,"ts":"2026-10-21T01:11:28.439Z","why":"[3-2] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":1,"ms":11}
 {"v":1,"ts":"2026-10-21T01:11:31.184Z","why":"[3-2] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":17}
 {"v":1,"ts":"2026-10-21T01:11:31.378Z","why":"[3-2] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-21T01:11:37.179Z","why":"[3-2] の変更・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".srwr/tapes","README.md","docs/design/decisions.md","docs/examples/getting-started.md","docs/reference/cli.md","go.mod","go.sum","internal/cli"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-21T01:34:11.891Z","why":"Windows で link が \\ になる原因を探すため、Show の Readlink と core のテストのリンクの扱いを見る","cmd":["sh","-c","grep -n \"Readlink\\|Link\" internal/core/read.go; grep -n \"Symlink\\|Link\\|windows\" internal/core/read_test.go"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-21T01:34:33.010Z","why":"リンクの宛先を / 区切りにしたあと、Linux で壊していないか確かめる","cmd":["qsoku","check"],"dir":".","exit":0,"ms":833}
+{"v":1,"ts":"2026-10-21T01:34:43.791Z","why":"CI の Windows で見つかった不具合を記録する","cmd":["mtqg","b","add","Windows で show の link が \\ 区切りで出る（CI windows-latest の TestTextShowLink が失敗。releases\\v2 が出た）。原因：Windows の os.Symlink は宛先の / を \\ にして保存し、core.Show は os.Readlink の結果をそのまま出していた。cli.md の「パスは / 区切り」と決定事項の「OS によらず同じ出力」に反する。core のテストは区切りの無い宛先 src を使っていたので捕まえられなかった。直し：core.Show で filepath.ToSlash をかける（Unix では何もしない）。core のテストの宛先を src/auth にした。testing.md の CI の落とし穴に追記した。"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-21T01:34:46.853Z","why":"Windows の link の修正のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":8}
+{"v":1,"ts":"2026-10-21T01:34:49.093Z","why":"Windows の link の修正のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":14}
+{"v":1,"ts":"2026-10-21T01:34:49.267Z","why":"Windows の link の修正のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":2}
