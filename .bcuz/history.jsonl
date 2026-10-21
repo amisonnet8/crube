@@ -417,3 +417,11 @@
 {"v":1,"ts":"2026-10-21T10:56:09.141Z","why":"シェル補完のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":29}
 {"v":1,"ts":"2026-10-21T10:56:09.346Z","why":"シェル補完のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
 {"v":1,"ts":"2026-10-21T10:56:09.524Z","why":"コミットの前に作者の設定が正しいか確かめる","cmd":["git","config","user.email"],"dir":".","exit":0,"ms":1}
+{"v":1,"ts":"2026-10-21T10:56:12.283Z","why":"シェル補完の変更・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".srwr/tapes",".claude/rules/directory-structure.md",".claude/rules/testing.md",".claude/skills/mutation-check/crube-spec.txt",".crube/structure.txt",".crube/structure_ja.txt","README.md","docs/design/decisions.md","docs/reference/cli.md","internal/cli","e2e/completion_test.go","internal/core/complete.go","internal/core/complete_test.go"],"dir":".","exit":0,"ms":9}
+{"v":1,"ts":"2026-10-21T14:35:55.031Z","why":"参考にする mtqg の postCreate.sh と、crube の今のものを比べる","cmd":["sh","-c","diff /home/vscode/mtqg/.devcontainer/postCreate.sh .devcontainer/postCreate.sh; echo ===; diff /home/vscode/mtqg/.devcontainer/devcontainer.json .devcontainer/devcontainer.json"],"dir":".","exit":1,"ms":5}
+{"v":1,"ts":"2026-10-21T14:36:02.835Z","why":"crube が今コンテナに入っているかと、mtqg の devcontainer.json の書き方を確かめる","cmd":["sh","-c","command -v crube || echo \"crube: none\"; cat .devcontainer/devcontainer.json"],"dir":".","exit":0,"ms":1}
+{"v":1,"ts":"2026-10-21T14:36:32.489Z","why":"postCreate.sh を直したので、文法と ShellCheck を確かめる","cmd":["sh","-c","bash -n .devcontainer/postCreate.sh && qsoku shellcheck"],"dir":".","exit":0,"ms":254}
+{"v":1,"ts":"2026-10-21T14:36:50.064Z","why":"devcontainer を直したあとの区切りの確認","cmd":["qsoku","check"],"dir":".","exit":0,"ms":1828}
+{"v":1,"ts":"2026-10-21T14:36:52.029Z","why":"devcontainer の直しのコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":6}
+{"v":1,"ts":"2026-10-21T14:36:54.488Z","why":"devcontainer の直しのコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":14}
+{"v":1,"ts":"2026-10-21T14:36:54.654Z","why":"devcontainer の直しのコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":2}

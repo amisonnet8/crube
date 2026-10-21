@@ -8,8 +8,9 @@ package e2e
 // intact, and quote a pattern. What is offered is decided by crube and tested
 // in internal/cli.
 //
-// A shell that is not installed is skipped. The devcontainer has bash and
-// zsh; the runners of CI have bash and PowerShell.
+// A shell that is not installed is skipped. The devcontainer has all four
+// (.devcontainer/postCreate.sh, devcontainer.json); the runners of CI have
+// bash and PowerShell.
 
 import (
 	"bytes"

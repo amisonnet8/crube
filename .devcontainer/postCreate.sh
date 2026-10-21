@@ -11,11 +11,16 @@ set -euo pipefail
 # ShellCheck:  Static analysis of tracked *.sh and *.bash files (qsoku shellcheck).
 #              Comment lines must not start with the lowercase directive word,
 #              or ShellCheck parses them as directives (SC1072/SC1073).
+# fish:        One of the four shells that crube completion has a script for (the
+#              scripts are run by the real shells in e2e/completion_test.go), and
+#              one of the four that qsoku's shell integration supports. The other
+#              three come from elsewhere: bash and zsh are in the base image, and
+#              PowerShell is the "powershell" feature in devcontainer.json.
 # gh:          GitHub CLI (issues, pull requests, Actions runs) is the "github-cli"
-#              feature in devcontainer.json, not installed here. The feature is left
+#              feature in devcontainer.json, not installed here. The features are left
 #              unpinned (no "version" option): each rebuild installs the latest release.
 sudo apt-get update
-sudo apt-get install -y wget gnupg lsb-release gcc jq shellcheck
+sudo apt-get install -y wget gnupg lsb-release gcc jq shellcheck fish
 
 # The Bash sandbox (.claude/settings.json "sandbox") needs bubblewrap (bwrap)
 # and socat on Linux; without them it silently stays off even with
@@ -95,13 +100,45 @@ go install github.com/amisonnet8/bcuz/cmd/bcuz@latest
 # and succeeds if it is there). Without it, commands still run but are not recorded.
 (cd "$(dirname "$0")/.." && bcuz --init)
 
-# Wire up qsoku's bash integration (working-directory carry-back and
-# completion). Idempotent: skipped if already present, so re-running
-# postCreate.sh does not duplicate the line. The single quotes are intentional
-# -- the line is meant to land in ~/.bashrc unexpanded.
+# crube: built from this repository's own source, so a fresh devcontainer has
+# a `crube` command and its completion (below) to use interactively. It is a
+# snapshot of the source at creation: to work on .crube/ itself, use
+# `qsoku crube`, which builds the current source every time (qsokufile).
+(cd "$(dirname "$0")/.." && go install ./cmd/crube)
+
+# Wire up qsoku's shell integration (working-directory carry-back and
+# completion) for bash, zsh, fish and pwsh. Idempotent: skipped if already
+# present, so re-running postCreate.sh does not duplicate the line. The single
+# quotes are intentional -- the line is meant to land in the rc file unexpanded.
 # shellcheck disable=SC2016
 grep -qF 'qsoku .shell bash' ~/.bashrc 2>/dev/null || echo 'eval "$(qsoku .shell bash)"' >>~/.bashrc
+# shellcheck disable=SC2016
+grep -qF 'qsoku .shell zsh' ~/.zshrc 2>/dev/null || echo 'eval "$(qsoku .shell zsh)"' >>~/.zshrc
+mkdir -p ~/.config/fish
+grep -qF 'qsoku .shell fish' ~/.config/fish/config.fish 2>/dev/null || echo 'qsoku .shell fish | source' >>~/.config/fish/config.fish
+# pwsh has no $PROFILE of its own until asked; query it rather than hardcode
+# the path. The single quotes below are intentional too -- $PROFILE is pwsh's
+# variable, not bash's.
+# shellcheck disable=SC2016
+pwsh_profile=$(pwsh -NoLogo -NoProfile -Command '$PROFILE')
+mkdir -p "$(dirname "$pwsh_profile")"
+grep -qF 'qsoku .shell pwsh' "$pwsh_profile" 2>/dev/null || echo 'Invoke-Expression (& qsoku .shell pwsh | Out-String)' >>"$pwsh_profile"
 
-# mtqg's own bash completion, for interactive use in this container.
-mkdir -p ~/.local/share/bash-completion/completions
-mtqg completion bash >~/.local/share/bash-completion/completions/mtqg
+# The completion of crube and mtqg, for interactive use in this container, in
+# all four shells. Each install path is the one that their docs name (for
+# crube: docs/reference/cli.md "crube completion").
+# shellcheck disable=SC2016
+zsh_fpath=$(zsh -c 'echo $fpath[1]')
+# zsh's fpath[1] in this image is a root-owned system directory, unlike the
+# user-local completion directories of bash and fish.
+sudo mkdir -p "$zsh_fpath"
+mkdir -p ~/.local/share/bash-completion/completions ~/.config/fish/completions
+for tool in crube mtqg; do
+  "$tool" completion bash >~/.local/share/bash-completion/completions/"$tool"
+  "$tool" completion zsh | sudo tee "$zsh_fpath/_$tool" >/dev/null
+  "$tool" completion fish >~/.config/fish/completions/"$tool".fish
+  # pwsh has no completions directory: the script is appended to $PROFILE,
+  # so re-running this needs the same marker-line check as qsoku above.
+  grep -qF "Register-ArgumentCompleter -Native -CommandName $tool" "$pwsh_profile" 2>/dev/null ||
+    "$tool" completion powershell >>"$pwsh_profile"
+done
