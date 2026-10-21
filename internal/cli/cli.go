@@ -5,7 +5,6 @@ package cli
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -27,6 +26,9 @@ type Env struct {
 	Stdout  io.Writer
 	Stderr  io.Writer
 	Version string // set at build time by the release; "" otherwise
+	// Width returns the width of the terminal that Stdout is, or 0 when it is
+	// not a terminal. nil looks at Stdout itself.
+	Width func() int
 }
 
 const usage = `usage: crube <command> [arguments]
@@ -199,15 +201,16 @@ func (r *runner) writeJSON(v any) error {
 	return enc.Encode(v)
 }
 
-// errNoText is returned for the text output that is not written yet ([3-2]).
-var errNoText = errors.New("text output is not ready yet (use --json)")
-
-// output writes v as JSON with --json; the text output comes in [3-2].
-func (r *runner) output(p *parsed, v any) error {
+// output writes v as JSON with --json, else the text that text makes. text
+// gets the width to cut descs at: 0 when nothing is to be cut.
+func (r *runner) output(p *parsed, v any, text func(b *strings.Builder, width int)) error {
 	if p.has("--json") {
 		return r.writeJSON(v)
 	}
-	return r.argError(errNoText)
+	var b strings.Builder
+	text(&b, termWidth(r.env))
+	_, err := io.WriteString(r.env.Stdout, b.String())
+	return err
 }
 
 func (r *runner) init(p *parsed) (int, error) {
@@ -229,7 +232,12 @@ func (r *runner) ls(p *parsed) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	return exitOK, r.output(p, res)
+	return exitOK, r.output(p, res, func(b *strings.Builder, width int) {
+		if p.has("--full") {
+			width = 0
+		}
+		lsText(b, res, width)
+	})
 }
 
 func (r *runner) tree(p *parsed) (int, error) {
@@ -245,7 +253,7 @@ func (r *runner) tree(p *parsed) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	return exitOK, r.output(p, res)
+	return exitOK, r.output(p, res, func(b *strings.Builder, width int) { treeText(b, res, width) })
 }
 
 func (r *runner) find(p *parsed) (int, error) {
@@ -261,7 +269,7 @@ func (r *runner) find(p *parsed) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	return exitOK, r.output(p, res)
+	return exitOK, r.output(p, res, func(b *strings.Builder, width int) { findText(b, res, width) })
 }
 
 func (r *runner) show(p *parsed) (int, error) {
@@ -273,7 +281,7 @@ func (r *runner) show(p *parsed) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	return exitOK, r.output(p, res)
+	return exitOK, r.output(p, res, func(b *strings.Builder, _ int) { showText(b, res) })
 }
 
 func (r *runner) status(p *parsed) (int, error) {
@@ -289,7 +297,7 @@ func (r *runner) status(p *parsed) (int, error) {
 	if err != nil {
 		return 0, r.argError(err)
 	}
-	if err := r.output(p, res); err != nil {
+	if err := r.output(p, res, func(b *strings.Builder, _ int) { statusText(b, res) }); err != nil {
 		return 0, err
 	}
 	if failed {

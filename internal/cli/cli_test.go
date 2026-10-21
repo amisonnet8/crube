@@ -167,7 +167,6 @@ func TestArgumentErrors(t *testing.T) {
 		{[]string{"find", "-C", dir, "--limit", "0", "q"}, `crube: find: invalid --limit "0" (use a number of 1 or more)` + "\n"},
 		{[]string{"tree", "-C", dir, "-d", "x"}, `crube: tree: invalid -d "x" (use a number of 1 or more)` + "\n"},
 		{[]string{"status", "-C", dir, "--require", "x"}, `crube: status: invalid --require "x" (use all or dirs)` + "\n"},
-		{[]string{"ls", "-C", dir}, "crube: ls: text output is not ready yet (use --json)\n"},
 	}
 	for _, tt := range tests {
 		code, out, errs := run(t, "", tt.args...)

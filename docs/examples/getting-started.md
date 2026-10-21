@@ -62,10 +62,10 @@ internal/	Private packages
 ```
 $ cd internal/store
 $ crube tree
-  cmd/            Executables
-    myapp/        CLI entry point of myapp
-  internal/       Private packages
->   store/        Persistence layer (SQLite)
+  cmd/        Executables
+    myapp/    CLI entry point of myapp
+  internal/   Private packages
+>   store/    Persistence layer (SQLite)
 $ cd ../..
 
 $ crube find sqlite
@@ -84,7 +84,7 @@ created .crube/structure_ja.txt
 $ crube set internal/store/ "永続化レイヤー(SQLite)"
 $ crube tree
   internal/
-    store/      永続化レイヤー(SQLite)
+    store/    永続化レイヤー(SQLite)
 ```
 
 `CRUBE_LANG=ja` の間は、参照も編集も `structure_ja.txt` だけを使います。英語のファイルの説明が混ざることはありません。`structure_ja.txt` を作っていなければ、`CRUBE_LANG=ja` でも英語の `structure.txt` が使われます。
