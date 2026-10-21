@@ -96,6 +96,9 @@ internal/	crube のパッケージ：コアと、その上の CLI
 	textwidth/	表示幅：全角 2、結合文字 0、ほかは 1
 		textwidth.go	1文字と文字列の表示幅
 		*_test.go	テスト（期待値は Python の unicodedata で求めた）
+	mcpserver/	MCP サーバー（crube mcp）：各ツールは core を呼び、CLI の --json と同じものを返す
+		server.go	ツールとその引数・説明文。書き込みのツールは --allow-write のときだけ
+		*_test.go	インメモリの MCP クライアントからのテスト
 .gitattributes	改行（すべて LF）と、記録のファイルの merge=union
 .gitignore	git に入れないもの。ルート直下のドットで始まる名前は許可リスト方式
 .golangci.yaml	golangci-lint の設定

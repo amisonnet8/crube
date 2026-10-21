@@ -26,6 +26,7 @@
 │   ├── core/               ← CLIとMCPが呼ぶ操作（init・set・rm・mv、参照の操作）。ほかのパッケージを組み合わせる
 │   ├── ignore/             ← `.crube/ignore`の除外判定（gitignore と同じ書式）と、init が書く既定の中身
 │   ├── lang/               ← `CRUBE_LANG`から使う structure ファイルを1つ決める
+│   ├── mcpserver/          ← MCPサーバー（`crube mcp`。公式のGo SDK）。各ツールは`core`を呼ぶだけ
 │   ├── match/              ← 照合（実在のパスに当たるエントリ。完全一致→`path.Match`を書いた順）
 │   ├── project/            ← `.crube/`の探索と、`.crube/`への書き込み（書き込みガード）。**`.crube/`に書くのはここだけ**
 │   ├── search/             ← 検索（find。パス・desc・detail、インデックスなし）
@@ -54,7 +55,8 @@
 ## 各ファイル・ディレクトリの補足
 
 - **`cmd/crube/`**: `main.go`は、引数・環境変数・標準出力を`internal/cli`の`Run`に渡し、その終了コードで終わるだけにする。テストは`internal/cli`に書く
-- **`internal/cli/`**: 引数をどう読むか、結果をどう見せるか（JSON・テキスト）、エラーを`crube: …`の1行と終了コードにすることだけを持つ。値の検証・合否の判定（`status --require`など）は`core`にあり、ここには書かない。MCP（[4-1]）も同じ`core`を呼ぶ
+- **`internal/cli/`**: 引数をどう読むか、結果をどう見せるか（JSON・テキスト）、エラーを`crube: …`の1行と終了コードにすることだけを持つ。値の検証・合否の判定（`status --require`など）は`core`にあり、ここには書かない。`mcp`コマンドは`internal/mcpserver`を起動するだけ（SDK を import しない）
+- **`internal/mcpserver/`**: ツールの名前・引数・説明文と、`core`の結果をそのまま返すことだけを持つ。絞り込み（`kinds`）やルートからのパスの読み方も`core`にある（`FilterKinds`・`AtRoot`）。結果の型が再帰すると SDK が出力のスキーマを作れないので（`tree`）、そのときはスキーマを手で渡す
 - **`internal/`**: Goの仕組みとして、モジュールの外からimportできない。外へ公開するパッケージは`internal/`に置かない
 - **`internal/core/`**: CLI・MCPから呼ばれる操作の入口。引数の検証・判定はここか、ここが呼ぶパッケージに置き、CLI・MCPには書かない。書き込みは`internal/project`の関数だけを通す
 - **`internal/structure/`**: structure ファイルのバイト列と木（`Tree`・`Entry`）の変換だけを持つ。ファイルの探索・ディスクへの書き込み・照合は持たない（ほかのコアのパッケージに置く）

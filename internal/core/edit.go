@@ -8,12 +8,32 @@ import (
 	"github.com/amisonnet8/crube/internal/structure"
 )
 
+// SetResult is the result of Set: the entry as written.
+type SetResult struct {
+	Path   string `json:"path"` // the entry path
+	Desc   string `json:"desc"`
+	Detail string `json:"detail"`
+}
+
+// RemoveResult is the result of Remove.
+type RemoveResult struct {
+	Path    string `json:"path"`    // the entry path removed
+	Removed int    `json:"removed"` // how many entries went: the one at Path and those below it
+}
+
+// MoveResult is the result of Move.
+type MoveResult struct {
+	From  string `json:"from"`
+	To    string `json:"to"`
+	Moved int    `json:"moved"` // how many entries moved: the one at From and those below it
+}
+
 // Set adds or updates the entry at entryPath (such as "data/" or
 // "data/*.csv") in the structure file of the language: its desc, and its
 // detail when detail is not nil ("" removes the detail). Missing parents are
 // added as lines without a desc; a new entry goes after its siblings. It
 // returns the entry as written.
-func (p *Project) Set(entryPath, desc string, detail *string) (*structure.Entry, error) {
+func (p *Project) Set(entryPath, desc string, detail *string) (*SetResult, error) {
 	names, err := splitEntryPath(entryPath)
 	if err != nil {
 		return nil, err
@@ -52,13 +72,12 @@ func (p *Project) Set(entryPath, desc string, detail *string) (*structure.Entry,
 	if err != nil {
 		return nil, err
 	}
-	return e, nil
+	return &SetResult{Path: entryPath, Desc: e.Desc, Detail: e.Detail}, nil
 }
 
 // Remove removes the entry at entryPath, and every entry below it, from the
-// structure file of the language. Files of the project are not touched. It
-// returns the entry removed.
-func (p *Project) Remove(entryPath string) (*structure.Entry, error) {
+// structure file of the language. Files of the project are not touched.
+func (p *Project) Remove(entryPath string) (*RemoveResult, error) {
 	names, err := splitEntryPath(entryPath)
 	if err != nil {
 		return nil, err
@@ -76,14 +95,14 @@ func (p *Project) Remove(entryPath string) (*structure.Entry, error) {
 	if err != nil {
 		return nil, err
 	}
-	return e, nil
+	return &RemoveResult{Path: entryPath, Removed: count(e)}, nil
 }
 
 // Move moves the entry at from, with every entry below it, to the entry path
 // to, in the structure file of the language. Missing parents of to are added
 // as lines without a desc; the entry goes after its new siblings. Files of
-// the project are not touched. It returns the entry moved.
-func (p *Project) Move(from, to string) (*structure.Entry, error) {
+// the project are not touched.
+func (p *Project) Move(from, to string) (*MoveResult, error) {
 	fromNames, err := splitEntryPath(from)
 	if err != nil {
 		return nil, err
@@ -118,7 +137,16 @@ func (p *Project) Move(from, to string) (*structure.Entry, error) {
 	if err != nil {
 		return nil, err
 	}
-	return e, nil
+	return &MoveResult{From: from, To: to, Moved: count(e)}, nil
+}
+
+// count is the number of entries in e: e itself and every entry below it.
+func count(e *structure.Entry) int {
+	n := 1
+	for _, c := range e.Children {
+		n += count(c)
+	}
+	return n
 }
 
 // splitEntryPath splits an entry path into the names of its entries, each

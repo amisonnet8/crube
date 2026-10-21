@@ -52,6 +52,15 @@ func Open(o Options) (*Project, error) {
 	return &Project{Root: root, dir: dir, lang: o.Lang, noIgnore: o.NoIgnore}, nil
 }
 
+// AtRoot returns the same project, with real paths read from the project root
+// instead of from where the operation runs (the MCP server has no current
+// place: the paths it gets are those it returned, from the root).
+func (p *Project) AtRoot() *Project {
+	q := *p
+	q.dir = p.Root
+	return &q
+}
+
 // Ignore returns the matcher of .crube/ignore: with --no-ignore, or without
 // the file, only .crube/ is left out.
 func (p *Project) Ignore() (*ignore.Matcher, error) {

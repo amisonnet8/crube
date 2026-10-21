@@ -96,6 +96,9 @@ internal/	Packages of crube: the core, and the CLI on top of it
 	textwidth/	Display width: wide characters 2, combining characters 0, the rest 1
 		textwidth.go	Width of a rune and of a string
 		*_test.go	Tests, with the expected widths taken from Python's unicodedata
+	mcpserver/	MCP server (crube mcp): each tool calls core and returns what the CLI --json gives
+		server.go	The tools, their arguments and descriptions; write tools only with --allow-write
+		*_test.go	Tests through an in-memory MCP client
 .gitattributes	Line endings (LF everywhere) and merge=union for the record files
 .gitignore	Files kept out of git; dot entries in the root are an allowlist
 .golangci.yaml	golangci-lint settings

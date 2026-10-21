@@ -160,9 +160,8 @@ func TestArgumentErrors(t *testing.T) {
 		{[]string{"ls", "--foo"}, "crube: ls: unknown option --foo\n"},
 		{[]string{"ls", "-C"}, "crube: ls: -C needs a value\n"},
 		{[]string{"ls", "a", "b"}, "crube: ls: too many arguments (usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore])\n"},
-		{[]string{"set", "x"}, "crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [-C <dir>])\n"},
+		{[]string{"set", "x"}, "crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--json] [-C <dir>])\n"},
 		{[]string{"find"}, "crube: find: missing <query> (usage: crube find <query> [--limit N] [--json] [-C <dir>] [--no-ignore])\n"},
-		{[]string{"set", "a", "b", "--json"}, "crube: set: unknown option --json\n"},
 		{[]string{"init", "--json"}, "crube: init: unknown option --json\n"},
 		{[]string{"find", "-C", dir, "--limit", "0", "q"}, `crube: find: invalid --limit "0" (use a number of 1 or more)` + "\n"},
 		{[]string{"tree", "-C", dir, "-d", "x"}, `crube: tree: invalid -d "x" (use a number of 1 or more)` + "\n"},
@@ -236,6 +235,28 @@ func TestEdit(t *testing.T) {
 	}
 	if got := readStructure(t, dir, "structure.txt"); strings.Contains(got, "|") {
 		t.Errorf("detail is left:\n%s", got)
+	}
+}
+
+func TestEditJSON(t *testing.T) {
+	dir := newProject(t)
+	tests := []struct {
+		args []string
+		want string
+	}{
+		{[]string{"set", "--json", "-C", dir, "internal/store/", "Store", "--detail", "SQLite"},
+			"{\n  \"path\": \"internal/store/\",\n  \"desc\": \"Store\",\n  \"detail\": \"SQLite\"\n}\n"},
+		// internal/ (added as a parent) and store/ below it.
+		{[]string{"mv", "--json", "-C", dir, "internal/", "lib/"},
+			"{\n  \"from\": \"internal/\",\n  \"to\": \"lib/\",\n  \"moved\": 2\n}\n"},
+		{[]string{"rm", "--json", "-C", dir, "lib/"},
+			"{\n  \"path\": \"lib/\",\n  \"removed\": 2\n}\n"},
+	}
+	for _, tt := range tests {
+		code, out, errs := run(t, "", tt.args...)
+		if code != 0 || out != tt.want || errs != "" {
+			t.Errorf("%q: %d %q %q\nwant %q", tt.args, code, out, errs, tt.want)
+		}
 	}
 }
 

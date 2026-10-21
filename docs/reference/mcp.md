@@ -25,13 +25,18 @@
 | 種別 | ツール | 引数 | 返す内容 |
 | --- | --- | --- | --- |
 | 参照 | `tree` | path, depth | CLI の `crube tree --json` と同じ入れ子の構造。現在地の印は付けない(`here` は最上位が `""`、各エントリが `false`) |
-| 参照 | `ls` | path | 直下の一覧と説明 |
+| 参照 | `ls` | path | CLI の `crube ls --json` と同じ(直下の一覧と説明) |
 | 参照 | `find` | query, limit | CLI の `crube find --json` と同じ(一致したパスと説明、省いた件数) |
 | 参照 | `show` | path | CLI の `crube show` と同じ(desc、detail、当たったエントリのパス、シンボリックリンクならリンク先) |
 | 保守 | `status` | kinds(絞り込み) | `crube status --json` と同じ内容 |
-| 書き込み | `set_description` | path, desc, detail | 更新後のエントリ |
-| 書き込み | `remove_description` | path | 削除結果 |
-| 書き込み | `move_description` | from, to | 移動結果 |
+| 書き込み | `set_description` | path, desc, detail | 更新後のエントリ `{ "path", "desc", "detail" }` |
+| 書き込み | `remove_description` | path | `{ "path", "removed" }`(`removed` は配下を含めて消えたエントリの数) |
+| 書き込み | `move_description` | from, to | `{ "from", "to", "moved" }`(`moved` は配下を含めて動いたエントリの数) |
+
+- 引数は、書いていないもの(`path`・`depth`・`limit`・`kinds`・`detail`)を省ける。`depth`・`limit` は省略か 0 で制限なし。`set_description` の `detail` は、省略するとそのまま、`""` で消す。
+- `ls`・`show` の `path` は、**プロジェクトルートからの相対**(サーバーを起動した場所によらない)。MCP には現在地がなく、返すパスもルートからの相対なので、結果のパスをそのまま次の呼び出しに渡せる。
+- `status` の `kinds` は `untracked`・`orphan`・`invalid` の配列。`items` だけを絞り、`coverage` は常にプロジェクト全体。ほかの値はエラー。
+- ツールは呼ばれるたびに `.crube/` を読み直す。サーバーを動かしたまま `.crube/` を直しても、次の呼び出しから反映される。
 
 ## ツール名
 

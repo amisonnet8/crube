@@ -4,6 +4,7 @@
 package cli
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/amisonnet8/crube/internal/core"
 	"github.com/amisonnet8/crube/internal/lang"
+	"github.com/amisonnet8/crube/internal/mcpserver"
 )
 
 // Exit codes (docs/reference/cli.md).
@@ -43,6 +45,7 @@ commands:
   set      add or change a description
   rm       remove a description
   mv       move a description
+  mcp      run as an MCP server over stdio
 
 common options: --json  -C <dir>  --no-ignore
 `
@@ -58,13 +61,13 @@ type command struct {
 }
 
 var (
-	readOptions  = []string{"--json", "-C", "--no-ignore"}
-	writeOptions = []string{"-C"}
+	readOptions = []string{"--json", "-C", "--no-ignore"}
+	editOptions = []string{"--json", "-C"}
 )
 
 var commands = map[string]*command{
 	"init": {
-		usage: "crube init [-C <dir>]", options: writeOptions,
+		usage: "crube init [-C <dir>]", options: []string{"-C"},
 		run: (*runner).init,
 	},
 	"ls": {
@@ -93,19 +96,23 @@ var commands = map[string]*command{
 		run:     (*runner).status,
 	},
 	"set": {
-		usage:   "crube set <path> <desc> [--detail <text>] [-C <dir>]",
-		options: append([]string{"--detail"}, writeOptions...), args: []string{"path", "desc"}, min: 2,
+		usage:   "crube set <path> <desc> [--detail <text>] [--json] [-C <dir>]",
+		options: append([]string{"--detail"}, editOptions...), args: []string{"path", "desc"}, min: 2,
 		run: (*runner).set,
 	},
 	"rm": {
-		usage:   "crube rm <path> [-C <dir>]",
-		options: writeOptions, args: []string{"path"}, min: 1,
+		usage:   "crube rm <path> [--json] [-C <dir>]",
+		options: editOptions, args: []string{"path"}, min: 1,
 		run: (*runner).rm,
 	},
 	"mv": {
-		usage:   "crube mv <from> <to> [-C <dir>]",
-		options: writeOptions, args: []string{"from", "to"}, min: 2,
+		usage:   "crube mv <from> <to> [--json] [-C <dir>]",
+		options: editOptions, args: []string{"from", "to"}, min: 2,
 		run: (*runner).mv,
+	},
+	"mcp": {
+		usage: "crube mcp [--allow-write]", options: []string{"--allow-write"},
+		run: (*runner).mcp,
 	},
 }
 
@@ -315,8 +322,11 @@ func (r *runner) set(p *parsed) (int, error) {
 	if d, ok := p.opts["--detail"]; ok {
 		detail = &d
 	}
-	_, err = proj.Set(p.args[0], p.args[1], detail)
-	return exitOK, err
+	res, err := proj.Set(p.args[0], p.args[1], detail)
+	if err != nil {
+		return 0, err
+	}
+	return exitOK, r.edited(p, res)
 }
 
 func (r *runner) rm(p *parsed) (int, error) {
@@ -324,8 +334,11 @@ func (r *runner) rm(p *parsed) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	_, err = proj.Remove(p.args[0])
-	return exitOK, err
+	res, err := proj.Remove(p.args[0])
+	if err != nil {
+		return 0, err
+	}
+	return exitOK, r.edited(p, res)
 }
 
 func (r *runner) mv(p *parsed) (int, error) {
@@ -333,8 +346,34 @@ func (r *runner) mv(p *parsed) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	_, err = proj.Move(p.args[0], p.args[1])
-	return exitOK, err
+	res, err := proj.Move(p.args[0], p.args[1])
+	if err != nil {
+		return 0, err
+	}
+	return exitOK, r.edited(p, res)
+}
+
+// edited writes the result of set, rm or mv as JSON with --json; without it,
+// nothing is written.
+func (r *runner) edited(p *parsed, v any) error {
+	if !p.has("--json") {
+		return nil
+	}
+	return r.writeJSON(v)
+}
+
+// mcp runs the MCP server over stdio until the client closes it. The language
+// is checked first, so that a wrong CRUBE_LANG stops the server at once.
+func (r *runner) mcp(p *parsed) (int, error) {
+	tag := r.env.Getenv(lang.EnvVar)
+	if err := lang.Check(tag); err != nil {
+		return 0, err
+	}
+	return exitOK, mcpserver.Run(context.Background(), mcpserver.Options{
+		Lang:       tag,
+		AllowWrite: p.has("--allow-write"),
+		Version:    version(r.env.Version),
+	})
 }
 
 // arg is the i-th positional argument, or "" when it is not given.

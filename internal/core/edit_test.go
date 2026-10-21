@@ -103,14 +103,14 @@ func TestSet(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := newProject(t, "", map[string]string{"structure.txt": tt.before})
-			e, err := p.Set(tt.path, tt.desc, tt.detail)
+			r, err := p.Set(tt.path, tt.desc, tt.detail)
 			if err != nil {
 				t.Fatal(err)
 			}
 			if got := content(t, p, "structure.txt"); got != tt.after {
 				t.Errorf("structure.txt:\ngot  %q\nwant %q", got, tt.after)
 			}
-			// The entry returned is the one written.
+			// The result is the entry as written.
 			tree, _, err := p.Load()
 			if err != nil {
 				t.Fatal(err)
@@ -121,13 +121,12 @@ func TestSet(t *testing.T) {
 				t.Fatalf("%s is not in the file", tt.path)
 			}
 			got := (*list)[i]
-			if e.Name != got.Name || e.Desc != got.Desc || e.Detail != got.Detail {
-				t.Errorf("returned %+v, the file has %+v", *e, *got)
+			if r.Path != tt.path || r.Desc != got.Desc || r.Detail != got.Detail {
+				t.Errorf("returned %+v, the file has %+v", *r, *got)
 			}
 		})
 	}
 }
-
 func TestSetRefused(t *testing.T) {
 	before := "keep\tme\n"
 	tests := []struct {
@@ -222,12 +221,13 @@ func TestRemove(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	e, err := p.Remove("src/legacy/")
+	r, err := p.Remove("src/legacy/")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if e.Name != "legacy/" || len(e.Children) != 1 {
-		t.Errorf("returned %+v", *e)
+	// legacy/ and old.go below it.
+	if want := (RemoveResult{Path: "src/legacy/", Removed: 2}); *r != want {
+		t.Errorf("returned %+v, want %+v", *r, want)
 	}
 	if got, want := content(t, p, "structure.txt"), "src/\tS\n\tmain.go\tM\ndata/\n\t*.csv\n"; got != want {
 		t.Errorf("structure.txt:\ngot  %q\nwant %q", got, want)
@@ -261,36 +261,37 @@ func TestMove(t *testing.T) {
 		before   string
 		from, to string
 		after    string
+		moved    int // the entry and those below it
 	}{
 		{"a directory with what is below it, after its new siblings",
 			"src/\tS\n\tlegacy/\tL\n\t\told.go\tO\n\t\t*_test.go\tT\nlib/\tLib\n\tx\tX\n",
 			"src/legacy/", "lib/old/",
-			"src/\tS\nlib/\tLib\n\tx\tX\n\told/\tL\n\t\told.go\tO\n\t\t*_test.go\tT\n"},
+			"src/\tS\nlib/\tLib\n\tx\tX\n\told/\tL\n\t\told.go\tO\n\t\t*_test.go\tT\n", 3},
 		{"missing parents of the destination are added",
 			"a.go\tA\n", "a.go", "cmd/tool/a.go",
-			"cmd/\n\ttool/\n\t\ta.go\tA\n"},
+			"cmd/\n\ttool/\n\t\ta.go\tA\n", 1},
 		{"rename in place goes to the end of the siblings",
 			"a\tA\nb\tB\n", "a", "c",
-			"b\tB\nc\tA\n"},
+			"b\tB\nc\tA\n", 1},
 		{"a file into a new directory of the same name",
 			"a\tA\n", "a", "a/a",
-			"a/\n\ta\tA\n"},
+			"a/\n\ta\tA\n", 1},
 		{"up to the root",
 			"x/\n\ty/\tY\n\t\tz\tZ\n", "x/y/", "y/",
-			"x/\ny/\tY\n\tz\tZ\n"},
+			"x/\ny/\tY\n\tz\tZ\n", 2},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := newProject(t, "", map[string]string{"structure.txt": tt.before})
-			e, err := p.Move(tt.from, tt.to)
+			r, err := p.Move(tt.from, tt.to)
 			if err != nil {
 				t.Fatal(err)
 			}
 			if got := content(t, p, "structure.txt"); got != tt.after {
 				t.Errorf("structure.txt:\ngot  %q\nwant %q", got, tt.after)
 			}
-			if !strings.HasSuffix(tt.to, e.Name) {
-				t.Errorf("returned entry named %q", e.Name)
+			if want := (MoveResult{From: tt.from, To: tt.to, Moved: tt.moved}); *r != want {
+				t.Errorf("returned %+v, want %+v", *r, want)
 			}
 		})
 	}

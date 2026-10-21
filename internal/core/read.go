@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/amisonnet8/crube/internal/match"
@@ -284,6 +285,28 @@ func (p *Project) Status() (*status.Report, error) {
 	}
 	r.Structure = relPath(name)
 	return r, nil
+}
+
+// FilterKinds keeps only the items of r whose kind is in kinds ("untracked",
+// "orphan" or "invalid"); with no kinds, all of them. The coverage is left
+// as it is: it is always that of the whole project.
+func FilterKinds(r *status.Report, kinds []string) error {
+	if len(kinds) == 0 {
+		return nil
+	}
+	for _, k := range kinds {
+		if k != status.Untracked && k != status.Orphan && k != status.Invalid {
+			return fmt.Errorf("invalid kind %q (use untracked, orphan or invalid)", k)
+		}
+	}
+	items := []status.Item{}
+	for _, it := range r.Items {
+		if slices.Contains(kinds, it.Kind) {
+			items = append(items, it)
+		}
+	}
+	r.Items = items
+	return nil
 }
 
 // Failed reports whether status ends with exit code 1: there is an orphan or

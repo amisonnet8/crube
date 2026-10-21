@@ -27,7 +27,7 @@
 
 - オプションは、位置引数の前後どこに書いてもよい(`crube ls src --full`)。値をとるオプションは `--limit 3` でも `--limit=3` でもよい。
 - `--` より後ろは、すべて位置引数として読む(`crube set -- note.txt "-v flag help"`)。
-- `set`・`rm`・`mv`・`init` は `--json` をまだ受け付けない(形は MCP の書き込みツールと合わせて決める)。`init` が受け付けるのは `-C` だけ、`set`・`rm`・`mv` は `-C` に加えて各自のオプション。
+- `init` が受け付けるのは `-C` だけ。`set`・`rm`・`mv` は `--json` と `-C`(と各自のオプション)。`mcp` は `--allow-write` だけ。
 
 ## 使い方と版
 
@@ -45,6 +45,7 @@ commands:
   set      add or change a description
   rm       remove a description
   mv       move a description
+  mcp      run as an MCP server over stdio
 
 common options: --json  -C <dir>  --no-ignore
 
@@ -105,7 +106,7 @@ crube: ls: unknown option --foo
 crube: ls: -C needs a value
 crube: find: invalid --limit "x" (use a number of 1 or more)
 crube: ls: too many arguments (usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore])
-crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [-C <dir>])
+crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--json] [-C <dir>])
 ```
 
 ### JSON
@@ -351,7 +352,7 @@ coverage    all: yes   dirs: yes
 ## crube set
 
 ```
-crube set <path> <desc> [--detail <text>]
+crube set <path> <desc> [--detail <text>] [--json]
 ```
 
 エントリの説明を追加・更新します。
@@ -365,12 +366,16 @@ $ crube set "data/*.csv" "CSVデータ"
 - エントリがなければ、兄弟の末尾に追加する。途中の親がなければ、desc なしの行として作る。
 - `--detail` の改行は、そのまま detail の複数行になる。`--detail ""` で detail を消す。
 - desc が 256 桁を超える、改行を含む、または detail が 4096 桁を超える場合はエラー。
-- 成功したときは何も出力しない(`rm`・`mv` も同じ)。`--json` を付けたときの形は、MCP の書き込みツールの返す内容と合わせて決める(未定)。
+- 成功したときは何も出力しない(`rm`・`mv` も同じ)。`--json` を付けたときだけ、書いた結果を出す。形は MCP の書き込みツールが返すものと同じ。
+
+```json
+{ "path": "data/*.csv", "desc": "CSVデータ", "detail": "" }
+```
 
 ## crube rm
 
 ```
-crube rm <path>
+crube rm <path> [--json]
 ```
 
 対象言語で使っているファイルから、エントリを削除します。ディレクトリのエントリなら、その下のエントリもすべて削除します。実際のファイルは削除しません。
@@ -378,7 +383,7 @@ crube rm <path>
 ## crube mv
 
 ```
-crube mv <from> <to>
+crube mv <from> <to> [--json]
 ```
 
 対象言語で使っているファイルの中で、エントリを別の位置へ移します。ディレクトリのエントリなら、その下のエントリも一緒に移ります。実際のファイルは移動しません。ファイルを移動したあとで、説明を新しいパスへ付け替えるために使います。
