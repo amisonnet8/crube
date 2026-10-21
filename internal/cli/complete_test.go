@@ -47,10 +47,10 @@ func TestComplete(t *testing.T) {
 		// The first word.
 		{"", []string{"--word="}, "init\tcreate .crube/\nls\tlist a directory with descriptions\n" +
 			"tree\tshow the descriptions as a tree\nfind\tsearch paths and descriptions\n" +
-			"show\tshow the description of one path\nstatus\treport undescribed, orphan and invalid entries\n" +
+			"show\tshow the description of one path\nstatus\treport untracked, orphan and invalid entries\n" +
 			"set\tadd or change a description\nrm\tremove a description\nmv\tmove a description\n" +
 			"mcp\trun as an MCP server over stdio\ncompletion\tprint a shell completion script\n"},
-		{"", []string{"--word=s", "--"}, "show\tshow the description of one path\nstatus\treport undescribed, orphan and invalid entries\nset\tadd or change a description\n"},
+		{"", []string{"--word=s", "--"}, "show\tshow the description of one path\nstatus\treport untracked, orphan and invalid entries\nset\tadd or change a description\n"},
 		{"", []string{"--word=-", "--"}, "--help\n--version\n"},
 		{"", []string{"--word=", "--", "lss"}, ""},
 		{"", []string{"--word=", "--", "--help"}, ""},

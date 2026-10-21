@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"runtime/debug"
 	"strings"
 
 	"github.com/amisonnet8/crube/internal/core"
@@ -27,7 +28,7 @@ type Env struct {
 	Getenv  func(string) string
 	Stdout  io.Writer
 	Stderr  io.Writer
-	Version string // set at build time by the release; "" otherwise
+	Version string // see BuildVersion; "" for none
 	// Width returns the width of the terminal that Stdout is, or 0 when it is
 	// not a terminal. nil looks at Stdout itself.
 	Width func() int
@@ -89,7 +90,7 @@ var commands = map[string]*command{
 		run: (*runner).show,
 	},
 	"status": {
-		usage: "crube status [--require all|dirs] [--json] [-C <dir>] [--no-ignore]", summary: "report undescribed, orphan and invalid entries",
+		usage: "crube status [--require all|dirs] [--json] [-C <dir>] [--no-ignore]", summary: "report untracked, orphan and invalid entries",
 		options: append([]string{"--require"}, readOptions...),
 		run:     (*runner).status,
 	},
@@ -162,7 +163,21 @@ func Run(args []string, env Env) int {
 	return code
 }
 
-// version is the version to show: the one set by the release, else "(devel)".
+// BuildVersion is the version for Env.Version: set, the one the release build
+// set, or else the version of the module that Go recorded in the binary
+// (go install …@v0.1.0 records v0.1.0). read is debug.ReadBuildInfo. Go
+// records "(devel)" when it knows no version; that is none.
+func BuildVersion(set string, read func() (*debug.BuildInfo, bool)) string {
+	if set != "" {
+		return set
+	}
+	if bi, ok := read(); ok && bi.Main.Version != "(devel)" {
+		return bi.Main.Version
+	}
+	return ""
+}
+
+// version is the version to show: Env.Version, else "(devel)".
 func version(v string) string {
 	if v != "" {
 		return v

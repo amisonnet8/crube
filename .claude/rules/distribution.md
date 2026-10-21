@@ -5,7 +5,7 @@
 ## 決まっていること
 
 - Goの**単一バイナリ**で配る（`docs/design/architecture.md`）。ライセンスはMIT
-- 依存ライブラリがあれば、そのライセンス文を配布物に同梱する（`docs/design/architecture.md`「実装」）
+- 依存ライブラリがあれば、そのライセンス文を配布物に同梱する（`docs/design/architecture_ja.md`「実装」）
 
 ## リリースの流れ
 

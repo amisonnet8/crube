@@ -7,8 +7,8 @@ crube 本体は AI を呼び出しません。AI エージェントが CLI ま�
 ## 手順
 
 1. `crube status --json` で、説明が必要な箇所を取得する。
-2. AI が該当ファイルの中身や、利用可能な情報源(設計資料、作業記録など)を読む。
-3. AI が `crube set` / `mv` / `rm`(または MCP の書き込みツール)で structure を更新する。
+2. AI が該当ファイルの中身や、利用可能な情報源（設計資料、作業記録など）を読む。
+3. AI が `crube set` / `mv` / `rm`（または MCP の書き込みツール）で structure を更新する。
 4. もう一度 `crube status` を実行し、問題がなくなったことを確認する。
 5. 人間が `.crube/` の差分をレビューする。
 
@@ -54,7 +54,13 @@ crube 本体は AI を呼び出しません。AI エージェントが CLI ま�
 - CI では `crube status --require dirs` などの終了コードで説明漏れを検出する。どの段階を求めるかはプロジェクトで決める。
 
 ```yaml
-# 例: CI のステップ
+# 例：CI のステップ
+- uses: actions/checkout@v7
+- uses: actions/setup-go@v7
+  with:
+    go-version: stable
+- name: Install crube
+  run: go install github.com/amisonnet8/crube/cmd/crube@latest
 - name: Check crube descriptions
   run: crube status --require dirs
 ```

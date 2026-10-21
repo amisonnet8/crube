@@ -4,7 +4,7 @@
 
 ## このプロジェクトについて
 
-crube（「しるべ（道標）」を縮めた名前）は、プロジェクト内のファイルとディレクトリに説明を付けて`.crube/`に保存し、説明付きの`ls`／`tree`／`find`で目的の場所へすぐたどり着けるようにするツール。説明の作成・更新にはAIを使えるが、参照するときにAIは要らない。実装はGo（単一バイナリ）、データはタブのインデントで書く独自のツリー形式のテキスト（`.crube/structure.txt`）、ライセンスはMIT。
+crubeは、プロジェクト内のファイルとディレクトリに説明を付けて`.crube/`に保存し、説明付きの`ls`／`tree`／`find`で目的の場所へすぐたどり着けるようにするツール。説明の作成・更新にはAIを使えるが、参照するときにAIは要らない。実装はGo（単一バイナリ）、データはタブのインデントで書く独自のツリー形式のテキスト（`.crube/structure.txt`）、ライセンスはMIT。
 
 設計と仕様は`docs/`にある（`docs/README.md`が目次）。**実装の前に、関係するページを読む。**
 
@@ -14,7 +14,7 @@ crube（「しるべ（道標）」を縮めた名前）は、プロジェクト
 
 ## 守ること（設計の芯）
 
-実装の細部より優先する。これを崩す変更は、実装する前に必ず相談すること。出所は`docs/design/overview.md`「基本方針」、`docs/design/architecture.md`、`docs/design/decisions.md`。
+実装の細部より優先する。これを崩す変更は、実装する前に必ず相談すること。出所は`docs/design/overview_ja.md`「基本方針」、`docs/design/architecture_ja.md`、`docs/design/decisions_ja.md`。
 
 - **書き込むのは`.crube/`の中だけ**（不変条件）：プロジェクトのファイルは読むだけで、作成・変更・削除・移動をしない。`mv`・`rm`も説明を動かす・消すだけ。書き込みの直前に、書き込み先が`.crube/`の中であることをコアで検証する（シンボリックリンク経由で外に出るものも拒否）
 - **生成と参照の分離**：crube本体はAIを呼び出さない。参照（`ls`・`tree`・`find`・`show`・`status`）は保存済みのデータだけで動く
@@ -28,7 +28,7 @@ crube（「しるべ（道標）」を縮めた名前）は、プロジェクト
 
 `CLAUDE.md`・`.claude/rules/`は日本語。README と`docs/`は、英語（`X.md`）と日本語（`X_ja.md`）の対で、片方を直したら同じ変更でもう片方も直す（`.claude/rules/documentation.md`）。
 
-<!-- TODO: コード・コメント・コミットメッセージの言語を決めて書く（CLI出力は英語だけと決まった。`docs/reference/cli.md`「出力の共通の決まり」）。詳しい書き方は`.claude/rules/documentation.md` -->
+<!-- TODO: コード・コメント・コミットメッセージの言語を決めて書く（CLI出力は英語だけと決まった。`docs/reference/cli_ja.md`「出力の共通の決まり」）。詳しい書き方は`.claude/rules/documentation.md` -->
 
 ## 参照すべきファイル
 

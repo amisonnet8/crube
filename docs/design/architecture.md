@@ -40,7 +40,7 @@ All the logic is in a core library, and the CLI and the MCP server are thin wrap
 
 - **Language**: Go, distributed as a single binary.
 - **Structure files**: a text format of its own, read and written with the standard library only (`strings`, `path`).
-- **License**: MIT. The license texts of the libraries it uses are shipped with it.
+- **License**: MIT. The release archives include the license texts of the libraries it uses.
 
 ## What it writes (an invariant)
 

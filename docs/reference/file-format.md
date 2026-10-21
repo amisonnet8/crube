@@ -131,7 +131,7 @@ One pattern of paths to leave out per line. The format is that of gitignore. Onl
 ```
 # .crube/ignore
 node_modules/
-dist/
+dist/*
 *.log
 !dist/README.md
 ```
@@ -139,5 +139,5 @@ dist/
 - `.crube/` directly in the project root is always left out; neither `!` nor `--no-ignore` brings it back. A `.crube` in a subdirectory is treated like any other name.
 - Without `ignore`, nothing but `.crube/` is left out.
 - `crube init` writes a default ignore with what almost every project wants to leave out (`.git/`, `.hg/`, `.svn/`, `node_modules/`). Things such as `dist/` and `vendor/`, which mean something in some projects, are not in it. Edit it as you like.
-- A path left out is out of scope for ls, tree, find and status alike.
+- A path left out is out of scope for ls, tree, find, show and status alike.
 - Leaving a path out only hides it from views and checks; it does not remove descriptions from the structure.

@@ -4,6 +4,7 @@ package main
 
 import (
 	"os"
+	"runtime/debug"
 
 	"github.com/amisonnet8/crube/internal/cli"
 )
@@ -16,6 +17,6 @@ func main() {
 		Getenv:  os.Getenv,
 		Stdout:  os.Stdout,
 		Stderr:  os.Stderr,
-		Version: version,
+		Version: cli.BuildVersion(version, debug.ReadBuildInfo),
 	}))
 }

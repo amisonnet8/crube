@@ -4,13 +4,13 @@
 
 ## 製品名
 
-- **crube**（「しるべ（道標）」を縮めたもの）。文中でもコマンドでも、すべて小文字で書く
+- **crube**。文中でもコマンドでも、すべて小文字で書く
 - データの置き場は`.crube/`、環境変数は`CRUBE_LANG`
 - structure ファイルの名前は`structure.txt`（英語）と`structure_<言語タグ>.txt`（言語タグは BCP 47。例：`structure_ja.txt`）。除外の設定は`.crube/ignore`
 
 ## 用語
 
-出所は`docs/design/overview.md`「用語」と`docs/reference/`。**用語を変えたり足したりしたら、docs とこの表を同じ変更の中で直す。** CLI・JSON での表記は、docs にあるものだけを書いている。
+出所は`docs/design/overview_ja.md`「用語」と`docs/reference/`。**用語を変えたり足したりしたら、docs とこの表を同じ変更の中で直す。** CLI・JSON での表記は、docs にあるものだけを書いている。
 
 | 用語 | CLI・JSON での表記 | 意味 |
 |---|---|---|

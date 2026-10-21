@@ -1,6 +1,6 @@
 // Package textwidth measures text by its display width on a terminal, the
 // unit crube uses for the limits of desc and detail and for aligning columns
-// (docs/design/data-model.md "長さの上限").
+// (docs/design/data-model.md "Length limits").
 package textwidth
 
 import (

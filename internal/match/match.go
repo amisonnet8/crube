@@ -1,5 +1,5 @@
 // Package match decides which entry of a structure file an existing path
-// matches (docs/reference/file-format.md "照合の規則").
+// matches (docs/reference/file-format.md "Matching").
 //
 // In each directory, an entry whose name is exactly the name wins; otherwise
 // the entries are tried in the order they are written, as patterns of

@@ -11,14 +11,13 @@
   "mcpServers": {
     "crube": {
       "command": "crube",
-      "args": ["mcp", "--allow-write"],
-      "env": { "CRUBE_LANG": "ja" }
+      "args": ["mcp", "--allow-write"]
     }
   }
 }
 ```
 
-The server looks for `.crube/` from the directory where it started, upwards. The language is the `CRUBE_LANG` environment variable when the server starts (it can be set with `env` in the client's settings). If it is not in the form of a language tag, the server does not start and stops with exit code 2. The writing tools, too, write only inside `.crube/`. `remove_description` / `move_description` only remove or move descriptions; they do not touch files.
+The server looks for `.crube/` from the directory where it started, upwards. The language is the `CRUBE_LANG` environment variable when the server starts (it can be set with `env` in the client's settings, such as `"env": { "CRUBE_LANG": "ja" }`). If it is not in the form of a language tag, the server does not start and stops with exit code 2. The writing tools, too, write only inside `.crube/`. `remove_description` / `move_description` only remove or move descriptions; they do not touch files.
 
 ## Tools
 
@@ -29,7 +28,7 @@ The writing tools are offered only when the server is started with `crube mcp --
 | Read | `tree` | path, depth | The nested structure of the CLI's `crube tree --json`. No mark of the current place (`here` is `""` at the top, and `false` on each entry) |
 | Read | `ls` | path | The same as the CLI's `crube ls --json` (what is directly in it, with descriptions) |
 | Read | `find` | query, limit | The same as the CLI's `crube find --json` (the paths found with descriptions, and how many were left out) |
-| Read | `show` | path | The same as the CLI's `crube show` (desc, detail, the path of the entry that matched, and the target of a symbolic link) |
+| Read | `show` | path | The same as the CLI's `crube show --json` (desc, detail, the path of the entry that matched, and the target of a symbolic link) |
 | Maintain | `status` | kinds (a filter) | The same as `crube status --json` |
 | Write | `set_description` | path, desc, detail | The entry after the update, `{ "path", "desc", "detail" }` |
 | Write | `remove_description` | path | `{ "path", "removed" }` (`removed` is the number of entries removed, those below included) |

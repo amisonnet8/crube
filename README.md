@@ -146,8 +146,7 @@ The idea is that AI writes the descriptions, and people review the diff of `.cru
   "mcpServers": {
     "crube": {
       "command": "crube",
-      "args": ["mcp", "--allow-write"],
-      "env": { "CRUBE_LANG": "ja" }
+      "args": ["mcp", "--allow-write"]
     }
   }
 }
@@ -177,6 +176,12 @@ Without `--allow-write`, only the reading tools (`tree`, `ls`, `find`, `show`, `
 <summary><b>Stopping missing descriptions in CI (GitHub Actions)</b></summary>
 
 ```yaml
+- uses: actions/checkout@v7
+- uses: actions/setup-go@v7
+  with:
+    go-version: stable
+- name: Install crube
+  run: go install github.com/amisonnet8/crube/cmd/crube@latest
 - name: Check crube descriptions
   run: crube status --require dirs
 ```

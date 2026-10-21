@@ -44,7 +44,7 @@ commands:
   tree        show the descriptions as a tree
   find        search paths and descriptions
   show        show the description of one path
-  status      report undescribed, orphan and invalid entries
+  status      report untracked, orphan and invalid entries
   set         add or change a description
   rm          remove a description
   mv          move a description
@@ -62,7 +62,7 @@ crube v0.1.0
 
 - `--help`, `-h` and `help` print to standard output, with exit code 0. `crube` with no arguments prints the same to standard error, with exit code 2.
 - `-h` and `--help` of a command print its usage in one line.
-- `--version` prints the version built into the release. A build that is not a release prints `crube (devel)`.
+- `--version` prints the version built into the release, or else the version Go recorded in the binary (`v0.1.0` after `go install …@v0.1.0`). A build with neither prints `crube (devel)`.
 
 ## Language
 

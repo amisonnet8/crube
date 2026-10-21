@@ -26,7 +26,7 @@ How to work and what to know are left to the agent's own rules (`.claude/` and t
 
 ## Principles
 
-- **Writing and reading are separate**: AI is used only to write and update descriptions. Reading (ls / tree / find / status) works on the saved data alone.
+- **Writing and reading are separate**: AI is used only to write and update descriptions. Reading (ls / tree / find / show / status) works on the saved data alone.
 - **Paths are the anchor**: descriptions are tied to paths, so comparing them with the real directories is the freshness check.
 - **Text people can read**: the data is text that writes the directory structure as it is, with indentation. People can read and write it directly, and diffs are easy to take.
 - **Independent**: it depends on neither Git, nor a particular AI provider, nor any other tool, and works on its own.

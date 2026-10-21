@@ -1,5 +1,6 @@
 // Package lang decides which structure file to read and write from the value
-// of CRUBE_LANG (docs/design/data-model.md "多言語").
+// of CRUBE_LANG (docs/design/data-model.md "Languages: one independent file
+// per language").
 //
 // Each language has a file of its own: structure.txt for English (the
 // default) and structure_<tag>.txt for any other language. Exactly one file is

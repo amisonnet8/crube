@@ -57,8 +57,8 @@ func CheckDetail(detail string) error {
 
 // CheckName reports whether name (with a trailing "/" for a directory entry)
 // can be written as the name of an entry: the names that the format cannot
-// hold (docs/reference/file-format.md "書けない名前") are refused, as are an
-// empty name, a "/" inside it, and "." and "..".
+// hold (docs/reference/file-format.md "Names that cannot be written") are
+// refused, as are an empty name, a "/" inside it, and "." and "..".
 func CheckName(name string) error {
 	base := strings.TrimSuffix(name, "/")
 	if base == "" || base == "." || base == ".." ||

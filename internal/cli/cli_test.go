@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime/debug"
 	"strings"
 	"testing"
 )
@@ -145,6 +146,31 @@ func TestVersion(t *testing.T) {
 		code := Run([]string{"--version"}, Env{Getenv: func(string) string { return "" }, Stdout: &out, Stderr: &out, Version: v})
 		if code != 0 || out.String() != want {
 			t.Errorf("version %q: %d %q, want %q", v, code, out.String(), want)
+		}
+	}
+}
+
+func TestBuildVersion(t *testing.T) {
+	recorded := func(v string, ok bool) func() (*debug.BuildInfo, bool) {
+		return func() (*debug.BuildInfo, bool) {
+			if !ok {
+				return nil, false
+			}
+			return &debug.BuildInfo{Main: debug.Module{Version: v}}, true
+		}
+	}
+	for _, c := range []struct {
+		set, recorded string
+		ok            bool
+		want          string
+	}{
+		{"v1.2.3", "v0.9.0", true, "v1.2.3"}, // the release build's wins
+		{"", "v0.9.0", true, "v0.9.0"},       // go install …@v0.9.0
+		{"", "(devel)", true, ""},
+		{"", "", false, ""},
+	} {
+		if got := BuildVersion(c.set, recorded(c.recorded, c.ok)); got != c.want {
+			t.Errorf("BuildVersion(%q) with %q, %v: %q, want %q", c.set, c.recorded, c.ok, got, c.want)
 		}
 	}
 }

@@ -177,6 +177,12 @@ AI が説明を書き、人が `.crube/` の差分をレビューする、とい
 <summary><b>CI で説明漏れを止める（GitHub Actions）</b></summary>
 
 ```yaml
+- uses: actions/checkout@v7
+- uses: actions/setup-go@v7
+  with:
+    go-version: stable
+- name: Install crube
+  run: go install github.com/amisonnet8/crube/cmd/crube@latest
 - name: Check crube descriptions
   run: crube status --require dirs
 ```

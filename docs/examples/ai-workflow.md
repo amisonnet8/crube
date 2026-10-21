@@ -54,7 +54,13 @@ Instructions like these in the agent's rules (`.claude/` and the like) make it e
 - In CI, catch missing descriptions by the exit code of `crube status --require dirs` or the like. Which level to require is up to the project.
 
 ```yaml
-# Example: a CI step
+# Example: CI steps
+- uses: actions/checkout@v7
+- uses: actions/setup-go@v7
+  with:
+    go-version: stable
+- name: Install crube
+  run: go install github.com/amisonnet8/crube/cmd/crube@latest
 - name: Check crube descriptions
   run: crube status --require dirs
 ```

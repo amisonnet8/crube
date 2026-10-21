@@ -39,7 +39,7 @@ $ crube set internal/ "Private packages"
 $ crube set internal/store/ "Persistence layer (SQLite)" --detail "Also called: db, database"
 ```
 
-この時点の `.crube/structure.txt` はこうなっています(インデントと、名前と説明の区切りはタブ)。
+この時点の `.crube/structure.txt` はこうなっています（インデントと、名前と説明の区切りはタブ）。
 
 ```
 cmd/	Executables
@@ -74,7 +74,7 @@ $ crube find sqlite
 internal/store/   Persistence layer (SQLite)
 ```
 
-## (任意)日本語のファイルを作る
+## （任意）日本語のファイルを作る
 
 言語ごとに独立したファイルを持てます。`CRUBE_LANG` を設定して `init` を実行すると、その言語の空ファイルができます。
 
@@ -91,7 +91,7 @@ $ crube tree
 
 `CRUBE_LANG=ja` の間は、参照も編集も `structure_ja.txt` だけを使います。英語のファイルの説明が混ざることはありません。`structure_ja.txt` を作っていなければ、`CRUBE_LANG=ja` でも英語の `structure.txt` が使われます。
 
-以下は `CRUBE_LANG` を外した(英語の)状態で続けます。
+以下は `CRUBE_LANG` を外した（英語の）状態で続けます。
 
 ```
 $ unset CRUBE_LANG
