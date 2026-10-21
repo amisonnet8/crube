@@ -128,3 +128,9 @@
 {"v":1,"ts":"2026-10-21T00:16:02.488Z","why":"[3-1] のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":12}
 {"v":1,"ts":"2026-10-21T00:16:04.734Z","why":"[3-1] のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":18}
 {"v":1,"ts":"2026-10-21T00:16:04.933Z","why":"[3-1] のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-21T00:16:07.431Z","why":"[3-1] の変更・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".srwr/tapes",".claude/rules/directory-structure.md","docs/design/decisions.md","docs/reference/cli.md","cmd","internal/cli"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-21T00:16:07.612Z","why":"足したものが意図どおりか確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-21T00:32:38.906Z","why":"同じ化け方の誤字がほかに残っていないか、追跡中のファイル全体で確かめる","cmd":["git","grep","-n","慯"],"dir":".","exit":1,"ms":3}
+{"v":1,"ts":"2026-10-21T00:32:43.615Z","why":"誤字の修正のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":8}
+{"v":1,"ts":"2026-10-21T00:32:45.818Z","why":"誤字の修正のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":11}
+{"v":1,"ts":"2026-10-21T00:32:46.007Z","why":"誤字の修正のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
