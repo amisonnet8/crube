@@ -1,0 +1,110 @@
+.bcuz/	bcuz を通して動かしたコマンドの記録（コミットする）
+	history.jsonl	1コマンド1行の JSON：いつ・なぜ・何を・終了コード
+.claude/	リポジトリで共有する Claude Code の設定
+	hooks/	Claude Code が道具の前後に動かすフック
+		build.sh	srwr で .go・go.mod・go.sum を変えたあとに qsoku build を動かす
+		require-bcuz.sh	bcuz を通さない Bash のコマンドを断る PreToolUse フック
+		require-bcuz.test.sh	require-bcuz.sh が通す・断るコマンドの表（qsoku hook）
+	rules/	このリポジトリで作業するときのルール（日本語）。いつ読むかは CLAUDE.md にある
+		bcuz-usage.md	Bash のコマンドを bcuz で動かす方法と、秘密をコマンドに書かないこと
+		datetime.md	日時の扱い：UTC で持ち、表示だけ利用者のタイムゾーンに直す
+		directory-structure.md	ファイルの置き場所と、リポジトリの構成
+		distribution.md	配布の流れ（タグと下書きの Release は人間が扱う）
+		documentation.md	docs/ の書き方：例の値は道具で求める
+		mtqg-usage.md	mtqg でメモ・todo・質問・不具合・決まり事を記録する方法
+		naming.md	名前：製品名・用語・コマンド
+		qsoku-usage.md	ビルド・テスト・lint の qsoku の名前と呼び方
+		srwr-usage.md	ファイルは srwr だけで変える（厳格モード）こと、テープの閉じ方
+		testing.md	テスト方針と、サンドボックス・OS ごとの CI の落とし穴
+		working-with-human.md	人間への頼み方：小さなつまずき、確認、見え方の了承
+	settings.json	Claude Code の許可・サンドボックス・フック（人間が管理する）
+	skills/	Claude Code のスキル
+		commit-with-tape/	スキル：srwr のテープを閉じてコミットする
+			SKILL.md	スキルの手順
+.devcontainer/	開発用のコンテナ
+	devcontainer-lock.json	コンテナを作ったときの feature の版
+	devcontainer.json	コンテナの定義と VS Code の設定
+	postCreate.sh	コンテナを作ったあとに道具（qsoku・mtqg・srwr・bcuz・golangci-lint・Trivy）を入れる
+.github/	GitHub の設定
+	workflows/	GitHub Actions のワークフロー
+		ci.yml	CI：Linux・macOS・Windows での qsoku check、race、ShellCheck、Trivy
+.mtqg/	mtqg の作業記録：メモ・todo・質問・不具合・用語・決まり事
+	.gitattributes	journal.jsonl を merge=union でマージする
+	.gitignore	.local/ を git に入れない
+	SCHEMA.md	journal.jsonl のデータ形式
+	journal.jsonl	記録そのもの。1件1行の JSON（mtqg からだけ書く）
+	version	mtqg のデータ形式の版
+.srwr/	srwr：AI によるファイル編集のテープ（操作ごとに理由つき）
+	tapes/	閉じたテープ（コミットする）。srwr view で再生できる
+		*.tape.jsonl.gz	作業のまとまりごとに1本のテープ（圧縮済み）
+cmd/	実行ファイル
+	crube/	crube コマンド
+		main.go	入口：引数を internal/cli に渡すだけ
+docs/	設計と仕様（日本語）
+	README.md	docs の目次
+	design/	なぜこの形なのか
+		architecture.md	アーキテクチャ：コア・CLI・MCP サーバー、書き込みガード
+		data-model.md	データモデル：ツリー形式のテキスト、名前とパターン、desc と detail
+		decisions.md	決定事項とその理由の表
+		freshness.md	鮮度と充足度：status が報告するもの、status --require
+		overview.md	概要・基本方針・用語
+	examples/	使い方の例
+		ai-workflow.md	AI エージェントが status・set・mv・rm で説明を保つ手順
+		getting-started.md	はじめての crube：init・status・set・tree・find
+		sample-crube/	サンプルの .crube/（このリポジトリのものではない）
+			ignore	ignore ファイルのサンプル
+			structure.txt	英語の structure ファイルのサンプル
+			structure_ja.txt	日本語の structure ファイルのサンプル
+	reference/	正確な仕様
+		cli.md	CLI リファレンス：コマンド・オプション・出力・終了コード
+		file-format.md	.crube/ のファイル形式：structure ファイルと ignore ファイル
+		mcp.md	MCP サーバーのリファレンス：ツールとその返す内容
+internal/	crube のパッケージ：コアと、その上の CLI
+	cli/	コマンドライン：引数を解析し、core を呼び、JSON かテキストで出す
+		args.go	オプションの解析（引数の前後どちらに書いてもよい）
+		cli.go	コマンド・ヘルプ・版・終了コード・エラーの行
+		text.go	テキストの出力：桁揃え、端末幅での切り詰め、status の表
+		*_test.go	同名ファイルのテスト
+	core/	CLI と MCP サーバーが呼ぶ操作
+		core.go	プロジェクトを開く、言語の structure ファイルを読む、ignore ファイルを読む
+		edit.go	set・rm・mv
+		init.go	init
+		read.go	ls・tree・show と、find・status の配線
+		*_test.go	同名ファイルのテスト
+	ignore/	.crube/ignore：.gitignore と同じ規則と、init が書く既定のファイル
+		ignore.go	除外の規則の解析と照合
+		*_test.go	テスト（期待値は git check-ignore で求めた）
+	lang/	CRUBE_LANG から使う structure ファイルを選ぶ
+		lang.go	言語タグとファイル名（structure_<タグ>.txt）
+		*_test.go	同名ファイルのテスト
+	match/	実在のパスとエントリの照合（名前の完全一致が先、次にパターンを書いた順）
+		match.go	Child・Walk・Find
+		*_test.go	同名ファイルのテスト
+	project/	.crube/ の探索と、そこへ書き込む唯一のコード（書き込みガード）
+		project.go	FindRoot と、.crube/ の外やシンボリックリンク経由を拒む書き込み
+		*_test.go	同名ファイルのテスト
+	search/	find：エントリのパス・desc・detail の検索（インデックスなし）
+		search.go	大文字・小文字を区別しない検索。語はすべて含むものだけに当たる
+		*_test.go	同名ファイルのテスト
+	status/	status：プロジェクトを走査して structure ファイルと突き合わせる（読むだけ）
+		status.go	未説明のパス、孤立エントリ、上限超え、充足度
+		*_test.go	同名ファイルのテスト
+	structure/	structure ファイル：読み込み、正規形での書き出し、desc と detail の上限
+		limits.go	desc（256 桁）と detail（4096 桁）の上限と、書けない名前
+		structure.go	タブで字下げしたツリーの Parse と Format
+		*_test.go	同名ファイルのテスト
+	textwidth/	表示幅：全角 2、結合文字 0、ほかは 1
+		textwidth.go	1文字と文字列の表示幅
+		*_test.go	テスト（期待値は Python の unicodedata で求めた）
+.gitattributes	改行（すべて LF）と、記録のファイルの merge=union
+.gitignore	git に入れないもの。ルート直下のドットで始まる名前は許可リスト方式
+.golangci.yaml	golangci-lint の設定
+.mcp.json	Claude Code に mtqg と srwr の MCP サーバーをつなぐ設定
+.srwrignore	srwr がテープに記録しないファイル
+CLAUDE.md	このリポジトリでの Claude Code のルールと、読むべきルールファイルの案内
+LICENSE	MIT ライセンス
+README.md	crube とは何か（例つき）
+go.mod	Go モジュールと依存
+go.sum	依存のチェックサム
+qsokufile	ビルド・テスト・lint の名前つきコマンド（qsoku）
+trivy.yaml	Trivy の設定：何を脆弱性・ライセンスの失敗とみなすか

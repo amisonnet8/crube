@@ -2,7 +2,7 @@
 
 新しいファイルを追加する際は、どこに置くかをここで確かめる。**構成を変えたら、この文書も同じ変更の中で直す。**
 
-**このリポジトリ自身の説明（`.crube/`）も保つ。** ファイル・ディレクトリを足す・動かす・消すときは、同じ変更の中で`qsoku crube set`／`mv`／`rm`で説明を直し、コミットの前に`qsoku crube status --require all`を通す（説明は英語で`.crube/structure.txt`に書く。`.crube/`の中は srwr で直接直してもよい）。コミットしないものを`.gitignore`に足したら、`.crube/ignore`にも足す（crube は`.gitignore`を読まない）
+**このリポジトリ自身の説明（`.crube/`）も保つ。** ファイル・ディレクトリを足す・動かす・消すときは、同じ変更の中で`qsoku crube set`／`mv`／`rm`で説明を直し、コミットの前に`qsoku crube status --require all`を通す。**説明は英語（`.crube/structure.txt`）と日本語（`.crube/structure_ja.txt`）の両方を直し**、日本語は`env CRUBE_LANG=ja qsoku crube …`で扱う。`status --require all`も両方の言語で通す（言語ごとのファイルは独立で、片方だけ直すともう片方が古くなる）。`.crube/`の中は srwr で直接直してもよい。コミットしないものを`.gitignore`に足したら、`.crube/ignore`にも足す（crube は`.gitignore`を読まない）
 
 ```
 .
@@ -19,7 +19,7 @@
 ├── .srwrignore             ← srwrがテープに記録しないファイル（`.mtqg/`・`.bcuz/`など）
 ├── .bcuz/                  ← bcuzの記録（`history.jsonl`）。`postCreate.sh`が`bcuz --init`で作る。**コミットする**（`merge=union`）
 ├── .srwr/                  ← srwrの鍵・ロック・テープ（最初のhook・MCPの呼び出しでできる。**閉じた`tapes/*.gz`だけコミットする**）
-├── .crube/                 ← このリポジトリ自身の説明（crube の dogfooding。`structure.txt`は英語、`ignore`は`.gitignore`に合わせて手で保つ）。**コミットする**
+├── .crube/                 ← このリポジトリ自身の説明（crube の dogfooding。`structure.txt`は英語、`structure_ja.txt`は日本語、`ignore`は`.gitignore`に合わせて手で保つ）。**コミットする**
 ├── cmd/crube/              ← CLIの`main.go`（引数・環境を`internal/cli`に渡すだけ。リリースの版を受け取る`version`）
 ├── internal/               ← このモジュールの中だけで使うコード（コア）
 │   ├── cli/                ← CLI（引数の解析、`core`の呼び出し、出力・エラー文・終了コード）。判定は`core`に任せる
