@@ -21,9 +21,9 @@
 ├── .srwr/                  ← srwrの鍵・ロック・テープ（最初のhook・MCPの呼び出しでできる。**閉じた`tapes/*.gz`だけコミットする**）
 ├── .crube/                 ← このリポジトリ自身の説明（crube の dogfooding。`structure.txt`は英語、`structure_ja.txt`は日本語、`ignore`は`.gitignore`に合わせて手で保つ）。**コミットする**
 ├── cmd/crube/              ← CLIの`main.go`（引数・環境を`internal/cli`に渡すだけ。リリースの版を受け取る`version`）
-├── e2e/                    ← docs の例と実際の出力の突き合わせ、CLI と MCP の一致（テストだけのパッケージ。`qsoku unit`に入る）
+├── e2e/                    ← docs の例と実際の出力の突き合わせ、CLI と MCP の一致、補完スクリプトを本物のシェルで動かす（テストだけのパッケージ。`qsoku unit`に入る）
 ├── internal/               ← このモジュールの中だけで使うコード（コア）
-│   ├── cli/                ← CLI（引数の解析、`core`の呼び出し、出力・エラー文・終了コード）。判定は`core`に任せる
+│   ├── cli/                ← CLI（引数の解析、`core`の呼び出し、出力・エラー文・終了コード、シェル補完）。判定は`core`に任せる。`completions/`は埋め込む補完スクリプト
 │   ├── core/               ← CLIとMCPが呼ぶ操作（init・set・rm・mv、参照の操作）。ほかのパッケージを組み合わせる
 │   ├── ignore/             ← `.crube/ignore`の除外判定（gitignore と同じ書式）と、init が書く既定の中身
 │   ├── lang/               ← `CRUBE_LANG`から使う structure ファイルを1つ決める

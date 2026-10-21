@@ -16,6 +16,7 @@
 | [`crube rm`](#crube-rm) | 編集 | エントリの削除(配下も含む) |
 | [`crube mv`](#crube-mv) | 編集 | エントリの移動(配下も含む) |
 | [`crube mcp`](#crube-mcp) | 連携 | MCP サーバーとして起動 |
+| [`crube completion`](#crube-completion) | 連携 | シェルの補完スクリプトを出力 |
 
 ## 共通オプション
 
@@ -27,7 +28,7 @@
 
 - オプションは、位置引数の前後どこに書いてもよい(`crube ls src --full`)。値をとるオプションは `--limit 3` でも `--limit=3` でもよい。
 - `--` より後ろは、すべて位置引数として読む(`crube set -- note.txt "-v flag help"`)。
-- `init` が受け付けるのは `-C` だけ。`set`・`rm`・`mv` は `--json` と `-C`(と各自のオプション)。`mcp` は `--allow-write` だけ。
+- `init` が受け付けるのは `-C` だけ。`set`・`rm`・`mv` は `--json` と `-C`(と各自のオプション)。`mcp` は `--allow-write` だけ。`completion` はオプションを受け付けない。
 
 ## 使い方と版
 
@@ -36,16 +37,17 @@ $ crube --help
 usage: crube <command> [arguments]
 
 commands:
-  init     create .crube/
-  ls       list a directory with descriptions
-  tree     show the descriptions as a tree
-  find     search paths and descriptions
-  show     show the description of one path
-  status   report undescribed, orphan and invalid entries
-  set      add or change a description
-  rm       remove a description
-  mv       move a description
-  mcp      run as an MCP server over stdio
+  init        create .crube/
+  ls          list a directory with descriptions
+  tree        show the descriptions as a tree
+  find        search paths and descriptions
+  show        show the description of one path
+  status      report undescribed, orphan and invalid entries
+  set         add or change a description
+  rm          remove a description
+  mv          move a description
+  mcp         run as an MCP server over stdio
+  completion  print a shell completion script
 
 common options: --json  -C <dir>  --no-ignore
 
@@ -418,3 +420,50 @@ crube mcp [--allow-write]
 ```
 
 stdio の MCP サーバーとして起動します。`--allow-write` を付けたときだけ、書き込み系ツールを公開します。詳しくは [mcp.md](mcp.md) を参照してください。
+
+## crube completion
+
+```
+crube completion <shell>
+```
+
+シェルの補完スクリプトを標準出力に出します。`<shell>` は `bash`・`zsh`・`fish`・`powershell` のどれかです。ほかの語はエラー(`crube: completion: unknown shell "tcsh" (use bash, zsh, fish or powershell)`)です。スクリプトは、シェルが補完を探す場所に置きます。
+
+```
+crube completion bash > ~/.local/share/bash-completion/completions/crube
+crube completion zsh > "${fpath[1]}/_crube"
+crube completion fish > ~/.config/fish/completions/crube.fish
+crube completion powershell >> $PROFILE
+```
+
+スクリプトはコマンドの一覧を持たない、短い固定のテキストです。TAB を押すたびに `crube __complete` に候補を聞きます。そのため、出る候補が入っている crube と食い違うことはありません。その場所のプロジェクトのエントリのパスも出せます。
+
+補完するもの:
+
+| 場所 | 候補 |
+| --- | --- |
+| 1 語目 | コマンド(要約付き) |
+| `-` で始まる語 | そのコマンドが受け付けるオプションのうち、行にまだないものと `--help`(1 語目なら `--help`・`--version`) |
+| `--require` の値 | `all`・`dirs` |
+| `tree` のパス、`set` のパス、`rm` のパス、`mv` の `from`・`to` | エントリのパス |
+| `completion` の次 | 4 つのシェル |
+
+- エントリのパスは 1 段ずつ出す。打ちかけの語の最後の `/` までのエントリの直下にあるエントリを、ルートからのパスで、desc 付きで出す(`crube tree src/<TAB>` で `src/auth/`・`src/main.go`)。ディレクトリのエントリは末尾 `/` で、後ろに空白を入れない。除外されたエントリは出さない(`tree` と同じ)。
+- `set` のパスには、エントリに加えて、説明のない実在のパス(同じディレクトリの直下で、名前が完全に一致するエントリがないもの)も出す。ルートからのパスで、除外設定に従う。新しく説明を付けるときのため。
+- パターンのエントリ(`data/*.csv`)は、シェルに展開させないよう、引用符を付けて入れる(zsh と fish はエスケープする)。打ちかけの語の引用符とバックスラッシュは、取り除いてから候補を探す。
+- 等号の形(`--require=`)の後ろの値は、補完しないシェルがある。`--require <TAB>` と書く。
+- `-C` の値と、`ls`・`show` のパス(実在のパス)は、シェルのファイル補完に任せる。`-d`・`--limit`・`--detail` の値、desc、`find` の語は補完しない。
+- 行に `-C <dir>` があればそのディレクトリから、なければカレントディレクトリから `.crube/` を探す。desc は `CRUBE_LANG` の言語のファイルから出す。行の `--no-ignore` に従う。
+- `.crube/` がない、structure ファイルが読めないなどのときは、エントリのパスを出さないだけで、何も言わない(TAB のたびに警告が出ると、打っている行が崩れるため)。
+
+### __complete
+
+```
+crube __complete [--word=<打ちかけの語>] -- <語>...
+```
+
+スクリプトが呼ぶコマンドです。打つためのものではないので、`crube --help` には出しません。
+
+- `--` の後ろの語は、それまでに打った行(`crube` 自身は含まない)を、シェルが区切ったまま渡す。`--word` は今打っている語で、カーソルが新しい語の先頭にあるときは空。語の並びに入れないのは、シェルが空の引数を落とすことがあるため。
+- 出力は 1 行に 1 件。値と、説明があれば、タブと説明(コマンドなら要約、エントリなら desc を表示幅 60 桁で切ったもの)。`--word` で始まるものだけを出す。
+- どんな語でも、終了コード 0 で終わり、標準エラー出力に何も出さない。

@@ -75,12 +75,19 @@ internal/	Packages of crube: the core, and the CLI on top of it
 		cli.go	Commands, help, version, exit codes and error lines
 		text.go	Text output: aligned columns, cutting to the terminal width, the status table
 		*_test.go	Tests of the file of the same name
+		complete.go	Shell completion: the completion command, and __complete that the scripts call at every TAB
+		completions/	The completion scripts of bash, zsh, fish and PowerShell (embedded; fixed text that asks crube __complete)
+			crube.bash	bash completion script
+			crube.zsh	zsh completion script
+			crube.fish	fish completion script
+			crube.ps1	PowerShell completion script
 	core/	The operations that the CLI and the MCP server call
 		core.go	Opening a project, loading the structure file of the language, reading the ignore file
 		edit.go	set, rm and mv
 		init.go	init
 		read.go	ls, tree and show, and the wiring of find and status
 		*_test.go	Tests of the file of the same name
+		complete.go	The entry paths offered by shell completion, one level at a time (and real paths for set)
 	ignore/	.crube/ignore: the rules of .gitignore, and the default file written by init
 		ignore.go	Parsing and matching of the ignore rules
 		*_test.go	Tests, with the expected values taken from git check-ignore
@@ -126,3 +133,4 @@ e2e/	Checks of the docs against what crube really does, and of the MCP server ag
 	docs_test.go	getting-started, the cli.md and README examples, the JSON examples and the error lines
 	mcp_test.go	Each MCP tool returns what the CLI --json gives, and fails with the same message
 	demo_test.go	Draws docs/assets/demo.svg from a real session, and checks it is up to date
+	completion_test.go	Runs the completion scripts in the real shells that are installed

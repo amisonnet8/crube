@@ -122,8 +122,9 @@ src/auth/session.ts
 | `crube set <path> <desc> [--detail <text>]` | 説明の追加・更新 |
 | `crube rm <path>` / `crube mv <from> <to>` | 説明の削除・付け替え（配下も含む。ファイルには触れない） |
 | `crube mcp [--allow-write]` | MCP サーバーとして起動 |
+| `crube completion <shell>` | bash・zsh・fish・PowerShell の補完スクリプトを出力（エントリのパスも TAB で補える） |
 
-どのコマンドも `--json` で構造化した結果を出せます。詳しくは [CLI リファレンス](docs/reference/cli.md)。
+参照・編集のコマンドは `--json` で構造化した結果を出せます。詳しくは [CLI リファレンス](docs/reference/cli.md)。
 
 <a id="ai-agents"></a>
 

@@ -33,26 +33,24 @@ type Env struct {
 	Width func() int
 }
 
-const usage = `usage: crube <command> [arguments]
+// order is the order of the commands in the usage and in completion.
+var order = []string{"init", "ls", "tree", "find", "show", "status", "set", "rm", "mv", "mcp", "completion"}
 
-commands:
-  init     create .crube/
-  ls       list a directory with descriptions
-  tree     show the descriptions as a tree
-  find     search paths and descriptions
-  show     show the description of one path
-  status   report undescribed, orphan and invalid entries
-  set      add or change a description
-  rm       remove a description
-  mv       move a description
-  mcp      run as an MCP server over stdio
-
-common options: --json  -C <dir>  --no-ignore
-`
+// usage is what crube --help prints.
+var usage = func() string {
+	var b strings.Builder
+	b.WriteString("usage: crube <command> [arguments]\n\ncommands:\n")
+	for _, name := range order {
+		fmt.Fprintf(&b, "  %-12s%s\n", name, commands[name].summary)
+	}
+	b.WriteString("\ncommon options: --json  -C <dir>  --no-ignore\n")
+	return b.String()
+}()
 
 // command is one subcommand.
 type command struct {
 	usage    string   // the synopsis after "usage: "
+	summary  string   // what it does, in the usage and in completion
 	options  []string // the options it accepts
 	args     []string // the names of its positional arguments
 	min      int      // how many of args are required
@@ -67,52 +65,57 @@ var (
 
 var commands = map[string]*command{
 	"init": {
-		usage: "crube init [-C <dir>]", options: []string{"-C"},
+		usage: "crube init [-C <dir>]", summary: "create .crube/", options: []string{"-C"},
 		run: (*runner).init,
 	},
 	"ls": {
-		usage:   "crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore]",
+		usage: "crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore]", summary: "list a directory with descriptions",
 		options: append([]string{"--full"}, readOptions...), args: []string{"path"},
 		run: (*runner).ls,
 	},
 	"tree": {
-		usage:   "crube tree [path] [-d N] [--json] [-C <dir>] [--no-ignore]",
+		usage: "crube tree [path] [-d N] [--json] [-C <dir>] [--no-ignore]", summary: "show the descriptions as a tree",
 		options: append([]string{"-d"}, readOptions...), args: []string{"path"},
 		run: (*runner).tree,
 	},
 	"find": {
-		usage:   "crube find <query> [--limit N] [--json] [-C <dir>] [--no-ignore]",
+		usage: "crube find <query> [--limit N] [--json] [-C <dir>] [--no-ignore]", summary: "search paths and descriptions",
 		options: append([]string{"--limit"}, readOptions...), args: []string{"query"}, min: 1, variadic: true,
 		run: (*runner).find,
 	},
 	"show": {
-		usage:   "crube show <path> [--json] [-C <dir>] [--no-ignore]",
+		usage: "crube show <path> [--json] [-C <dir>] [--no-ignore]", summary: "show the description of one path",
 		options: readOptions, args: []string{"path"}, min: 1,
 		run: (*runner).show,
 	},
 	"status": {
-		usage:   "crube status [--require all|dirs] [--json] [-C <dir>] [--no-ignore]",
+		usage: "crube status [--require all|dirs] [--json] [-C <dir>] [--no-ignore]", summary: "report undescribed, orphan and invalid entries",
 		options: append([]string{"--require"}, readOptions...),
 		run:     (*runner).status,
 	},
 	"set": {
-		usage:   "crube set <path> <desc> [--detail <text>] [--json] [-C <dir>]",
+		usage: "crube set <path> <desc> [--detail <text>] [--json] [-C <dir>]", summary: "add or change a description",
 		options: append([]string{"--detail"}, editOptions...), args: []string{"path", "desc"}, min: 2,
 		run: (*runner).set,
 	},
 	"rm": {
-		usage:   "crube rm <path> [--json] [-C <dir>]",
+		usage: "crube rm <path> [--json] [-C <dir>]", summary: "remove a description",
 		options: editOptions, args: []string{"path"}, min: 1,
 		run: (*runner).rm,
 	},
 	"mv": {
-		usage:   "crube mv <from> <to> [--json] [-C <dir>]",
+		usage: "crube mv <from> <to> [--json] [-C <dir>]", summary: "move a description",
 		options: editOptions, args: []string{"from", "to"}, min: 2,
 		run: (*runner).mv,
 	},
 	"mcp": {
-		usage: "crube mcp [--allow-write]", options: []string{"--allow-write"},
+		usage: "crube mcp [--allow-write]", summary: "run as an MCP server over stdio", options: []string{"--allow-write"},
 		run: (*runner).mcp,
+	},
+	"completion": {
+		usage: "crube completion <shell>", summary: "print a shell completion script",
+		args: []string{"shell"}, min: 1,
+		run: (*runner).completion,
 	},
 }
 
@@ -128,6 +131,8 @@ func Run(args []string, env Env) int {
 		return say(env, usage)
 	case "--version":
 		return say(env, "crube "+version(env.Version)+"\n")
+	case completeCommand:
+		return complete(args[1:], env)
 	}
 
 	name := args[0]

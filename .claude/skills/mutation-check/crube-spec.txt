@@ -133,3 +133,24 @@
 init: 既にある .crube でも言語のファイルを作らない | internal/core/init.go | ⇥⇥if err := project.CreateFile(root, name, nil); err != nil { | ⇥⇥if err := project.CreateFile(root, "structure.txt", nil); err != nil {
 init: 英語以外でも言語のファイルを作らない | internal/core/init.go | ⇥if name != lang.DefaultFile {⏎⇥⇥files = append(files, file{name, ""}) | ⇥if false {⏎⇥⇥files = append(files, file{name, ""})
 init: 既定の ignore を空で書く | internal/core/init.go | file{ignore.FileName, ignore.Default} | file{ignore.FileName, ""}
+# 補完
+補完: 除外したエントリも出す | internal/core/complete.go | !strings.HasPrefix(e.Name, prefix) || ign.Ignored(child(plain, e.Name), e.IsDir()) | !strings.HasPrefix(e.Name, prefix)
+補完: 打ちかけの語で絞らない | internal/core/complete.go | if !strings.HasPrefix(e.Name, prefix) || | if false ||
+補完: set にエントリのある実在の名前も重ねて出す | internal/core/complete.go | || index(entries, name) >= 0 || | ||
+補完: set の実在の名前で除外を見ない | internal/core/complete.go | ⇥⇥⇥ign.Ignored(child(plain, name), strings.HasSuffix(name, "/")) { | ⇥⇥⇥false {
+補完: シンボリックリンクの先の中を出す | internal/core/complete.go | ⇥⇥if !fi.IsDir() {⏎⇥⇥⇥return nil, nil | ⇥⇥if !fi.IsDir() && false {⏎⇥⇥⇥return nil, nil
+補完: 実在のディレクトリに / を付けない | internal/core/complete.go | ⇥⇥⇥name += "/" | ⇥⇥⇥name += ""
+補完: set でなくても実在の名前を出す | internal/cli/complete.go | proj.Complete(word, p.name == "set") | proj.Complete(word, true)
+補完: set でも実在の名前を出さない | internal/cli/complete.go | proj.Complete(word, p.name == "set") | proj.Complete(word, false)
+補完: mv の to にエントリのパスを出さない | internal/cli/complete.go | ⇥⇥return i <= 1 | ⇥⇥return i == 0
+補完: -C を見ない | internal/cli/complete.go | core.Options{Dir: p.dir, | core.Options{Dir: "",
+補完: --no-ignore を見ない | internal/cli/complete.go | NoIgnore: p.noIgnore}) | NoIgnore: false})
+補完: CRUBE_LANG を見ない | internal/cli/complete.go | Lang: env.Getenv(lang.EnvVar), | Lang: env.Getenv(lang.EnvVar + "_X"),
+補完: 行にあるオプションも出す | internal/cli/complete.go | ⇥⇥⇥if !p.seen[name] { | ⇥⇥⇥if true {
+補完: -h を --help と見なさない | internal/cli/complete.go | ⇥⇥⇥if name == "-h" { | ⇥⇥⇥if false {
+補完: bash の = を値と読む | internal/cli/complete.go | ⇥⇥⇥if w == "=" {⏎⇥⇥⇥⇥continue | ⇥⇥⇥if false {⏎⇥⇥⇥⇥continue
+補完: -- の後ろでもオプションを出す | internal/cli/complete.go | option := strings.HasPrefix(word, "-") && !p.dashdash | option := strings.HasPrefix(word, "-")
+補完: desc を切らない | internal/cli/complete.go | cut(c.desc, candidateWidth) | c.desc
+補完: -- が無いと --word を語に入れる | internal/cli/complete.go | ⇥var words []string // the words after "--" | ⇥words := args
+補完: bash でパターンを引用符で包まない | internal/cli/completions/crube.bash | value="'${value//\'/\'\\\'\'}'" | value="$value"
+補完: bash で打ちかけの語の引用符を残す | internal/cli/completions/crube.bash | REPLY=${REPLY//\'/} | REPLY=$REPLY

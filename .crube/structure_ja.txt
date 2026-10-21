@@ -75,12 +75,19 @@ internal/	crube のパッケージ：コアと、その上の CLI
 		cli.go	コマンド・ヘルプ・版・終了コード・エラーの行
 		text.go	テキストの出力：桁揃え、端末幅での切り詰め、status の表
 		*_test.go	同名ファイルのテスト
+		complete.go	シェル補完：completion コマンドと、スクリプトが TAB のたびに呼ぶ __complete
+		completions/	bash・zsh・fish・PowerShell の補完スクリプト（埋め込み。crube __complete に聞くだけの固定の文）
+			crube.bash	bash の補完スクリプト
+			crube.zsh	zsh の補完スクリプト
+			crube.fish	fish の補完スクリプト
+			crube.ps1	PowerShell の補完スクリプト
 	core/	CLI と MCP サーバーが呼ぶ操作
 		core.go	プロジェクトを開く、言語の structure ファイルを読む、ignore ファイルを読む
 		edit.go	set・rm・mv
 		init.go	init
 		read.go	ls・tree・show と、find・status の配線
 		*_test.go	同名ファイルのテスト
+		complete.go	シェル補完で出すエントリのパス（1段ずつ。set には実在のパスも）
 	ignore/	.crube/ignore：.gitignore と同じ規則と、init が書く既定のファイル
 		ignore.go	除外の規則の解析と照合
 		*_test.go	テスト（期待値は git check-ignore で求めた）
@@ -126,3 +133,4 @@ e2e/	docs と実際の動きの突き合わせ、MCP サーバーと CLI の一�
 	docs_test.go	getting-started、cli.md と README の例、JSON の例、エラー文の確認
 	mcp_test.go	MCP の各ツールが CLI の --json と同じものを返し、同じ文で失敗すること
 	demo_test.go	実際の出力から docs/assets/demo.svg を描き、古くなっていないか確かめる
+	completion_test.go	補完スクリプトを、入っている本物のシェルで動かす
