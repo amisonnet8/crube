@@ -19,6 +19,9 @@
   - cli.md と README の例は、1つの架空のプロジェクト（`src/`・`data/`。`e2e/helpers_test.go`の`cliProject`）を前提にする。statusの例だけは別のプロジェクト（`statusProject`）。例を足すときは、このプロジェクトで実際に出る値を書く
   - JSON の例（```json）は、どのコマンドの出力かを`e2e/docs_test.go`の`TestJSONExamples`の表に足す。足さないと「知らない例」としてテストが落ちる。コマンドの出力でない JSON（クライアントの設定など）は、同じテストの`notOutput`に足す
   - cli.md「出力の共通の決まり」のエラー文は、1行ずつ`TestErrorExamples`の表に、それを出す場面を足す
+  - README.md と docs/README.md の`$ `の例も、`cliProject`で動かして突き合わせる（`TestREADMEExample`）。どの OS でも同じ出力になる例だけを書く（`cliProject`のシンボリックリンク`current`は、Windows で作れないことがあるので、ルートの`ls`や`status`は README の`$ `の例にしない）
+  - README のデモの画像（`docs/assets/demo.svg`）は、`e2e/demo_test.go`の`TestDemoSVG`が、実際の出力から作る。出力が変わると、このテストが落ちる。`qsoku demo`で作り直し、画像を見てからコミットする。手で書き換えない
+  - ヘッダーの画像（`docs/assets/header.svg`）は手で書いた SVG。中の例は飾りで、テストしない
 
 ## `docs/design/`に書く経緯
 

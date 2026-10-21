@@ -66,6 +66,9 @@ docs/	設計と仕様（日本語）
 		cli.md	CLI リファレンス：コマンド・オプション・出力・終了コード
 		file-format.md	.crube/ のファイル形式：structure ファイルと ignore ファイル
 		mcp.md	MCP サーバーのリファレンス：ツールとその返す内容
+	assets/	README の画像
+		header.svg	README のヘッダー（手で書いた SVG）
+		demo.svg	README のデモ（qsoku demo が crube の実際の出力から作る、動く端末の画像）
 internal/	crube のパッケージ：コアと、その上の CLI
 	cli/	コマンドライン：引数を解析し、core を呼び、JSON かテキストで出す
 		args.go	オプションの解析（引数の前後どちらに書いてもよい）
@@ -122,3 +125,4 @@ e2e/	docs と実際の動きの突き合わせ、MCP サーバーと CLI の一�
 	helpers_test.go	Markdown のコードブロックの読み込み、$ の行を動かす小さなシェル、例のプロジェクト
 	docs_test.go	getting-started、cli.md と README の例、JSON の例、エラー文の確認
 	mcp_test.go	MCP の各ツールが CLI の --json と同じものを返し、同じ文で失敗すること
+	demo_test.go	実際の出力から docs/assets/demo.svg を描き、古くなっていないか確かめる

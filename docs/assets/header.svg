@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="360" viewBox="0 0 1280 360" role="img" aria-label="crube: a signpost for your project. Describe every file once, find it instantly.">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset="0.6" stop-color="#161b22"/>
+      <stop offset="1" stop-color="#1c2a3f"/>
+    </linearGradient>
+    <linearGradient id="board1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#388bfd"/>
+      <stop offset="1" stop-color="#79c0ff"/>
+    </linearGradient>
+    <linearGradient id="board2" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#2ea043"/>
+      <stop offset="1" stop-color="#56d364"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .sans { font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, "Hiragino Sans", "Noto Sans JP", sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "DejaVu Sans Mono", monospace; font-size: 15px; }
+  </style>
+
+  <rect width="1280" height="360" rx="16" fill="url(#bg)"/>
+
+  <!-- The signpost (しるべ) -->
+  <ellipse cx="157" cy="300" rx="56" ry="9" fill="#30363d"/>
+  <rect x="150" y="70" width="14" height="232" rx="4" fill="#8b949e"/>
+  <path d="M106 92 H246 L274 120 L246 148 H106 Z" fill="url(#board1)"/>
+  <path d="M90 186 L118 158 H210 V214 H118 Z" fill="url(#board2)"/>
+  <circle cx="157" cy="64" r="9" fill="#d29922"/>
+
+  <!-- Name and catch copy -->
+  <text x="310" y="180" class="sans" font-size="112" font-weight="800" fill="#f0f6fc" letter-spacing="-2">crube</text>
+  <text x="316" y="232" class="sans" font-size="28" fill="#79c0ff">しるべ — a signpost for your project</text>
+  <text x="316" y="274" class="sans" font-size="22" fill="#c9d1d9">Describe every file once. Find it instantly.</text>
+  <text x="316" y="310" class="mono" fill="#8b949e">ls · tree · find · show · status · MCP</text>
+
+  <!-- A tree with descriptions, as crube shows it -->
+  <rect x="830.5" y="60.5" width="410" height="240" rx="12" fill="#0d1117" stroke="#30363d"/>
+  <circle cx="852" cy="82" r="5" fill="#ff5f56"/>
+  <circle cx="868" cy="82" r="5" fill="#ffbd2e"/>
+  <circle cx="884" cy="82" r="5" fill="#27c93f"/>
+  <path d="M831 102 H1240" stroke="#30363d"/>
+  <g class="mono">
+    <text x="852" y="134" fill="#3fb950" font-weight="bold">$</text>
+    <text x="870" y="134" fill="#f0f6fc" font-weight="bold">crube tree</text>
+
+    <text x="870" y="164" fill="#f0f6fc">src/</text>
+    <text x="1010" y="164" fill="#8b949e">Application source</text>
+
+    <text x="852" y="190" fill="#58a6ff" font-weight="bold">&gt;</text>
+    <text x="888" y="190" fill="#f0f6fc">auth/</text>
+    <text x="1010" y="190" fill="#8b949e">Login, sessions, tokens</text>
+
+    <text x="906" y="216" fill="#f0f6fc">session.ts</text>
+    <text x="1010" y="216" fill="#8b949e">Session store, expiry</text>
+
+    <text x="870" y="242" fill="#f0f6fc">data/</text>
+    <text x="1010" y="242" fill="#8b949e">Data files</text>
+
+    <text x="888" y="268" fill="#f0f6fc">*.csv</text>
+    <text x="1010" y="268" fill="#8b949e">Nightly CSV exports</text>
+  </g>
+</svg>

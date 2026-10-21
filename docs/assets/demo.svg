@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="670" height="256" viewBox="0 0 670 256" role="img" aria-label="crube in a terminal: tree, find, show and status">
+<!-- Made by TestDemoSVG (e2e/demo_test.go) from what crube prints; run qsoku demo to make it again. -->
+<style>
+text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono","Noto Sans Mono CJK JP",monospace;font-size:14px;fill:#c9d1d9}
+.prompt{fill:#3fb950;font-weight:bold}.cmd{fill:#f0f6fc;font-weight:bold}.mark{fill:#58a6ff;font-weight:bold}.warn{fill:#d29922}.err{fill:#f85149}.label{fill:#79c0ff}.dim{fill:#8b949e}
+.cover{fill:#0d1117;transform-box:fill-box;transform-origin:right}
+.c0-0{animation:c0-0 15.60s linear infinite}
+@keyframes c0-0{0%,3.85%{opacity:0}3.86%,100%{opacity:1}}
+.c0-1{animation:c0-1 15.60s linear infinite}
+@keyframes c0-1{0%,9.62%{opacity:0}9.63%,100%{opacity:1}}
+.o0-1{animation:o0-1 15.60s linear infinite}
+@keyframes o0-1{0%,15.06%{opacity:0}15.07%,100%{opacity:1}}
+.s0{animation:s0 15.60s linear infinite}
+@keyframes s0{0%,3.85%{opacity:0}3.86%,27.88%{opacity:1}27.89%,100%{opacity:0}}
+.c1-0{animation:c1-0 15.60s linear infinite}
+@keyframes c1-0{0%,27.88%{opacity:0}27.89%,100%{opacity:1}}
+.o1-0{animation:o1-0 15.60s linear infinite}
+@keyframes o1-0{0%,36.86%{opacity:0}36.87%,100%{opacity:1}}
+.s1{animation:s1 15.60s linear infinite}
+@keyframes s1{0%,27.88%{opacity:0}27.89%,49.68%{opacity:1}49.69%,100%{opacity:0}}
+.c2-0{animation:c2-0 15.60s linear infinite}
+@keyframes c2-0{0%,49.68%{opacity:0}49.69%,100%{opacity:1}}
+.o2-0{animation:o2-0 15.60s linear infinite}
+@keyframes o2-0{0%,58.65%{opacity:0}58.66%,100%{opacity:1}}
+.s2{animation:s2 15.60s linear infinite}
+@keyframes s2{0%,49.68%{opacity:0}49.69%,71.47%{opacity:1}71.48%,100%{opacity:0}}
+.c3-0{animation:c3-0 15.60s linear infinite}
+@keyframes c3-0{0%,71.47%{opacity:0}71.48%,100%{opacity:1}}
+.o3-0{animation:o3-0 15.60s linear infinite}
+@keyframes o3-0{0%,77.56%{opacity:0}77.57%,100%{opacity:1}}
+.s3{animation:s3 15.60s linear infinite}
+@keyframes s3{0%,71.47%{opacity:0}71.48%,90.38%{opacity:1}90.39%,100%{opacity:0}}
+.k0-0{animation:k0-0 15.60s infinite}
+@keyframes k0-0{0%,3.85%{transform:scaleX(1);animation-timing-function:steps(11,end)}7.37%,100%{transform:scaleX(0)}}
+.k0-1{animation:k0-1 15.60s infinite}
+@keyframes k0-1{0%,9.62%{transform:scaleX(1);animation-timing-function:steps(10,end)}12.82%,100%{transform:scaleX(0)}}
+.k1-0{animation:k1-0 15.60s infinite}
+@keyframes k1-0{0%,27.88%{transform:scaleX(1);animation-timing-function:steps(21,end)}34.62%,100%{transform:scaleX(0)}}
+.k2-0{animation:k2-0 15.60s infinite}
+@keyframes k2-0{0%,49.68%{transform:scaleX(1);animation-timing-function:steps(21,end)}56.41%,100%{transform:scaleX(0)}}
+.k3-0{animation:k3-0 15.60s infinite}
+@keyframes k3-0{0%,71.47%{transform:scaleX(1);animation-timing-function:steps(12,end)}75.32%,100%{transform:scaleX(0)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+<rect x="0.5" y="0.5" width="669" height="255" rx="10" fill="#0d1117" stroke="#30363d"/>
+<path d="M0.5 36.0H669.5" stroke="#30363d"/>
+<circle cx="20" cy="18" r="6" fill="#ff5f56"/><circle cx="40" cy="18" r="6" fill="#ffbd2e"/><circle cx="60" cy="18" r="6" fill="#27c93f"/>
+<text x="335.0" y="23" text-anchor="middle" class="dim" style="font-size:12px">crube</text>
+<g class="s0">
+<g class="c0-0">
+<text y="71.0"><tspan x="20.0" class="prompt">$</tspan><tspan x="36.8 45.2 62.0 70.4 78.8 87.2 95.6 104.0 112.4 120.8" class="cmd">cdsrc/auth</tspan></text>
+<rect class="k0-0 cover" x="36.8" y="56.0" width="94.4" height="20.0"/>
+</g>
+<g class="c0-1">
+<text y="91.0"><tspan x="20.0" class="prompt">$</tspan><tspan x="36.8 45.2 53.6 62.0 70.4 87.2 95.6 104.0 112.4" class="cmd">crubetree</tspan></text>
+<rect class="k0-1 cover" x="36.8" y="76.0" width="86.0" height="20.0"/>
+</g>
+<g class="o0-1">
+<text y="111.0"><tspan x="36.8 45.2 53.6 62.0 179.6 196.4 213.2 230.0 246.8 263.6 280.4 297.2 314.0 330.8 347.6 364.4 381.2 398.0 414.8">src/アプリケーションのソースコード</tspan></text>
+<text y="131.0"><tspan x="20.0" class="mark">&gt;</tspan><tspan x="53.6 62.0 70.4 78.8 87.2 179.6 196.4 213.2 221.6 238.4 255.2 272.0 288.8 305.6 322.4 339.2 356.0 372.8 389.6 406.4 423.2 440.0 456.8 473.6 490.4 507.2">auth/認証(ログイン、セッション、トークン更新)</tspan></text>
+<text y="151.0"><tspan x="70.4 78.8 87.2 95.6 104.0 112.4 120.8 129.2 137.6 146.0 179.6 196.4 213.2 230.0 246.8 263.6 280.4 297.2 314.0 330.8 347.6 364.4 381.2 398.0 414.8 431.6">session.tsセッションの保存と有効期限の管理</tspan></text>
+<text y="171.0"><tspan x="70.4 78.8 87.2 95.6 104.0 112.4 120.8 129.2 137.6 179.6 196.4 213.2 230.0 246.8 263.6 280.4 297.2 314.0 330.8">*_test.go同名ファイルのテスト</tspan></text>
+<text y="191.0"><tspan x="53.6 62.0 70.4 78.8 87.2 95.6 104.0 179.6 196.4 213.2 230.0 246.8 263.6 280.4 297.2">main.goエントリポイント</tspan></text>
+<text y="211.0"><tspan x="36.8 45.2 53.6 62.0 70.4 179.6 196.4 213.2 230.0 246.8 263.6 280.4">data/データ格納場所</tspan></text>
+<text y="231.0"><tspan x="53.6 62.0 70.4 78.8 87.2 179.6 188.0 196.4 204.8 221.6 238.4">*.csvCSVデータ</tspan></text>
+</g>
+</g>
+<g class="s1">
+<g class="c1-0">
+<text y="71.0"><tspan x="20.0" class="prompt">$</tspan><tspan x="36.8 45.2 53.6 62.0 70.4 87.2 95.6 104.0 112.4 129.2 146.0 162.8 179.6 196.4" class="cmd">crubefindセッション</tspan></text>
+<rect class="k1-0 cover" x="36.8" y="56.0" width="178.4" height="20.0"/>
+</g>
+<g class="o1-0">
+<text y="91.0"><tspan x="20.0 28.4 36.8 45.2 53.6 62.0 70.4 78.8 87.2 204.8 221.6 238.4 246.8 263.6 280.4 297.2 314.0 330.8 347.6 364.4 381.2 398.0 414.8 431.6 448.4 465.2 482.0 498.8 515.6 532.4">src/auth/認証(ログイン、セッション、トークン更新)</tspan></text>
+<text y="111.0"><tspan x="20.0 28.4 36.8 45.2 53.6 62.0 70.4 78.8 87.2 95.6 104.0 112.4 120.8 129.2 137.6 146.0 154.4 162.8 171.2 204.8 221.6 238.4 255.2 272.0 288.8 305.6 322.4 339.2 356.0 372.8 389.6 406.4 423.2 440.0 456.8">src/auth/session.tsセッションの保存と有効期限の管理</tspan></text>
+</g>
+</g>
+<g class="s2">
+<g class="c2-0">
+<text y="71.0"><tspan x="20.0" class="prompt">$</tspan><tspan x="36.8 45.2 53.6 62.0 70.4 87.2 95.6 104.0 112.4 129.2 137.6 146.0 154.4 162.8 171.2 179.6 188.0 196.4 204.8" class="cmd">crubeshowsession.ts</tspan></text>
+<rect class="k2-0 cover" x="36.8" y="56.0" width="178.4" height="20.0"/>
+</g>
+<g class="o2-0">
+<text y="91.0"><tspan x="20.0 28.4 36.8 45.2 53.6 62.0 70.4 78.8 87.2 95.6 104.0 112.4 120.8 129.2 137.6 146.0 154.4 162.8 171.2">src/auth/session.ts</tspan></text>
+<text y="111.0"><tspan x="36.8 45.2 53.6 62.0" class="label">desc</tspan><tspan x="104.0 120.8 137.6 154.4 171.2 188.0 204.8 221.6 238.4 255.2 272.0 288.8 305.6 322.4 339.2 356.0">セッションの保存と有効期限の管理</tspan></text>
+<text y="131.0"><tspan x="36.8 45.2 53.6 62.0 70.4 78.8" class="label">detail</tspan><tspan x="104.0 120.8 137.6 154.4 171.2 188.0 213.2 221.6 230.0 238.4 246.8 263.6 280.4 297.2 314.0 330.8 347.6 364.4 381.2 398.0 414.8 431.6 448.4 465.2 482.0 498.8 515.6 532.4 549.2 566.0 582.8 599.6 616.4 633.2">セッションはRedisに保存し、アクセスのたびに有効期限を延長する。</tspan></text>
+<text y="151.0"><tspan x="104.0 120.8 137.6 154.4 171.2 196.4 204.8 213.2 221.6 230.0 238.4 246.8 255.2 263.6 272.0 280.4 288.8 297.2 305.6 314.0 322.4 339.2 364.4 372.8 381.2 389.6 398.0 406.4 414.8 423.2 431.6 440.0 448.4 465.2 482.0 498.8 515.6 532.4 549.2">有効期限はconfig/auth.yamlのsession.ttlで設定する。</tspan></text>
+</g>
+</g>
+<g class="s3">
+<g class="c3-0">
+<text y="71.0"><tspan x="20.0" class="prompt">$</tspan><tspan x="36.8 45.2 53.6 62.0 70.4 87.2 95.6 104.0 112.4 120.8 129.2" class="cmd">crubestatus</tspan></text>
+<rect class="k3-0 cover" x="36.8" y="56.0" width="102.8" height="20.0"/>
+</g>
+<g class="o3-0">
+<text y="91.0"><tspan x="20.0 28.4 36.8 45.2 53.6 62.0 70.4 78.8 87.2" class="warn">untracked</tspan><tspan x="120.8 129.2 137.6 171.2 179.6 188.0 196.4 204.8 213.2 221.6">dirsrc/db/</tspan></text>
+<text y="111.0"><tspan x="20.0 28.4 36.8 45.2 53.6 62.0 70.4 78.8 87.2" class="warn">untracked</tspan><tspan x="120.8 129.2 137.6 146.0 171.2 179.6 188.0 196.4 204.8 213.2 221.6">filecurrent</tspan></text>
+<text y="131.0"><tspan x="20.0 28.4 36.8 45.2 53.6 62.0 70.4 78.8 87.2" class="warn">untracked</tspan><tspan x="120.8 129.2 137.6 146.0 171.2 179.6 188.0 196.4 204.8 213.2 221.6 230.0 238.4 246.8 255.2 263.6 272.0 280.4">filesrc/db/conn.go</tspan></text>
+<text y="151.0"><tspan x="20.0 28.4 36.8 45.2 53.6 62.0" class="err">orphan</tspan><tspan x="120.8 129.2 137.6 146.0 154.4 162.8 171.2 179.6 188.0 196.4 204.8 213.2 221.6 230.0 238.4 246.8 255.2 263.6">src/auth/*_test.go</tspan></text>
+<text y="171.0"></text>
+<text y="191.0"><tspan x="20.0 28.4 36.8 45.2 53.6 62.0 70.4 78.8" class="label">coverage</tspan><tspan x="120.8 129.2 137.6 146.0 162.8 171.2 188.0 196.4 204.8 238.4 246.8 255.2 263.6 272.0 288.8 297.2 314.0 322.4 330.8">all:no(3)dirs:no(1)</tspan></text>
+</g>
+</g>
+</svg>

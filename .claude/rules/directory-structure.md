@@ -37,7 +37,8 @@
 ├── docs/                   ← 設計と仕様（日本語。目次は`docs/README.md`）
 │   ├── design/             ← なぜこの形なのか
 │   ├── reference/          ← 正確な仕様（CLI・MCP・ファイル形式）
-│   └── examples/           ← 使い方の例。`sample-crube/`はサンプルの`.crube/`
+│   ├── examples/           ← 使い方の例。`sample-crube/`はサンプルの`.crube/`
+│   └── assets/             ← README の画像（`header.svg`は手で書いたもの、`demo.svg`は`qsoku demo`がテストで作るもの）
 ├── .devcontainer/          ← 開発環境（devcontainer.json、postCreate.sh）
 ├── .claude/                ← rules/（ルール）、skills/（commit-with-tape：テープを閉じてコミットする手順。mutation-check：壊して確かめる手順と、変異の道具`mutants/`（別の Go モジュール）・crube の仕様の変異の一覧）、hooks/（build.sh、require-bcuz.sh とそのテスト）、settings.json（人間が管理する）
 ├── .github/workflows/      ← CI

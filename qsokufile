@@ -33,3 +33,4 @@ shellcheck: (cd //; git ls-files '*.sh' '*.bash' | xargs -r shellcheck)
 # The decision table of the hook that forces commands through bcuz (needs jq).
 hook: (cd //; bash .claude/hooks/require-bcuz.test.sh)
 crube: (cd //; go build -o bin/crube ./cmd/crube) && "$QSOKU_ROOT/bin/crube" "$@"
+demo: (cd //; mkdir -p docs/assets && env UPDATE_DEMO=1 go test -count=1 -run "^TestDemoSVG$" ./e2e/)

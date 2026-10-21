@@ -66,6 +66,9 @@ docs/	Design and specification (Japanese)
 		cli.md	CLI reference: commands, options, output and exit codes
 		file-format.md	File format of .crube/: structure files and the ignore file
 		mcp.md	MCP server reference: the tools and what they return
+	assets/	Images of the README
+		header.svg	The header of the README (hand-written SVG)
+		demo.svg	The animated terminal of the README, made by qsoku demo from what crube prints
 internal/	Packages of crube: the core, and the CLI on top of it
 	cli/	Command line: parses arguments, calls core, writes JSON or text
 		args.go	Option parser (options may come before or after the arguments)
@@ -122,3 +125,4 @@ e2e/	Checks of the docs against what crube really does, and of the MCP server ag
 	helpers_test.go	Reading Markdown code blocks, a small shell for the $ lines, and the example projects
 	docs_test.go	getting-started, the cli.md and README examples, the JSON examples and the error lines
 	mcp_test.go	Each MCP tool returns what the CLI --json gives, and fails with the same message
+	demo_test.go	Draws docs/assets/demo.svg from a real session, and checks it is up to date
