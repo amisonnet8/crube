@@ -13,6 +13,7 @@ Bashのコマンドは、`git commit`を除いて、すべて`bcuz "理由" …`
 
 - コードを変えたなら、`bcuz "<何の変更>のあとの確認" qsoku check`が通っている（依存を足したなら`qsoku trivy`も）
 - mtqgの記録を先に済ませる：終わったtodoの`todo done`、決めたこと・気づいたことの`memo add`。**コミットの後に書くと、そのコミットに入らない**
+- このリポジトリ自身の説明がそろっている：`bcuz "<作業>のコミットの前に、英語の説明の漏れを確かめる" qsoku crube status --require all`と、`env CRUBE_LANG=ja`を付けた同じものの両方が通る。落ちたら、両方の言語で説明を直す（`.claude/rules/crube-usage.md`）
 - 構成を変えたなら`.claude/rules/directory-structure.md`、決めたことは`docs/design/decisions.md`も、同じ変更に入れる
 
 ## 1. テープを検査する

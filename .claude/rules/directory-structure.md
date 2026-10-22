@@ -2,7 +2,7 @@
 
 新しいファイルを追加する際は、どこに置くかをここで確かめる。**構成を変えたら、この文書も同じ変更の中で直す。**
 
-**このリポジトリ自身の説明（`.crube/`）も保つ。** ファイル・ディレクトリを足す・動かす・消すときは、同じ変更の中で`qsoku crube set`／`mv`／`rm`で説明を直し、コミットの前に`qsoku crube status --require all`を通す。**説明は英語（`.crube/structure.txt`）と日本語（`.crube/structure_ja.txt`）の両方を直し**、日本語は`env CRUBE_LANG=ja qsoku crube …`で扱う。`status --require all`も両方の言語で通す（言語ごとのファイルは独立で、片方だけ直すともう片方が古くなる）。`.crube/`の中は srwr で直接直してもよい。コミットしないものを`.gitignore`に足したら、`.crube/ignore`にも足す（crube は`.gitignore`を読まない）
+**このリポジトリ自身の説明（`.crube/`）も保つ。** ファイル・ディレクトリを足す・動かす・消すときは、同じ変更の中で英語と日本語の説明を直し、コミットの前に両方の言語で`qsoku crube status --require all`を通す。やり方（MCPとCLI、`.crube/ignore`の保ち方）は`.claude/rules/crube-usage.md`
 
 ```
 .
@@ -16,7 +16,7 @@
 ├── .golangci.yaml          ← lintの設定
 ├── .goreleaser.yaml        ← 配布物の作り方（goreleaser。`release.yml`と`qsoku snapshot`が使う。`.claude/rules/distribution.md`）
 ├── trivy.yaml              ← 脆弱性・ライセンス検査の設定
-├── .mcp.json               ← mtqgとsrwrのMCPサーバーの配線
+├── .mcp.json               ← mtqg・srwrと、このリポジトリ自身のcrube（英語の`crube`・日本語の`crube-ja`）のMCPサーバーの配線
 ├── .srwrignore             ← srwrがテープに記録しないファイル（`.mtqg/`・`.bcuz/`など）
 ├── .bcuz/                  ← bcuzの記録（`history.jsonl`）。`postCreate.sh`が`bcuz --init`で作る。**コミットする**（`merge=union`）
 ├── .srwr/                  ← srwrの鍵・ロック・テープ（最初のhook・MCPの呼び出しでできる。**閉じた`tapes/*.gz`だけコミットする**）
@@ -42,7 +42,7 @@
 │   ├── examples/           ← 使い方の例。`sample-crube/`はサンプルの`.crube/`
 │   └── assets/             ← README の画像（`header.svg`は手で書いたもの、`demo.svg`・`demo_ja.svg`は`qsoku demo`がテストで作るもの）
 ├── .devcontainer/          ← 開発環境（devcontainer.json、postCreate.sh）
-├── .claude/                ← rules/（ルール）、skills/（commit-with-tape：テープを閉じてコミットする手順。mutation-check：壊して確かめる手順と、変異の道具`mutants/`（別の Go モジュール）・crube の仕様の変異の一覧）、hooks/（build.sh、require-bcuz.sh とそのテスト）、settings.json（人間が管理する）
+├── .claude/                ← rules/（ルール）、skills/（commit-with-tape：テープを閉じてコミットする手順。mutation-check：壊して確かめる手順と、変異の道具`mutants/`（別の Go モジュール）・crube の仕様の変異の一覧）、hooks/（build.sh、require-bcuz.sh とそのテスト、crube-untracked.sh：srwr の new のあとに未説明を知らせる）、settings.json（人間が管理する）
 ├── .github/workflows/      ← CI（`ci.yml`）と、タグで動くリリース（`release.yml`。`ci.yml`を呼んでから下書きの Release を作る）
 └── .mtqg/                  ← mtqgの記録
 ```
@@ -68,7 +68,7 @@
 - **`.mtqg/`**: コミットされる。中のファイルは直接編集せず、すべて`mtqg`のコマンド経由で書く（`.claude/rules/mtqg-usage.md`）。`.mtqg/.local/`はコミットされない
 - **`.bcuz/`**: bcuzが`.bcuz/history.jsonl`に追記する、コマンドの実行の記録（`.claude/rules/bcuz-usage.md`）。**コミットする**（`.gitignore`の`!/.bcuz/`）。行を足すだけなので、`.gitattributes`の`merge=union`で、マージしても両側の行が残る。コミットの前に`git add .bcuz/history.jsonl`する（`git commit`は`bcuz`を通さない）。秘密をコマンドに書かない（記録に残る）。中のファイルは直接編集しない。`.srwrignore`でテープにも載せない
 - **`.claude/hooks/require-bcuz.sh`**: Bashツールのコマンドを、`bcuz`を通っていなければ実行前に断る`PreToolUse`フック。判定の表は`require-bcuz.test.sh`（`bash .claude/hooks/require-bcuz.test.sh`）。判定を変えたら、テストの表も同じ変更の中で直す
-- **`.mcp.json`**: `mtqg mcp`と`srwr mcp`（MCPサーバー）の配線。`mtqg init --agent claude-code`・`srwr init`が書くものと同じ
+- **`.mcp.json`**: `mtqg mcp`と`srwr mcp`（MCPサーバー）の配線。`mtqg init --agent claude-code`・`srwr init`が書くものと同じ。その後ろに、このリポジトリ自身のcrubeのMCPサーバー（`qsoku crube mcp --allow-write`。`crube-ja`は`CRUBE_LANG=ja`）を手で足している（`.claude/rules/crube-usage.md`）
 - **`.srwr/`**: 最初のhook・MCPの呼び出しで、srwrが作る（`srwr init`でも作られる。鍵`key`・`lock`・`active`・`tapes/`・`init-backup/`）。**コミットするのは閉じて圧縮したテープ`tapes/*.tape.jsonl.gz`だけ**。書き込み中の生のテープ`*.tape.jsonl`は`.gitignore`で対象外（閉じると`.gz`に置き換わり、生のままコミットすると「削除＋追加」の差分が出るため）。鍵は共有しない。テンプレートには置いていない（鍵をプロジェクトごとに別にするため）
 - **`.srwrignore`**: テープに記録しないファイル（`.gitignore`と同じ書き方）。生成物や巨大なファイルはここに足す。`.env`・`*.pem`・`*.key`などはsrwrが元から外す
 - **`.devcontainer/devcontainer-lock.json`**: コンテナのビルドで自動で作られる（このテンプレートには置いていない）。**できたらコミットする**（この版のfeatureでテストなどが通った証明になる）。featureを新しくしたいときは、lockを消してビルドし直し、新しいlockをコミットする

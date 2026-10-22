@@ -12,6 +12,25 @@
       "args": [
         "mcp"
       ]
+    },
+    "crube": {
+      "command": "qsoku",
+      "args": [
+        "crube",
+        "mcp",
+        "--allow-write"
+      ]
+    },
+    "crube-ja": {
+      "command": "qsoku",
+      "args": [
+        "crube",
+        "mcp",
+        "--allow-write"
+      ],
+      "env": {
+        "CRUBE_LANG": "ja"
+      }
     }
   }
 }

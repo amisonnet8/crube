@@ -5,6 +5,7 @@
 		build.sh	srwr で .go・go.mod・go.sum を変えたあとに qsoku build を動かす
 		require-bcuz.sh	bcuz を通さない Bash のコマンドを断る PreToolUse フック
 		require-bcuz.test.sh	require-bcuz.sh が通す・断るコマンドの表（qsoku hook）
+		crube-untracked.sh	srwr の new でファイルを作ったあと、説明の無いパスを言語ごとに Claude に知らせる
 	rules/	このリポジトリで作業するときのルール（日本語）。いつ読むかは CLAUDE.md にある
 		bcuz-usage.md	Bash のコマンドを bcuz で動かす方法と、秘密をコマンドに書かないこと
 		datetime.md	日時の扱い：UTC で持ち、表示だけ利用者のタイムゾーンに直す
@@ -17,6 +18,7 @@
 		srwr-usage.md	ファイルは srwr だけで変える（厳格モード）こと、テープの閉じ方
 		testing.md	テスト方針と、サンドボックス・OS ごとの CI の落とし穴
 		working-with-human.md	人間への頼み方：小さなつまずき、確認、見え方の了承
+		crube-usage.md	このリポジトリ自身に crube を使う方法：MCP と qsoku crube、場所の探し方、両方の言語の説明の保ち方
 	settings.json	Claude Code の許可・サンドボックス・フック（人間が管理する）
 	skills/	Claude Code のスキル
 		commit-with-tape/	スキル：srwr のテープを閉じてコミットする
@@ -125,7 +127,7 @@ internal/	crube のパッケージ：コアと、その上の CLI
 .gitattributes	改行（すべて LF）と、記録のファイルの merge=union
 .gitignore	git に入れないもの。ルート直下のドットで始まる名前は許可リスト方式
 .golangci.yaml	golangci-lint の設定
-.mcp.json	Claude Code に mtqg と srwr の MCP サーバーをつなぐ設定
+.mcp.json	Claude Code に mtqg・srwr と、このリポジトリ自身の crube（英語・日本語）の MCP サーバーをつなぐ設定
 .srwrignore	srwr がテープに記録しないファイル
 CLAUDE.md	このリポジトリでの Claude Code のルールと、読むべきルールファイルの案内
 LICENSE	MIT ライセンス

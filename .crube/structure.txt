@@ -5,6 +5,7 @@
 		build.sh	Runs qsoku build after a .go, go.mod or go.sum file is changed with srwr
 		require-bcuz.sh	PreToolUse hook that refuses Bash commands not run through bcuz
 		require-bcuz.test.sh	Table of the commands require-bcuz.sh allows and refuses (qsoku hook)
+		crube-untracked.sh	After srwr new creates a file, tells Claude which of its paths have no description, per language
 	rules/	Rules for working in this repository (Japanese); CLAUDE.md says when to read each
 		bcuz-usage.md	How to run Bash commands through bcuz, and keeping secrets out of them
 		datetime.md	Dates and times: keep UTC, show in the local time zone
@@ -17,6 +18,7 @@
 		srwr-usage.md	Editing files only through srwr (strict mode), and closing tapes
 		testing.md	Test policy, and pitfalls of the sandbox and of CI on each OS
 		working-with-human.md	How to ask people: small blockers, checks, and approval of what users see
+		crube-usage.md	Using crube on this repository itself: MCP and qsoku crube, finding places, keeping descriptions in both languages
 	settings.json	Permissions, sandbox and hooks of Claude Code (managed by people)
 	skills/	Skills of Claude Code
 		commit-with-tape/	Skill: close the srwr tape and commit
@@ -125,7 +127,7 @@ internal/	Packages of crube: the core, and the CLI on top of it
 .gitattributes	Line endings (LF everywhere) and merge=union for the record files
 .gitignore	Files kept out of git; dot entries in the root are an allowlist
 .golangci.yaml	golangci-lint settings
-.mcp.json	MCP servers of mtqg and srwr for Claude Code
+.mcp.json	MCP servers for Claude Code: mtqg, srwr, and this repository's own crube in English and Japanese
 .srwrignore	Files srwr does not put on its tapes
 CLAUDE.md	Rules for Claude Code in this repository, and the rule files to read
 LICENSE	MIT license
