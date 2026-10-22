@@ -1,9 +1,11 @@
-// Command licenses gathers the license texts of the code built into crube
-// (the modules it links, and Go's standard library) into one directory, for
-// the release archives (.goreleaser.yaml, .claude/rules/distribution.md).
+// Command licenses gathers the license texts of the code built into a command
+// of this module (the modules it links, and Go's standard library) into one
+// directory, for the release archives (.goreleaser.yaml,
+// .claude/rules/distribution.md).
 //
-//	go run ./tools/licenses <dir>
+//	go run ./tools/licenses <dir> <main package>
 //
+// <main package> is the command that is released, such as ./cmd/crube.
 // <dir> is made again from scratch: <dir>/<module path>/<license file> for
 // each module, and <dir>/go/LICENSE for the standard library. A module with
 // no license file is an error, so that no release ships code without its
@@ -20,7 +22,7 @@ import (
 	"strings"
 )
 
-// releasedOS are the OSes crube is released for (.goreleaser.yaml). Some
+// releasedOS are the OSes the command is released for (.goreleaser.yaml). Some
 // modules are linked on one OS only, so each is asked.
 var releasedOS = []string{"linux", "darwin", "windows"}
 
@@ -29,18 +31,18 @@ var releasedOS = []string{"linux", "darwin", "windows"}
 var licensePrefixes = []string{"LICENSE", "LICENCE", "COPYING", "NOTICE"} //nolint:misspell // LICENCE is the British spelling some modules use for the file
 
 func main() {
-	if len(os.Args) != 2 {
-		fmt.Fprintln(os.Stderr, "usage: go run ./tools/licenses <dir>")
+	if len(os.Args) != 3 {
+		fmt.Fprintln(os.Stderr, "usage: go run ./tools/licenses <dir> <main package>")
 		os.Exit(2)
 	}
-	if err := run(os.Args[1]); err != nil {
+	if err := run(os.Args[1], os.Args[2]); err != nil {
 		fmt.Fprintln(os.Stderr, "licenses:", err)
 		os.Exit(1)
 	}
 }
 
-func run(dir string) error {
-	mods, err := linkedModules()
+func run(dir, mainPkg string) error {
+	mods, err := linkedModules(mainPkg)
 	if err != nil {
 		return err
 	}
@@ -76,13 +78,14 @@ func run(dir string) error {
 	return nil
 }
 
-// linkedModules returns the modules (other than crube itself) whose packages
-// are built into crube on any released OS, with the directory of each.
-func linkedModules() (map[string]string, error) {
+// linkedModules returns the modules (other than this module itself) whose
+// packages are built into mainPkg on any released OS, with the directory of
+// each.
+func linkedModules(mainPkg string) (map[string]string, error) {
 	mods := map[string]string{}
 	for _, goos := range releasedOS {
 		out, err := goCmd(goos, "list", "-deps", "-f",
-			"{{with .Module}}{{if not .Main}}{{.Path}}\t{{.Dir}}{{end}}{{end}}", "./cmd/crube")
+			"{{with .Module}}{{if not .Main}}{{.Path}}\t{{.Dir}}{{end}}{{end}}", mainPkg)
 		if err != nil {
 			return nil, err
 		}
@@ -123,7 +126,7 @@ func isLicense(name string) bool {
 // goCmd runs the go command, for goos if it is not "", and returns what it
 // printed.
 func goCmd(goos string, args ...string) (string, error) {
-	cmd := exec.Command("go", args...) //nolint:gosec // only the go command, with arguments written in this file
+	cmd := exec.Command("go", args...) //nolint:gosec // only the go command; the arguments are written in this file, and the main package comes from .goreleaser.yaml
 	cmd.Env = os.Environ()
 	if goos != "" {
 		cmd.Env = append(cmd.Env, "GOOS="+goos)

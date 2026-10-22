@@ -53,7 +53,7 @@ func TestLicenseFiles(t *testing.T) {
 func TestRun(t *testing.T) {
 	t.Chdir(filepath.Join("..", "..")) // the module root, where ./cmd/crube is
 	dir := t.TempDir()
-	if err := run(dir); err != nil {
+	if err := run(dir, "./cmd/crube"); err != nil {
 		t.Fatal(err)
 	}
 	var got []string

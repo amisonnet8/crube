@@ -8,7 +8,8 @@
 - 配布物は linux・darwin・windows の amd64・arm64 の6つ。linux・darwin は`.tar.gz`、windows は`.zip`。名前は`crube_<版>_<OS>_<アーキテクチャ>`（版は`v`なし）。`checksums.txt`を添える
 - アーカイブに入れるもの：`crube`（`crube.exe`）、`LICENSE`、`README.md`・`README_ja.md`、`licenses/`（依存のライセンス文。下）
 - **版**：goreleaser が`-X main.version=<タグ>`（`v0.1.0`の形）を埋める。`go install`で入れたものは、Go がバイナリに記録したモジュールの版を出す（`cli.BuildVersion`。`docs/reference/cli_ja.md`「使い方と版」）。どちらでも`crube v0.1.0`になる
-- **依存のライセンス文**を配布物に同梱する（`docs/design/architecture_ja.md`「実装」）。`tools/licenses`が、3つの OS で crube に組み込まれるモジュールを`go list -deps`で求め、そのライセンスのファイルと Go の標準ライブラリの`LICENSE`を`bin/licenses/<モジュールのパス>/`に写す（goreleaser の`before`の手順）。ライセンスのファイルが無いモジュールがあれば失敗し、リリースが止まる
+- **依存のライセンス文**を配布物に同梱する（`docs/design/architecture_ja.md`「実装」）。`tools/licenses`が、3つの OS で crube に組み込まれるモジュールを`go list -deps`で求め、そのライセンスのファイルと Go の標準ライブラリの`LICENSE`を`bin/licenses/<モジュールのパス>/`に写す（goreleaser の`before`の手順で`go run ./tools/licenses bin/licenses ./cmd/crube`。配るコマンドの main パッケージを引数で渡す）。ライセンスのファイルが無いモジュールがあれば失敗し、リリースが止まる
+  - `.goreleaser.yaml`の`archives.files`には、`bin/licenses`を**ディレクトリのまま**`src`に書く（`dst: licenses`）。グロブ（`bin/licenses/**/*`）にすると、当たるファイルが1つだけのとき（依存の無いプロジェクトは`go/LICENSE`だけ）goreleaser が親のディレクトリを落とし、`licenses/LICENSE`になる
   - 依存を足す・外すと、`tools/licenses`の`TestRun`の一覧が落ちる。新しいモジュールのライセンスを確かめてから一覧を直す（Trivy の`qsoku trivy`も通す）
 
 ## リリースの流れ

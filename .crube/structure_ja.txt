@@ -147,6 +147,6 @@ e2e/	docs と実際の動きの突き合わせ、MCP サーバーと CLI の一�
 	| タグで .github/workflows/release.yml が、手元では qsoku snapshot が使う。.claude/rules/distribution.md を参照。
 tools/	プロジェクトを作るための道具（crube には組み込まれない）
 	licenses/	配布物に入れる依存のライセンス文を集める
-		| go run ./tools/licenses <dir>。goreleaser がビルドの前に動かす。ライセンスのファイルが無いモジュールがあれば失敗する。
+		| go run ./tools/licenses <dir> <main パッケージ>。goreleaser がビルドの前に動かす。ライセンスのファイルが無いモジュールがあれば失敗する。
 		main.go	crube に組み込まれるモジュールを go list -deps で求め、ライセンス文を写す
 		main_test.go	ライセンス文を集める処理のテスト。crube 自身のライセンスの一覧を丸ごと比べる

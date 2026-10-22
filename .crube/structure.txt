@@ -147,6 +147,6 @@ e2e/	Checks of the docs against what crube really does, and of the MCP server ag
 	| Used by .github/workflows/release.yml on a tag, and by qsoku snapshot locally. See .claude/rules/distribution.md.
 tools/	Tools for building the project (not built into crube)
 	licenses/	Gathers the license texts of the dependencies for the release archives
-		| go run ./tools/licenses <dir>; goreleaser runs it before building. Fails if a module has no license file.
+		| go run ./tools/licenses <dir> <main package>; goreleaser runs it before building. Fails if a module has no license file.
 		main.go	Finds the modules linked into crube with go list -deps and copies their licenses
 		main_test.go	Tests of the license gathering, with the full list of crube's own licenses

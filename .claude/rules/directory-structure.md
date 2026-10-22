@@ -62,6 +62,8 @@
 - **`internal/cli/`**: 引数をどう読むか、結果をどう見せるか（JSON・テキスト）、エラーを`crube: …`の1行と終了コードにすることだけを持つ。値の検証・合否の判定（`status --require`など）は`core`にあり、ここには書かない。`mcp`コマンドは`internal/mcpserver`を起動するだけ（SDK を import しない）
 - **`internal/mcpserver/`**: ツールの名前・引数・説明文と、`core`の結果をそのまま返すことだけを持つ。絞り込み（`kinds`）やルートからのパスの読み方も`core`にある（`FilterKinds`・`AtRoot`）。結果の型が再帰すると SDK が出力のスキーマを作れないので（`tree`）、そのときはスキーマを手で渡す
 - **`internal/`**: Goの仕組みとして、モジュールの外からimportできない。外へ公開するパッケージは`internal/`に置かない
+- **`tools/licenses/`**: 配布物に同梱する依存のライセンス文を集める（`.claude/rules/distribution.md`）。`go run ./tools/licenses <出力先> ./cmd/crube`。依存を足す・外したら、`TestRun`の一覧を直す
+- **`.claude/skills/mutation-check/mutants/`**: 変異の道具。`go.mod`を持つ別のモジュールなので、`qsoku check`（`./...`）の対象に入らない。変えたら、そのディレクトリで整形・vet・テストを通す（Skill の「気をつけること」）
 - **`internal/core/`**: CLI・MCPから呼ばれる操作の入口。引数の検証・判定はここか、ここが呼ぶパッケージに置き、CLI・MCPには書かない。書き込みは`internal/project`の関数だけを通す
 - **`internal/structure/`**: structure ファイルのバイト列と木（`Tree`・`Entry`）の変換だけを持つ。ファイルの探索・ディスクへの書き込み・照合は持たない（ほかのコアのパッケージに置く）
 - **`go.sum`**: コミットする（改ざん検知・再現可能なビルドのため）

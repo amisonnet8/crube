@@ -48,6 +48,8 @@
 **コミットするときは、Skill`commit-with-tape`（`.claude/skills/commit-with-tape/SKILL.md`）の手順で行う。** 下はその要点。
 
 ```
+qsoku crube status --require all                  # 説明の漏れが無いか（.claude/rules/crube-usage.md）
+env CRUBE_LANG=ja qsoku crube status --require all  # 日本語も
 srwr tapes check   # テープに無いのに変わったファイルが無いか（閉じる前に）
 srwr tapes new     # 今のテープを閉じて、その場で圧縮する
 git add … && git commit …
@@ -70,6 +72,7 @@ git add … && git commit …
 - **`Edit`・`Write`を使おうとしない。** 禁止されていて、拒否される。拒否されたら`look`＋`edit`／`new`に切り替える
 - **プランモードでは、計画のファイル（`~/.claude/plans/`）を書けない**（`Write`が禁止されているため）。計画は会話に文章で示してから`ExitPlanMode`を呼ぶ。`settings.json`で`~/.claude/plans/`への`Write`だけを許しても、`Write`の拒否（deny）が優先されるので効かない
 - **Bashでファイルを書き換えない**（`sed -i`・リダイレクト・`tee`・`cat > file`など）。止められないが、理由のない`external`としてテープに残り、再生が読みにくくなる。ジェネレーターや整形ツール（`go build`・`qsoku fmt`など）が書くものは、そのままでよい
+- **srwrにはファイルを消す道具が無い。** 消すときは`bcuz "理由" git rm <ファイル>`で消す（理由は`bcuz`の記録に残る）。`srwr tapes check`には「テープにない`D`」として出るが、それでよい。コミットメッセージにも消した理由を書く
 - **`.mtqg/`は`mtqg`のコマンド経由だけ**（`.claude/rules/mtqg-usage.md`）。`.srwrignore`で記録から外してあるので、`look`・`edit`は`ignored_file`で断られる
 - **`.claude/settings.json`は人間が管理する。** 変更案は差分で示し、`edit`で書き換えない。`.mcp.json`・`.devcontainer/`も、人間の依頼があったときだけ変える
 - 人間が事情を聞くときは、テープのIDで答えられる（`srwr tapes`で一覧、`srwr view`で再生）
@@ -88,4 +91,3 @@ git add … && git commit …
 - `srwr`が`PATH`に無いと、`.mcp.json`もhookも動かない（hookは失敗しても作業は止まらず、記録だけが抜ける）。`srwr --version`で確かめる
 - **`session`を呼ぶと、作業場全体のテープが切り替わる**（`srwr tapes new`と同じ）。ほかのセッション（人間が別のClaude Codeを動かしているなど）にも効く。範囲トークンは、閉じたテープのものは使えなくなるので、`session`のあとは`look`し直す
 - `srwr view`は`~/.cache/srwr`に書くので、サンドボックスの中では動かさず、人間のターミナルで動かす
-- **srwrにはファイルを消す道具が無い。** 消すときは`bcuz "理由" git rm <ファイル>`で消す（理由は`bcuz`の記録に残る）。`srwr tapes check`には「テープにない`D`」として出るが、それでよい。コミットメッセージにも消した理由を書く

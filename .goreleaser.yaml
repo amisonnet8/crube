@@ -8,7 +8,7 @@ project_name: crube
 before:
   hooks:
     # The license texts of what is built into crube, put into every archive.
-    - go run ./tools/licenses bin/licenses
+    - go run ./tools/licenses bin/licenses ./cmd/crube
 
 builds:
   - main: ./cmd/crube
@@ -34,9 +34,11 @@ archives:
       - LICENSE
       - README.md
       - README_ja.md
-      - src: bin/licenses/**/*
+      # The directory itself, not a glob: with a glob that matches one file
+      # only (a project with no dependencies has just go/LICENSE), goreleaser
+      # drops the parent directories and the archive gets licenses/LICENSE.
+      - src: bin/licenses
         dst: licenses
-        strip_parent: false
 
 checksum:
   name_template: checksums.txt

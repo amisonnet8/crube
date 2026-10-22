@@ -625,3 +625,30 @@
 {"v":1,"ts":"2026-10-22T01:36:34.381Z","why":"閉じる前に返せなかった直し方と確かめ方をメモに残す","cmd":["mtqg","m","add","bug 06f0fcc123 の直し：パスを .path as $p に取り、$p == $f か、$p が / で終わり $f が $p で始まるものだけを選ぶ。リポジトリの写しに未説明の a/b/x.go と other/y.go を作って確かめた：直した版は a/・a/b/・a/b/x.go だけ、直す前の版は other/ も出す。教訓：フックの確かめは、知らせるべきでないものがある状況（関係ない未説明）でも行う。"],"dir":".","exit":0,"ms":3}
 {"v":1,"ts":"2026-10-22T01:36:34.560Z","why":"フックの直しのコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":8}
 {"v":1,"ts":"2026-10-22T01:36:34.738Z","why":"フックの直しのコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-22T04:27:35.270Z","why":"共通化のためのルール変更の中身を把握する","cmd":["git","diff"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-22T04:27:44.275Z","why":"ルール変更の波及先を探す（licenses の引数・strip_parent の参照）","cmd":["git","grep","-n","-e","tools/licenses","-e","strip_parent","-e","bin/licenses"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-22T04:27:53.232Z","why":"directory-structure.md が指す mutation-check の mutants/ が実在するか確かめる","cmd":["ls",".claude/skills/mutation-check",".claude/skills/mutation-check/mutants"],"dir":".","exit":0,"ms":1}
+{"v":1,"ts":"2026-10-22T04:28:06.417Z","why":"tools/licenses の引数の変更と、ルールの共通化のあとの確認","cmd":["qsoku","check"],"dir":".","exit":0,"ms":7661}
+{"v":1,"ts":"2026-10-22T04:28:14.214Z","why":".goreleaser.yaml の licenses をディレクトリ指定にした変更で、配布物の中身が崩れないか確かめる","cmd":["qsoku","snapshot"],"dir":".","exit":0,"ms":21883}
+{"v":1,"ts":"2026-10-22T04:28:39.458Z","why":"licenses/ が <モジュールのパス>/ の形のまま入っているかを、アーカイブの中身で確かめる","cmd":["tar","-tzf","dist/crube_0.1.1-snapshot_linux_amd64.tar.gz"],"dir":".","exit":0,"ms":62}
+{"v":1,"ts":"2026-10-22T04:28:39.697Z","why":"windows の zip でも licenses/ の形が同じか確かめる","cmd":["unzip","-l","dist/crube_0.1.1-snapshot_windows_amd64.zip"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-22T04:28:45.559Z","why":"ルール変更のコミットの前に、英語の説明の漏れを確かめる","cmd":["qsoku","crube","status","--require","all"],"dir":".","exit":0,"ms":99}
+{"v":1,"ts":"2026-10-22T04:28:45.850Z","why":"ルール変更のコミットの前に、日本語の説明の漏れを確かめる","cmd":["env","CRUBE_LANG=ja","qsoku","crube","status","--require","all"],"dir":".","exit":0,"ms":108}
+{"v":1,"ts":"2026-10-22T04:31:00.281Z","why":"リビルドで道具の版が変わったか確かめる（srwr は版が変わったら init が要る）","cmd":["sh","-c","for c in srwr mtqg qsoku bcuz crube goreleaser golangci-lint trivy shellcheck go; do printf \"%s: \" $c; ($c --version || $c version || $c .version) 2>&1 | head -1; done"],"dir":".","exit":0,"ms":279}
+{"v":1,"ts":"2026-10-22T04:31:00.742Z","why":"リビルド後も srwr の設定がそろっているか確かめる（書き換えが無ければ何もしない）","cmd":["srwr","init"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-22T04:31:05.422Z","why":"リビルド後に定常の確認が通るか見る","cmd":["qsoku","check"],"dir":".","exit":0,"ms":908}
+{"v":1,"ts":"2026-10-22T04:31:06.464Z","why":"リビルド後に bcuz 強制フックの判定の表が通るか見る（jq が要る）","cmd":["qsoku","hook"],"dir":".","exit":0,"ms":1899}
+{"v":1,"ts":"2026-10-22T04:31:08.511Z","why":"リビルド後に ShellCheck が入っていて通るか見る","cmd":["qsoku","shellcheck"],"dir":".","exit":0,"ms":178}
+{"v":1,"ts":"2026-10-22T04:31:15.537Z","why":"リビルド後にキャッシュなしで全テストを -race で流す","cmd":["qsoku","race"],"dir":".","exit":0,"ms":20252}
+{"v":1,"ts":"2026-10-22T04:31:35.952Z","why":"リビルド後に4つのシェルが入っていて補完の e2e が飛ばされていないか見る（qsoku unit は -v を受けないため直接）","cmd":["go","test","-count=1","-v","-run","Completion","./e2e/"],"dir":".","exit":0,"ms":2695}
+{"v":1,"ts":"2026-10-22T04:31:42.018Z","why":"リビルド後に Trivy の DB 取得と検査が通るか見る","cmd":["qsoku","trivy"],"dir":".","exit":0,"ms":7688}
+{"v":1,"ts":"2026-10-22T04:31:49.844Z","why":"リビルドで入れ直した goreleaser で配布物が作れるか見る","cmd":["qsoku","snapshot"],"dir":".","exit":0,"ms":1537}
+{"v":1,"ts":"2026-10-22T04:31:58.254Z","why":"リビルド後の配布物にも licenses/ が前と同じ形で入っているか見る","cmd":["tar","-tzf","dist/crube_0.1.1-snapshot_darwin_arm64.tar.gz"],"dir":".","exit":0,"ms":57}
+{"v":1,"ts":"2026-10-22T04:31:58.488Z","why":"リビルド後に英語の説明の検査が動くか見る","cmd":["qsoku","crube","status","--require","all"],"dir":".","exit":0,"ms":103}
+{"v":1,"ts":"2026-10-22T04:31:58.780Z","why":"リビルド後に日本語の説明の検査が動くか見る","cmd":["env","CRUBE_LANG=ja","qsoku","crube","status","--require","all"],"dir":".","exit":0,"ms":85}
+{"v":1,"ts":"2026-10-22T04:31:59.000Z","why":"リビルド後にテープの検査が動き、テープに無い変更が無いか見る","cmd":["srwr","tapes","check"],"dir":".","exit":1,"ms":7}
+{"v":1,"ts":"2026-10-22T04:32:01.953Z","why":"リビルド後に mtqg の CLI が動くか見る","cmd":["mtqg","context"],"dir":".","exit":0,"ms":13}
+{"v":1,"ts":"2026-10-22T04:34:26.127Z","why":"セッション最初のコミットの前に、作者の設定が noreply の値か確かめる","cmd":["git","config","user.email"],"dir":".","exit":0,"ms":1}
+{"v":1,"ts":"2026-10-22T04:34:26.316Z","why":"セッション最初のコミットの前に、作者の名前を確かめる","cmd":["git","config","user.name"],"dir":".","exit":0,"ms":1}
+{"v":1,"ts":"2026-10-22T04:34:28.272Z","why":"ルールの共通化のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":11}
+{"v":1,"ts":"2026-10-22T04:34:30.106Z","why":"ルールの共通化のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}
