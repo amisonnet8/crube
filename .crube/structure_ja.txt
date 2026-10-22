@@ -10,7 +10,7 @@
 		bcuz-usage.md	Bash のコマンドを bcuz で動かす方法と、秘密をコマンドに書かないこと
 		datetime.md	日時の扱い：UTC で持ち、表示だけ利用者のタイムゾーンに直す
 		directory-structure.md	ファイルの置き場所と、リポジトリの構成
-		distribution.md	配布の流れ（タグと下書きの Release は人間が扱う）
+		distribution.md	配布方法：goreleaser での配布物と、リリースの流れ（人間はタグを push するだけ。workflow が公開する）
 		documentation.md	README と docs/ の書き方：英語と日本語の対、例の値は道具で求める
 		mtqg-usage.md	mtqg でメモ・todo・質問・不具合・決まり事を記録する方法
 		naming.md	名前：製品名・用語・コマンド
@@ -33,11 +33,11 @@
 .devcontainer/	開発用のコンテナ
 	devcontainer-lock.json	コンテナを作ったときの feature の版
 	devcontainer.json	コンテナの定義と VS Code の設定
-	postCreate.sh	コンテナを作ったあとに道具（qsoku・mtqg・srwr・bcuz・golangci-lint・Trivy）を入れる
+	postCreate.sh	コンテナを作ったあとに道具（qsoku・mtqg・srwr・bcuz・このソースの crube・goreleaser・golangci-lint・Trivy）を入れ、4つのシェルの設定をする
 .github/	GitHub の設定
 	workflows/	GitHub Actions のワークフロー
 		ci.yml	CI：Linux・macOS・Windows での qsoku check、race、ShellCheck、Trivy
-		release.yml	タグで動くリリース。ci.yml を通してから、goreleaser の配布物を下書きの Release に添付する
+		release.yml	タグで動くリリース。ci.yml を通してから、goreleaser の配布物を Release に添付して公開する
 .mtqg/	mtqg の作業記録：メモ・todo・質問・不具合・用語・決まり事
 	.gitattributes	journal.jsonl を merge=union でマージする
 	.gitignore	.local/ を git に入れない

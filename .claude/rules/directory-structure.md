@@ -43,7 +43,7 @@
 │   └── assets/             ← README の画像（`header.svg`は手で書いたもの、`demo.svg`・`demo_ja.svg`は`qsoku demo`がテストで作るもの）
 ├── .devcontainer/          ← 開発環境（devcontainer.json、postCreate.sh）
 ├── .claude/                ← rules/（ルール）、skills/（commit-with-tape：テープを閉じてコミットする手順。mutation-check：壊して確かめる手順と、変異の道具`mutants/`（別の Go モジュール）・crube の仕様の変異の一覧）、hooks/（build.sh、require-bcuz.sh とそのテスト、crube-untracked.sh：srwr の new のあとに未説明を知らせる）、settings.json（人間が管理する）
-├── .github/workflows/      ← CI（`ci.yml`）と、タグで動くリリース（`release.yml`。`ci.yml`を呼んでから下書きの Release を作る）
+├── .github/workflows/      ← CI（`ci.yml`）と、タグで動くリリース（`release.yml`。`ci.yml`を呼んでから Release を作って公開する）
 └── .mtqg/                  ← mtqgの記録
 ```
 

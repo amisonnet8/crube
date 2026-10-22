@@ -10,7 +10,7 @@
 		bcuz-usage.md	How to run Bash commands through bcuz, and keeping secrets out of them
 		datetime.md	Dates and times: keep UTC, show in the local time zone
 		directory-structure.md	Where each file goes, and the layout of the repository
-		distribution.md	How crube is released (tags and draft releases made by people)
+		distribution.md	How crube is released: the archives built with goreleaser, and the release flow (a person pushes the tag; the workflow publishes)
 		documentation.md	How to write README and docs/: English and Japanese pairs, example values from tools
 		mtqg-usage.md	How to record memos, todos, questions, bugs and rules with mtqg
 		naming.md	Names: the product, the terms and the commands
@@ -33,11 +33,11 @@
 .devcontainer/	Development container
 	devcontainer-lock.json	Versions of the features the container was built with
 	devcontainer.json	Container definition and VS Code settings
-	postCreate.sh	Installs the tools (qsoku, mtqg, srwr, bcuz, golangci-lint, Trivy) after the container is made
+	postCreate.sh	Installs the tools (qsoku, mtqg, srwr, bcuz, crube from this source, goreleaser, golangci-lint, Trivy) after the container is made, and wires up the four shells
 .github/	GitHub settings
 	workflows/	GitHub Actions workflows
 		ci.yml	CI: qsoku check on Linux, macOS and Windows, the race detector, ShellCheck and Trivy
-		release.yml	Release on a tag: runs ci.yml, then attaches goreleaser's archives to a draft Release
+		release.yml	Release on a tag: runs ci.yml, attaches goreleaser's archives to a Release and publishes it
 .mtqg/	Process record kept with mtqg: memos, todos, questions, bugs, glossary and rules
 	.gitattributes	Merges journal.jsonl with merge=union
 	.gitignore	Keeps .local/ out of git

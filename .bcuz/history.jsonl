@@ -652,3 +652,24 @@
 {"v":1,"ts":"2026-10-22T04:34:26.316Z","why":"セッション最初のコミットの前に、作者の名前を確かめる","cmd":["git","config","user.name"],"dir":".","exit":0,"ms":1}
 {"v":1,"ts":"2026-10-22T04:34:28.272Z","why":"ルールの共通化のコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":11}
 {"v":1,"ts":"2026-10-22T04:34:30.106Z","why":"ルールの共通化のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-22T21:54:00.006Z","why":"コンテナ作り直し後に goreleaser が入ったかを確かめる","cmd":["goreleaser","--version"],"dir":".","exit":0,"ms":79}
+{"v":1,"ts":"2026-10-22T21:54:00.450Z","why":"人間がルール共通化で加えた未コミットの変更を読む","cmd":["git","diff"],"dir":".","exit":0,"ms":11}
+{"v":1,"ts":"2026-10-22T21:54:10.347Z","why":"ルール変更（自動公開）と食い違う記述が残っていないか探す","cmd":["git","grep","-n","-i","-E","draft|下書き","--",".",":!.mtqg",":!.bcuz",":!.srwr"],"dir":".","exit":0,"ms":5}
+{"v":1,"ts":"2026-10-22T21:54:18.205Z","why":"人間が足した tools/licenses のテストと、書き換えた postCreate.sh を含め、全体が通るかを見る","cmd":["qsoku","check"],"dir":".","exit":0,"ms":7932}
+{"v":1,"ts":"2026-10-22T21:54:26.277Z","why":"書き換えた postCreate.sh が ShellCheck を通るかを見る","cmd":["qsoku","shellcheck"],"dir":".","exit":0,"ms":198}
+{"v":1,"ts":"2026-10-22T21:54:26.618Z","why":"リリースに関わる最近の記録と開いた todo の中身を読む","cmd":["mtqg","log","-n","15"],"dir":".","exit":2,"ms":3}
+{"v":1,"ts":"2026-10-22T21:54:30.343Z","why":"リリースに関わる最近の記録と開いた todo の中身を読む","cmd":["mtqg","log","--limit","15"],"dir":".","exit":0,"ms":5}
+{"v":1,"ts":"2026-10-22T21:54:30.532Z","why":"次のリリースの todo がルール変更（自動公開）と関わるかを見る","cmd":["mtqg","show","71a10203b0","7c4e63709a"],"dir":".","exit":2,"ms":3}
+{"v":1,"ts":"2026-10-22T21:54:46.746Z","why":"docs と README にリリースの流れ（公開のしかた）を書いた箇所が無いか探す","cmd":["git","grep","-n","-i","-E","release|リリース|公開","--","docs","README.md","README_ja.md",".claude/skills"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-22T21:54:46.938Z","why":"postCreate.sh が新しく入れる bcuz・srwr の補完が、今の版で出せるかを確かめる","cmd":["sh","-c","go version; srwr --version; bcuz --version; mtqg --version; qsoku .version; bcuz --completion bash | head -2; srwr completion bash | head -2; ls ~/.local/share/bash-completion/completions ~/.config/fish/completions"],"dir":".","exit":0,"ms":20}
+{"v":1,"ts":"2026-10-22T21:54:51.799Z","why":"ルール変更で書き換わった .goreleaser.yaml を、作り直したコンテナの goreleaser で確かめる","cmd":["qsoku","snapshot"],"dir":".","exit":0,"ms":20008}
+{"v":1,"ts":"2026-10-22T21:55:16.932Z","why":"v0.1.0 のタグができた後の snapshot の版と、アーカイブの中身・バイナリの版が文書どおりかを見る","cmd":["sh","-c","sed -n 40,60p .goreleaser.yaml; ls dist; tar tzf dist/crube_0.1.1-snapshot_linux_amd64.tar.gz | head -30; dist/crube_linux_amd64_v1/crube --version"],"dir":".","exit":0,"ms":69}
+{"v":1,"ts":"2026-10-22T21:55:50.528Z","why":"decisions の英日と postCreate.sh を直したあと、docs の対のテストと全体の検査が通るかを見る","cmd":["qsoku","check"],"dir":".","exit":0,"ms":3408}
+{"v":1,"ts":"2026-10-22T21:55:54.071Z","why":"postCreate.sh のコメントを折り返し直したあとも ShellCheck が通るかを見る","cmd":["qsoku","shellcheck"],"dir":".","exit":0,"ms":181}
+{"v":1,"ts":"2026-10-22T21:55:54.386Z","why":"コミット前に英語の説明の漏れが無いかを確かめる","cmd":["qsoku","crube","status","--require","all"],"dir":".","exit":0,"ms":80}
+{"v":1,"ts":"2026-10-22T21:55:54.612Z","why":"コミット前に日本語の説明の漏れが無いかを確かめる","cmd":["env","CRUBE_LANG=ja","qsoku","crube","status","--require","all"],"dir":".","exit":0,"ms":79}
+{"v":1,"ts":"2026-10-22T21:57:36.643Z","why":"ルール共通化の取り込みのコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":1,"ms":9}
+{"v":1,"ts":"2026-10-22T21:57:36.813Z","why":"セッション最初のコミットの前に、作者のメールを確かめる","cmd":["git","config","user.email"],"dir":".","exit":0,"ms":1}
+{"v":1,"ts":"2026-10-22T21:57:36.993Z","why":"セッション最初のコミットの前に、作者の名前を確かめる","cmd":["git","config","user.name"],"dir":".","exit":0,"ms":1}
+{"v":1,"ts":"2026-10-22T21:57:40.820Z","why":"ルール共通化の取り込みのコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":70}
+{"v":1,"ts":"2026-10-22T21:57:41.061Z","why":"ルール共通化の取り込みのコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}

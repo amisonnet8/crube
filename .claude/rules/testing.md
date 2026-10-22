@@ -59,6 +59,13 @@
 - `qsoku shellcheck`は`git ls-files '*.sh' '*.bash'`で追跡中のものを列挙してShellCheckにかける
 - シェルスクリプト中のコメントを、行頭が小文字の`# shellcheck`で始まる文にしてはいけない（ShellCheckがインラインディレクティブとして誤解釈し、SC1072/SC1073でパースエラーになる）。「ShellCheck」のように大文字を混ぜて書く
 - **`postCreate.sh`の中で`. /etc/os-release`をsourceしない。** ShellCheckのSC1091（追えない形で指定されたファイル）が情報の水準で報告され、終了コードが0でなくなる。ディストリビューションの版は`lsb_release -rs`で取る
+- `# shellcheck disable=…`は、`case`の枝の前には置けない（SC1124 のパースエラー）。`case`の文の前に置くと、全部の枝に効く
+
+## シェル向けのもの：補完のスクリプト・シェルとの連携
+
+- devcontainer のシェルは、`postCreate.sh`の`shells`で決める。**このリポジトリは4つ**（`(bash zsh fish pwsh)`。crube の補完のスクリプトを本物のシェルで確かめるため。テンプレートの初めは`(bash)`だけ）
+- 補完のスクリプトなど、自分のシェル向けのものを配るプロジェクトは、**本物のシェルで動かして確かめる**。`shells`を`(bash zsh fish pwsh)`にし、`devcontainer.json`の`features`に`"ghcr.io/devcontainers/features/powershell:2.0.3": {}`を足して、コンテナを作り直す（bash・zsh はベースイメージ、fish は`postCreate.sh`の apt、pwsh は feature）。`pwsh`を挙げて feature が無いと、`postCreate.sh`が止まる
+- テストは、入っていないシェルを飛ばす（CI のランナーにあるのは bash と`pwsh`）。飛んだときは、コンテナを作り直したかを確かめる。crube の補完のテストは、上の「Goのテスト」の「補完スクリプト」
 
 ## `-race`の運用
 
@@ -81,6 +88,7 @@
 - **`sudo`は、サンドボックスの中では承認しても失敗する。** サンドボックスのuidの付け替え（特権の無いユーザー名前空間）で、本来rootが持つファイルがnobodyの持ち物に見え、`sudo`自身の所有者の確認に落ちる。`sudo`が要るときは、人間のターミナルで動かすよう頼む（`.claude/rules/working-with-human.md` 2章）
 - **`srwr init`は、書き換えるものがあるときは、サンドボックスの中では`.mcp.json`・`.claude/settings.json`を置き換えられない（書き換えが無ければ動く。そもそもテンプレートから作ったプロジェクトでは動かさなくてよい）**（一時ファイルを`rename`する先が書き込み保護で、`device or resource busy`。`.srwr/`の鍵だけが先にできる）。人間のターミナルで動かす（`.claude/rules/srwr-usage.md`「落とし穴」）。`srwr view`は`~/.cache/srwr`に書くので、同じく人間のターミナルで動かす
 - **サンドボックスの書き込み保護が、作業ディレクトリ直下に`.bashrc`・`.gitconfig`などのダミーファイルを出現させることがある。** `git status`に大量の未追跡ファイルとして見えて驚くが、実害はない（未追跡のままなのでコミットには影響しない）。これはサンドボックス内のBashからだけ見える見かけ上のファイル（`/dev/null`のbind mount）で、サンドボックスの外の人間側には存在しない。`.gitignore`はルート直下のドットファイルを許可リスト方式にしてあり、`git add -A`で混ざらない
+- **道具のリリースのタグが打たれた直後にコンテナを作り直すと、前の版が入ることがある**（srwr の v0.3.0 で起きた）。Go のモジュールプロキシは`@latest`の答えをしばらく覚えているので、`postCreate.sh`の`go install …@latest`が前の版を入れ、その版に無い補完も警告を出して飛ばす。作り直したら、新しく出た道具の`--version`を見る。古ければ`go install github.com/amisonnet8/<道具>/cmd/<道具>@<新しい版>`で入れ直し（`proxy.golang.org`・`sum.golang.org`・`storage.googleapis.com`への接続が要る）、補完は人間のターミナルで入れ直す（書き先がサンドボックスの外）
 
 ## GitHub Actions CIの落とし穴
 

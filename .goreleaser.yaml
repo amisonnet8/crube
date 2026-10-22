@@ -1,6 +1,6 @@
 # The release archives of crube (.claude/rules/distribution.md). On a tag,
-# .github/workflows/release.yml runs this and attaches the archives to a draft
-# Release; a person reads the draft and publishes it. Locally: qsoku snapshot.
+# .github/workflows/release.yml runs this, which attaches the archives to a
+# draft Release, and then publishes the Release. Locally: qsoku snapshot.
 version: 2
 
 project_name: crube
@@ -49,6 +49,8 @@ snapshot:
 changelog:
   sort: asc
 
+# A draft, which release.yml publishes once everything is attached. The draft
+# left by a failed run is replaced by the next run for the tag.
 release:
   draft: true
   replace_existing_draft: true
