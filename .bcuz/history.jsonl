@@ -684,3 +684,19 @@
 {"v":1,"ts":"2026-10-22T22:00:53.988Z","why":"答えが出て2件の todo も閉じたので、質問を閉じる","cmd":["mtqg","qa","done","d05f07e7d7"],"dir":".","exit":0,"ms":5}
 {"v":1,"ts":"2026-10-22T22:00:54.167Z","why":"用語の重複と todo を閉じた記録のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":134}
 {"v":1,"ts":"2026-10-22T22:00:57.776Z","why":"記録だけのコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-22T22:01:00.540Z","why":"用語の重複の解消と todo を閉じた記録をコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl"],"dir":".","exit":0,"ms":11}
+{"v":1,"ts":"2026-10-22T22:01:50.672Z","why":"リビルド後に入った道具の版を見る（srwr は版が変わっていたら init が要る）","cmd":["sh","-c","go version; qsoku .version; mtqg version; srwr --version; bcuz --version; crube --version; golangci-lint --version; trivy --version | head -1; goreleaser --version 2>&1 | grep GitVersion; shellcheck --version | grep ^version; for s in zsh fish pwsh bwrap socat jq gh; do command -v $s >/dev/null && echo \"ok $s\" || echo \"MISSING $s\"; done"],"dir":".","exit":0,"ms":159}
+{"v":1,"ts":"2026-10-22T22:01:51.004Z","why":"リビルド後も srwr の設定が揃っているか（書き換えが要らないか）を見る","cmd":["srwr","init"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-22T22:01:51.183Z","why":"リビルド後に bcuz を強制するフックの判定が変わらないかを見る","cmd":["qsoku","hook"],"dir":".","exit":0,"ms":1965}
+{"v":1,"ts":"2026-10-22T22:01:53.276Z","why":"リビルド後の ShellCheck で追跡中のスクリプトが通るかを見る","cmd":["qsoku","shellcheck"],"dir":".","exit":0,"ms":183}
+{"v":1,"ts":"2026-10-22T22:02:01.863Z","why":"リビルド後に vet・lint・テストがキャッシュなしでも通るかを見る","cmd":["sh","-c","go clean -testcache; qsoku check"],"dir":".","exit":0,"ms":3542}
+{"v":1,"ts":"2026-10-22T22:02:05.539Z","why":"リビルド後に race 用の C コンパイラと -race が動くかを見る","cmd":["qsoku","race"],"dir":".","exit":0,"ms":19923}
+{"v":1,"ts":"2026-10-22T22:02:25.597Z","why":"リビルド後に Trivy が DB を取れて脆弱性・ライセンスの検査が通るかを見る","cmd":["qsoku","trivy"],"dir":".","exit":0,"ms":6955}
+{"v":1,"ts":"2026-10-22T22:02:32.686Z","why":"リビルド後に goreleaser が設定を読めるかだけを軽く見る（配布物の生成は前回確かめた）","cmd":["goreleaser","check"],"dir":".","exit":0,"ms":20}
+{"v":1,"ts":"2026-10-22T22:02:40.181Z","why":"リビルド後に補完の e2e が4つのシェルとも飛ばされずに動いたかを見る","cmd":["sh","-c","go test -count=1 -v -run Completion ./e2e/ 2>&1 | grep -E \"^(=== RUN|--- (SKIP|FAIL|PASS)|ok|FAIL)\" | grep -E \"SKIP|FAIL|^ok\" ; go test -count=1 -v -run Completion ./e2e/ 2>&1 | grep -c -- \"--- PASS\""],"dir":".","exit":0,"ms":5383}
+{"v":1,"ts":"2026-10-22T22:02:45.695Z","why":"リビルド後に英語の説明がそろっているかを見る","cmd":["qsoku","crube","status","--require","all"],"dir":".","exit":0,"ms":343}
+{"v":1,"ts":"2026-10-22T22:02:46.172Z","why":"リビルド後に日本語の説明がそろっているかを見る","cmd":["env","CRUBE_LANG=ja","qsoku","crube","status","--require","all"],"dir":".","exit":0,"ms":78}
+{"v":1,"ts":"2026-10-22T22:03:27.749Z","why":"リリースが要るかを判断するため、v0.1.0 以降に利用者に届くもの（バイナリ・配布物）が変わったかを見る","cmd":["git","diff","--stat","v0.1.0..HEAD","--","cmd","internal","go.mod","go.sum","LICENSE","README.md","README_ja.md",".goreleaser.yaml","tools/licenses","docs"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-22T22:03:27.928Z","why":"v0.1.0 以降のコミットの一覧を見る","cmd":["git","log","--oneline","v0.1.0..HEAD"],"dir":".","exit":0,"ms":2}
+{"v":1,"ts":"2026-10-22T22:03:48.613Z","why":"リビルド後の確認の記録のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":105}
+{"v":1,"ts":"2026-10-22T22:03:48.894Z","why":"リビルド後の確認の記録のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
