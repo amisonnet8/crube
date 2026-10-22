@@ -20,8 +20,8 @@ for lang in en ja; do
   # business: qsoku build and the commit step report those.
   json=$(env CRUBE_LANG="$lang" qsoku crube status --json 2>/dev/null) || continue
   paths=$(printf '%s' "$json" | jq -r --arg f "$file" '
-    .items[] | select(.kind == "untracked") | .path
-    | select(. == $f or (endswith("/") and ($f | startswith(.))))')
+    .items[] | select(.kind == "untracked") | .path as $p
+    | select($p == $f or ($p | endswith("/")) and ($f | startswith($p))) | $p')
   if [ -n "$paths" ]; then
     report+="CRUBE_LANG=$lang: $(printf '%s' "$paths" | paste -sd ' ')"$'\n'
   fi
