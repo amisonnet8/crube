@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
 	"testing"
@@ -169,7 +170,11 @@ func TestRunNoLicense(t *testing.T) {
 // arguments, the error and 1 when run fails, and the licenses in the given
 // directory when it works.
 func TestCommand(t *testing.T) {
-	bin := filepath.Join(t.TempDir(), "licenses")
+	name := "licenses"
+	if runtime.GOOS == "windows" {
+		name += ".exe" // without it, Windows does not find the file as a command
+	}
+	bin := filepath.Join(t.TempDir(), name)
 	if out, err := exec.Command("go", "build", "-o", bin, ".").CombinedOutput(); err != nil {
 		t.Fatalf("go build: %v\n%s", err, out)
 	}

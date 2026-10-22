@@ -700,3 +700,12 @@
 {"v":1,"ts":"2026-10-22T22:03:27.928Z","why":"v0.1.0 以降のコミットの一覧を見る","cmd":["git","log","--oneline","v0.1.0..HEAD"],"dir":".","exit":0,"ms":2}
 {"v":1,"ts":"2026-10-22T22:03:48.613Z","why":"リビルド後の確認の記録のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":105}
 {"v":1,"ts":"2026-10-22T22:03:48.894Z","why":"リビルド後の確認の記録のコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-22T22:03:51.384Z","why":"リビルド後の確認の記録をコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl"],"dir":".","exit":0,"ms":11}
+{"v":1,"ts":"2026-10-22T22:12:16.488Z","why":"Windows で落ちた TestCommand の直し方を、e2e がビルドするバイナリの名前の付け方に合わせるため探す","cmd":["git","grep","-n","-E","\\.exe|GOOS == \"windows\"","--","*.go"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-22T22:12:33.423Z","why":"TestCommand の直しのあと、全体の検査が通るかを見る","cmd":["qsoku","check"],"dir":".","exit":0,"ms":1467}
+{"v":1,"ts":"2026-10-22T22:12:35.043Z","why":"手元に Windows が無いので、Windows 向けにテストがコンパイル・vet できるかだけを見る","cmd":["env","GOOS=windows","go","vet","./tools/licenses/"],"dir":".","exit":0,"ms":2639}
+{"v":1,"ts":"2026-10-22T22:12:48.183Z","why":"直したことと、Windows での確かめが CI に残ることを bug に返信する","cmd":["mtqg","bug","add","04d6445b39","直した：TestCommand でビルドするバイナリの名前に、Windows では .exe を付ける（e2e/completion_test.go と同じ書き方）。手元では qsoku check と GOOS=windows go vet ./tools/licenses/ が通った。Windows で実際に動くかは、push 後の CI で確かめる。"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-22T22:12:48.371Z","why":"直しをコミットに入れるので bug を閉じる（CI で落ちたら開け直す）","cmd":["mtqg","bug","done","04d6445b39"],"dir":".","exit":0,"ms":5}
+{"v":1,"ts":"2026-10-22T22:12:48.560Z","why":"Windows の TestCommand の直しのコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":8}
+{"v":1,"ts":"2026-10-22T22:12:51.921Z","why":"Windows の TestCommand の直しのコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":69}
+{"v":1,"ts":"2026-10-22T22:12:52.172Z","why":"Windows の TestCommand の直しのコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}
