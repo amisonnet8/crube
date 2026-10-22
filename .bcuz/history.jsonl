@@ -673,3 +673,14 @@
 {"v":1,"ts":"2026-10-22T21:57:36.993Z","why":"セッション最初のコミットの前に、作者の名前を確かめる","cmd":["git","config","user.name"],"dir":".","exit":0,"ms":1}
 {"v":1,"ts":"2026-10-22T21:57:40.820Z","why":"ルール共通化の取り込みのコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":70}
 {"v":1,"ts":"2026-10-22T21:57:41.061Z","why":"ルール共通化の取り込みのコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-22T21:57:45.396Z","why":"ルール共通化の取り込みの変更・記録・テープをコミット対象にする","cmd":["git","add",".bcuz/history.jsonl",".mtqg/journal.jsonl",".srwr/tapes",".claude/rules/directory-structure.md",".claude/rules/distribution.md",".claude/rules/testing.md",".crube/structure.txt",".crube/structure_ja.txt",".devcontainer/postCreate.sh",".github/workflows/release.yml",".goreleaser.yaml","docs/design/decisions.md","docs/design/decisions_ja.md","tools/licenses/main_test.go"],"dir":".","exit":0,"ms":9}
+{"v":1,"ts":"2026-10-22T21:57:45.593Z","why":"コミット対象が意図どおりかをもう一度確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-22T21:59:08.933Z","why":"用語集で crube の定義が2つあると警告されているので、中身を読む","cmd":["mtqg","glossary","list"],"dir":".","exit":0,"ms":5}
+{"v":1,"ts":"2026-10-22T21:59:14.126Z","why":"用語の重複をどう解くか（取り消し・編集の手段）を mtqg の使い方で確かめる","cmd":["mtqg","help","glossary"],"dir":".","exit":2,"ms":3}
+{"v":1,"ts":"2026-10-22T21:59:16.652Z","why":"用語の重複をどう解くか（取り消し・編集の手段）を mtqg の使い方で確かめる","cmd":["mtqg","help"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-22T21:59:22.936Z","why":"しるべの由来を消すと決めた後に新しい定義を足し、古い定義が残って重複していたので隠す","cmd":["mtqg","delete","2d61ab0f2f"],"dir":".","exit":0,"ms":5}
+{"v":1,"ts":"2026-10-22T21:59:23.114Z","why":"古い定義を隠したあと、用語の重複がほかに無いかを確かめる","cmd":["mtqg","review"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-22T22:00:49.532Z","why":"人間が2件の todo を閉じると決めたので、その答えを人間の名前で残す","cmd":["env","MTQG_AUTHOR_KIND=human","MTQG_AUTHOR_NAME=amisonnet8","mtqg","qa","add","d05f07e7d7","どちらも不要。閉じる。"],"dir":".","exit":0,"ms":6}
+{"v":1,"ts":"2026-10-22T22:00:53.988Z","why":"答えが出て2件の todo も閉じたので、質問を閉じる","cmd":["mtqg","qa","done","d05f07e7d7"],"dir":".","exit":0,"ms":5}
+{"v":1,"ts":"2026-10-22T22:00:54.167Z","why":"用語の重複と todo を閉じた記録のコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":134}
+{"v":1,"ts":"2026-10-22T22:00:57.776Z","why":"記録だけのコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}
