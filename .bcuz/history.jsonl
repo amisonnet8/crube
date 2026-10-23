@@ -709,3 +709,18 @@
 {"v":1,"ts":"2026-10-22T22:12:48.560Z","why":"Windows の TestCommand の直しのコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":0,"ms":8}
 {"v":1,"ts":"2026-10-22T22:12:51.921Z","why":"Windows の TestCommand の直しのコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":69}
 {"v":1,"ts":"2026-10-22T22:12:52.172Z","why":"Windows の TestCommand の直しのコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}
+{"v":1,"ts":"2026-10-23T00:07:38.692Z","why":"共通化のためのルール変更の中身を把握する","cmd":["git","diff"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-23T00:07:45.225Z","why":"追加されたテストに実装が対応しているかを見る","cmd":["cat","tools/licenses/main.go"],"dir":".","exit":0,"ms":1}
+{"v":1,"ts":"2026-10-23T00:07:45.403Z","why":"直近のコミットで何が入ったかを把握する","cmd":["git","show","--stat","HEAD~1","HEAD"],"dir":".","exit":0,"ms":9}
+{"v":1,"ts":"2026-10-23T00:07:53.143Z","why":"PJの現状と開いているtodo・質問を把握する","cmd":["mtqg","log","-n","15"],"dir":".","exit":2,"ms":2}
+{"v":1,"ts":"2026-10-23T00:07:57.587Z","why":"PJの現状と開いているtodo・質問を把握する","cmd":["mtqg","log","--limit","15"],"dir":".","exit":0,"ms":6}
+{"v":1,"ts":"2026-10-23T00:07:57.772Z","why":"開いたままのtodo・bug・質問があるかを見る","cmd":["mtqg","status"],"dir":".","exit":0,"ms":9}
+{"v":1,"ts":"2026-10-23T00:08:07.204Z","why":"共通化で足されたテストを含めて全体が通るかを確かめる","cmd":["qsoku","check"],"dir":".","exit":0,"ms":7670}
+{"v":1,"ts":"2026-10-23T00:08:20.095Z","why":"足されたテストが RemoveAll を外す変異を捕まえるかを、写しで確かめる","cmd":["sh","-c","d=\"$TMPDIR/mut-licenses\" && rm -rf \"$d\" && mkdir -p \"$d\" && cp -r go.mod go.sum tools \"$d\"/ && cd \"$d\" && grep -n \"os.RemoveAll(dir)\" tools/licenses/main.go && sed -i \"s/if err := os.RemoveAll(dir); err != nil {/if err := error(nil); err != nil {/\" tools/licenses/main.go && go test -count=1 -run TestRun ./tools/licenses/ 2>&1 | tail -8"],"dir":".","exit":0,"ms":629}
+{"v":1,"ts":"2026-10-23T00:08:32.466Z","why":"ルール共通化の未コミット変更を確かめた結果を残す","cmd":["mtqg","m","add","人間のルール共通化の続き（2026-10-23、未コミット）を確かめた。testing.md に「go build -o で起動するバイナリは Windows では .exe を付ける」（bug 04d6445b39 の教訓）が入り、tools/licenses に TestRunRemovesEarlierOutput（前の出力を消して作り直す）が足された。実装は既に os.RemoveAll(dir) で作り直しており、直すものは無かった。qsoku check が通り、写しで RemoveAll を外す変異を入れると新しいテストが落ちる（the earlier output is still there）ことを確かめた。実装・docs・設定の変更は不要。"],"dir":".","exit":0,"ms":3}
+{"v":1,"ts":"2026-10-23T00:12:06.246Z","why":"ルール共通化の取り込みのコミットの前に、英語の説明の漏れを確かめる","cmd":["qsoku","crube","status","--require","all"],"dir":".","exit":0,"ms":97}
+{"v":1,"ts":"2026-10-23T00:12:06.537Z","why":"ルール共通化の取り込みのコミットの前に、日本語の説明の漏れを確かめる","cmd":["env","CRUBE_LANG=ja","qsoku","crube","status","--require","all"],"dir":".","exit":0,"ms":100}
+{"v":1,"ts":"2026-10-23T00:12:06.816Z","why":"ルール共通化の取り込みのコミットの前に、テープに無い変更が無いか確かめる","cmd":["srwr","tapes","check"],"dir":".","exit":1,"ms":119}
+{"v":1,"ts":"2026-10-23T00:12:07.090Z","why":"コミットの前に作者の設定が正しいか確かめる","cmd":["git","config","user.email"],"dir":".","exit":0,"ms":1}
+{"v":1,"ts":"2026-10-23T00:12:12.853Z","why":"ルール共通化の取り込みのコミットに入れるため、テープを閉じて圧縮する","cmd":["srwr","tapes","new"],"dir":".","exit":0,"ms":2}
+{"v":1,"ts":"2026-10-23T00:12:13.026Z","why":"ルール共通化の取り込みのコミットに入るものを確かめる","cmd":["git","status","--short"],"dir":".","exit":0,"ms":4}
