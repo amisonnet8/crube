@@ -89,7 +89,7 @@ $ crube tree
     store/    永続化レイヤー(SQLite)
 ```
 
-While `CRUBE_LANG=ja`, reading and editing use only `structure_ja.txt`. Descriptions of the English file never mix in. If `structure_ja.txt` has not been made, the English `structure.txt` is used even with `CRUBE_LANG=ja`.
+While `CRUBE_LANG=ja`, reading and editing use only `structure_ja.txt`. Descriptions of the English file never mix in. If `structure_ja.txt` has not been made, the English `structure.txt` is used even with `CRUBE_LANG=ja`. To use another language for one command only, give it with `--lang` (`crube tree --lang en`); `--lang` comes before `CRUBE_LANG`.
 
 The rest goes on without `CRUBE_LANG` (in English).
 

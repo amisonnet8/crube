@@ -134,7 +134,7 @@ src/auth/session.ts
 AI が説明を書き、人が `.crube/` の差分をレビューする、という分担を想定しています。
 
 1. `crube status --json` で、説明が必要な場所を取り出す
-2. AI がファイルを読み、`crube set` / `mv` / `rm`（または MCP の書き込みツール）で説明を直す
+2. AI がファイルを読み、`crube set` / `mv` / `rm`（または MCP の書き込みツール）で説明を直す。status のパスはルートからなので、プロジェクトルートで動かす
 3. もう一度 `crube status` で、問題がなくなったことを確かめる
 
 <details>
@@ -145,8 +145,7 @@ AI が説明を書き、人が `.crube/` の差分をレビューする、とい
   "mcpServers": {
     "crube": {
       "command": "crube",
-      "args": ["mcp", "--allow-write"],
-      "env": { "CRUBE_LANG": "ja" }
+      "args": ["mcp", "--allow-write", "--lang", "ja"]
     }
   }
 }

@@ -8,7 +8,7 @@ crube itself does not call AI. An AI agent writes the descriptions through the C
 
 1. Get the places that need a description with `crube status --json`.
 2. The AI reads those files and whatever sources it has (design documents, work records and so on).
-3. The AI updates the structure with `crube set` / `mv` / `rm` (or the MCP writing tools).
+3. The AI updates the structure with `crube set` / `mv` / `rm` (or the MCP writing tools). The paths of status are from the project root, and the CLI reads entry paths from the current directory, so run these at the root (or add `-C <project root>`). The MCP tools read paths from the root, so the paths can be passed as they are.
 4. Run `crube status` again to make sure no problem is left.
 5. A person reviews the diff of `.crube/`.
 

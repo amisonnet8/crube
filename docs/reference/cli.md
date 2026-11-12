@@ -84,7 +84,6 @@ src/auth          # the same (unless there is a file entry src/auth)
 ```
 
 - The trailing `/` can be left out. A path without it names the file entry or the directory entry of that name, whichever is there. If both are, it is an error (`crube: src/db: both src/db and src/db/ are entries (add / for the directory)`). If neither is, it is read as a file entry; but `set` gives an error instead of making a new entry when the path is a real directory (`crube: src/db: is a directory (use src/db/)`; a directory entry is not made by guessing). A symbolic link is taken as a file.
-
 - `.`, `..`, empty levels (`a//b`) and absolute paths are read as written, as `ls` reads them, and turned into the position from the project root before the entry is looked for (in `src`, `auth/` is `src/auth/` and `../data/` is `data/`). A path ending in `/`, `.` or `..` is a directory entry. Entry paths in results and errors are positions from the root.
 - A path outside the project is an error (`crube: ../../: outside the project`). For the project root itself, `tree` shows everything, and `set` / `rm` / `mv` give an error (`crube: ..: the project root has no entry (give a path below it)`).
 - An entry path finds an entry by the exact name at each level. It is not matched as a pattern (`crube rm "src/*.go"` removes only the entry "`*.go`" under `src/`).

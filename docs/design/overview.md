@@ -43,6 +43,7 @@ How to work and what to know are left to the agent's own rules (`.claude/` and t
 | --- | --- |
 | structure | All the descriptions of the project's structure. It is made of one file per language |
 | entry | One line of a structure file: a name (of a file or directory, or a pattern) with its description (desc and detail) |
+| entry path | The position of an entry in a structure file: names joined with `/` (`data/*.csv`). Given to `tree`, `set`, `rm` and `mv`; the CLI reads it from the current directory, MCP from the project root |
 | project root | The directory where `.crube/` is |
 | pattern | The name of an entry, such as `*.csv`, that matches several names directly in the same directory |
 | target language | The language given by the `--lang` option (the argument `lang` in MCP), or else the `CRUBE_LANG` environment variable. Reading and editing use the file of this language |

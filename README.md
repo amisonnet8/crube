@@ -134,7 +134,7 @@ The reading and editing commands can output structured results with `--json`. Se
 The idea is that AI writes the descriptions, and people review the diff of `.crube/`.
 
 1. Get the places that need a description with `crube status --json`
-2. The AI reads the files and fixes the descriptions with `crube set` / `mv` / `rm` (or the MCP writing tools)
+2. The AI reads the files and fixes the descriptions with `crube set` / `mv` / `rm` (or the MCP writing tools), at the project root: the paths of status are from the root
 3. Run `crube status` again to make sure no problem is left
 
 <details>

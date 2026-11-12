@@ -112,9 +112,9 @@ crube が書き込むときは、ファイル全体を次の形で出力し直�
 英語以外の言語のファイルです。形式は `structure.txt` とまったく同じです。
 
 - 各言語のファイルは独立している。`structure.txt` との対応関係は持たず、エントリが揃っている必要もない。
-- 参照・編集に使うのは、`CRUBE_LANG` の言語のファイル 1 つだけ。そのファイルがなければ（通常のファイルでなければ）`structure.txt` を使う。
-- `CRUBE_LANG` が未設定か `en` なら、`structure_en.txt` があっても `structure.txt` を使う。
-- `crube init` で空のファイルを作れる（`CRUBE_LANG=ja crube init`）。
+- 参照・編集に使うのは、対象言語（`--lang`、MCP は `lang`、なければ `CRUBE_LANG`。[cli_ja.md](cli_ja.md#言語)）のファイル 1 つだけ。そのファイルがなければ（通常のファイルでなければ）`structure.txt` を使う。
+- 言語の指定がないか `en` なら、`structure_en.txt` があっても `structure.txt` を使う。
+- `crube init` で空のファイルを作れる（`crube init --lang ja`、または `CRUBE_LANG=ja crube init`）。
 
 ## ignore
 

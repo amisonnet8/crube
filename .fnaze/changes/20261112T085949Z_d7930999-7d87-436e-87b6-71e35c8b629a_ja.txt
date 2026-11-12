@@ -1,0 +1,19 @@
+# リリースの前に、docs と README を v0.2.0 の動きと照らして直す
+.mtqg/
+	journal.jsonl	見直しのメモを記録する
+README.md	status のパスはルートからなので、set・mv・rm はルートで動かすと書く
+README_ja.md	README.md と同じ直しと、MCP の登録例を CRUBE_LANG でなく --lang ja にする
+docs/
+	design/
+		overview.md	用語に「エントリのパス」を足す
+		overview_ja.md	用語に「エントリのパス」を足す
+	examples/
+		ai-workflow.md	status のルートからのパスを渡す set・mv・rm をどこで動かすかを書く（CLI はエントリのパスを現在地から読む）
+		ai-workflow_ja.md	ai-workflow.md と同じ直し
+		getting-started.md	1つのコマンドだけ別の言語を使う --lang を書く
+		getting-started_ja.md	getting-started.md と同じ直し
+	reference/
+		cli.md	空行で分かれていた Entry paths の箇条書きを1つにする
+		cli_ja.md	cli.md と同じ直し
+		file-format.md	structure_<言語タグ>.txt の言語を --lang・lang・CRUBE_LANG で書く（CRUBE_LANG だけだった）
+		file-format_ja.md	file-format.md と同じ直し

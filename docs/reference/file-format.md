@@ -112,9 +112,9 @@ Alignment and empty lines made by hand are gone once crube writes the file.
 The file of a language other than English. The format is exactly that of `structure.txt`.
 
 - The file of each language is independent. It has no tie to `structure.txt`, and the entries need not be the same.
-- Reading and editing use only one file: that of the `CRUBE_LANG` language. If it is not there (not a regular file), `structure.txt` is used.
-- With `CRUBE_LANG` unset or `en`, `structure.txt` is used even if `structure_en.txt` exists.
-- `crube init` can make an empty one (`CRUBE_LANG=ja crube init`).
+- Reading and editing use only one file: that of the target language (`--lang`, `lang` in MCP, or else `CRUBE_LANG`; [cli.md](cli.md#language)). If it is not there (not a regular file), `structure.txt` is used.
+- With no language given, or with `en`, `structure.txt` is used even if `structure_en.txt` exists.
+- `crube init` can make an empty one (`crube init --lang ja`, or `CRUBE_LANG=ja crube init`).
 
 ## ignore
 

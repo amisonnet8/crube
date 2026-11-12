@@ -1,0 +1,19 @@
+# Review the docs and README against v0.2.0 before the release
+.mtqg/
+	journal.jsonl	Record the memo of the review
+README.md	Tell agents to run set, mv and rm at the root, since the paths of status are from the root
+README_ja.md	The same as README.md, and register the MCP server with --lang ja instead of CRUBE_LANG
+docs/
+	design/
+		overview.md	Add the term entry path
+		overview_ja.md	Add the term entry path
+	examples/
+		ai-workflow.md	Say where to run set, mv and rm with the root paths of status (the CLI reads entry paths from the current directory)
+		ai-workflow_ja.md	The same as ai-workflow.md
+		getting-started.md	Mention --lang for one command in another language
+		getting-started_ja.md	The same as getting-started.md
+	reference/
+		cli.md	Join the list of Entry paths that an empty line split
+		cli_ja.md	The same as cli.md
+		file-format.md	Give the language of structure_<tag>.txt as --lang, lang or CRUBE_LANG; only CRUBE_LANG was written
+		file-format_ja.md	The same as file-format.md

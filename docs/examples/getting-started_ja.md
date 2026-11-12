@@ -89,7 +89,7 @@ $ crube tree
     store/    永続化レイヤー(SQLite)
 ```
 
-`CRUBE_LANG=ja` の間は、参照も編集も `structure_ja.txt` だけを使います。英語のファイルの説明が混ざることはありません。`structure_ja.txt` を作っていなければ、`CRUBE_LANG=ja` でも英語の `structure.txt` が使われます。
+`CRUBE_LANG=ja` の間は、参照も編集も `structure_ja.txt` だけを使います。英語のファイルの説明が混ざることはありません。`structure_ja.txt` を作っていなければ、`CRUBE_LANG=ja` でも英語の `structure.txt` が使われます。1 つのコマンドだけ別の言語を使うときは、`--lang` で指定します（`crube tree --lang en`）。`--lang` は `CRUBE_LANG` より先です。
 
 以下は `CRUBE_LANG` を外した（英語の）状態で続けます。
 
