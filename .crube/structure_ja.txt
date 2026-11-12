@@ -1,13 +1,8 @@
-.bcuz/	bcuz を通して動かしたコマンドの記録（コミットする）
-	history.jsonl	1コマンド1行の JSON：いつ・なぜ・何を・終了コード
 .claude/	リポジトリで共有する Claude Code の設定
 	hooks/	Claude Code が道具の前後に動かすフック
-		build.sh	srwr で .go・go.mod・go.sum を変えたあとに qsoku build を動かす
-		require-bcuz.sh	bcuz を通さない Bash のコマンドを断る PreToolUse フック
-		require-bcuz.test.sh	require-bcuz.sh が通す・断るコマンドの表（qsoku hook）
-		crube-untracked.sh	srwr の new でファイルを作ったあと、説明の無いパスを言語ごとに Claude に知らせる
+		build.sh	Edit・Write で .go・go.mod・go.sum を変えたあとに qsoku build を動かす
+		crube-untracked.sh	Write でファイルを作ったあと、説明の無いパスを言語ごとに Claude に知らせる
 	rules/	このリポジトリで作業するときのルール（日本語）。いつ読むかは CLAUDE.md にある
-		bcuz-usage.md	Bash のコマンドを bcuz で動かす方法と、秘密をコマンドに書かないこと
 		datetime.md	日時の扱い：UTC で持ち、表示だけ利用者のタイムゾーンに直す
 		directory-structure.md	ファイルの置き場所と、リポジトリの構成
 		distribution.md	配布方法：goreleaser での配布物と、リリースの流れ（人間はタグを push するだけ。workflow が公開する）
@@ -15,14 +10,12 @@
 		mtqg-usage.md	mtqg でメモ・todo・質問・不具合・決まり事を記録する方法
 		naming.md	名前：製品名・用語・コマンド
 		qsoku-usage.md	ビルド・テスト・lint の qsoku の名前と呼び方
-		srwr-usage.md	ファイルは srwr だけで変える（厳格モード）こと、テープの閉じ方
 		testing.md	テスト方針と、サンドボックス・OS ごとの CI の落とし穴
 		working-with-human.md	人間への頼み方：小さなつまずき、確認、見え方の了承
 		crube-usage.md	このリポジトリ自身に crube を使う方法：MCP と qsoku crube、場所の探し方、両方の言語の説明の保ち方
+		fnaze-usage.md	fnaze の使い方：コミットごとに英語と日本語で説明を書く手順、pre-commit、落とし穴
 	settings.json	Claude Code の許可・サンドボックス・フック（人間が管理する）
 	skills/	Claude Code のスキル
-		commit-with-tape/	スキル：srwr のテープを閉じてコミットする
-			SKILL.md	スキルの手順
 		mutation-check/	スキル：実装をわざと壊して、テストが気づくか確かめる
 			SKILL.md	スキルの手順
 			crube-spec.txt	crube の仕様の約束を1つずつ壊す変異の一覧（仕様の言葉で書く）
@@ -33,7 +26,7 @@
 .devcontainer/	開発用のコンテナ
 	devcontainer-lock.json	コンテナを作ったときの feature の版
 	devcontainer.json	コンテナの定義と VS Code の設定
-	postCreate.sh	コンテナを作ったあとに道具（qsoku・mtqg・srwr・bcuz・このソースの crube・goreleaser・golangci-lint・Trivy）を入れ、4つのシェルの設定をする
+	postCreate.sh	コンテナを作ったあとに道具（qsoku・mtqg・fnaze・このソースの crube・goreleaser・golangci-lint・Trivy）を入れ、.fnaze/ を作り、git のフックを .githooks/ に向け、4つのシェルの設定をする
 .github/	GitHub の設定
 	workflows/	GitHub Actions のワークフロー
 		ci.yml	CI：Linux・macOS・Windows での qsoku check、race、ShellCheck、Trivy
@@ -44,9 +37,6 @@
 	SCHEMA.md	journal.jsonl のデータ形式
 	journal.jsonl	記録そのもの。1件1行の JSON（mtqg からだけ書く）
 	version	mtqg のデータ形式の版
-.srwr/	srwr：AI によるファイル編集のテープ（操作ごとに理由つき）
-	tapes/	閉じたテープ（コミットする）。srwr view で再生できる
-		*.tape.jsonl.gz	作業のまとまりごとに1本のテープ（圧縮済み）
 cmd/	実行ファイル
 	crube/	crube コマンド
 		main.go	入口：引数を internal/cli に渡すだけ
@@ -124,11 +114,10 @@ internal/	crube のパッケージ：コアと、その上の CLI
 	mcpserver/	MCP サーバー（crube mcp）：各ツールは core を呼び、CLI の --json と同じものを返す
 		server.go	ツールとその引数・説明文。書き込みのツールは --allow-write のときだけ
 		*_test.go	インメモリの MCP クライアントからのテスト
-.gitattributes	改行（すべて LF）と、記録のファイルの merge=union
+.gitattributes	改行（すべて LF）
 .gitignore	git に入れないもの。ルート直下のドットで始まる名前は許可リスト方式
 .golangci.yaml	golangci-lint の設定
-.mcp.json	Claude Code に mtqg・srwr と、このリポジトリ自身の crube（英語・日本語）の MCP サーバーをつなぐ設定
-.srwrignore	srwr がテープに記録しないファイル
+.mcp.json	Claude Code に mtqg と、このリポジトリ自身の crube（英語・日本語）と、fnaze の MCP サーバーをつなぐ設定
 CLAUDE.md	このリポジトリでの Claude Code のルールと、読むべきルールファイルの案内
 LICENSE	MIT ライセンス
 README.md	crube とは何か（例つき。英語。日本語は README_ja.md）
@@ -150,3 +139,8 @@ tools/	プロジェクトを作るための道具（crube には組み込まれ�
 		| go run ./tools/licenses <dir> <main パッケージ>。goreleaser がビルドの前に動かす。ライセンスのファイルが無いモジュールがあれば失敗する。
 		main.go	crube に組み込まれるモジュールを go list -deps で求め、ライセンス文を写す
 		main_test.go	ライセンス文を集める処理のテスト。crube 自身のライセンスの一覧を丸ごと比べる
+.fnaze/	コミットごとの説明を fnaze で書いたもの（.claude/rules/fnaze-usage.md）。.devcontainer/postCreate.sh が作る（fnaze init）
+	changes/	説明のファイル。コミット1つにつき組1つ（英語と日本語）
+		| <日時>_<UUID>[_<言語>].txt。fnaze new で作り、fnaze title・set・rm で書く。1つずつに説明を付けても意味が無いので、.crube/ignore で外す
+.githooks/	このリポジトリの git のフック（core.hooksPath。.devcontainer/postCreate.sh が設定する）
+	pre-commit	fnaze の docs/examples/pre-commit：説明のファイルを足さないコミットと、いちばん新しい組を fnaze status --require が報告するコミットを止める

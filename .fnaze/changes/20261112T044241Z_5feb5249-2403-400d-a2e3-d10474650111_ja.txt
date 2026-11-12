@@ -1,0 +1,44 @@
+# srwr・bcuz から fnaze と git の pre-commit へのルールの変更に、実装・設定・説明を合わせる
+.bcuz/	bcuz のコマンドの記録を消した：Bash のコマンドは bcuz を通さなくなった
+.claude/
+	hooks/
+		build.sh	srwr の edit・new の代わりに、Edit・Write・MultiEdit（file_path）のあとにビルドする
+		crube-untracked.sh	srwr の new の代わりに、Write（file_path）のあとに説明の無いパスを知らせる
+		require-bcuz.sh	Bash のコマンドに bcuz を強いる PreToolUse フックを消した
+		require-bcuz.test.sh	消した bcuz のフックの判定の表を消した
+	rules/
+		bcuz-usage.md	消した：bcuz を使わなくなった
+		crube-usage.md	bcuz・srwr・commit-with-tape の記述を外し、フックは Write のあとに動くとした
+		directory-structure.md	.bcuz/・.srwr/・.srwrignore を、.fnaze/ と .githooks/ に置き換えた
+		fnaze-usage.md	足した：fnaze でコミットごとの説明を英語と日本語で書く方法
+		mtqg-usage.md	今使う道具を挙げ直した（srwr・bcuz の代わりに crube・fnaze）
+		qsoku-usage.md	qsoku hook と bcuz の記述を外し、shellcheck が .githooks/ も見るとした
+		srwr-usage.md	消した：srwr（厳格モード）を使わなくなり、Edit・Write を使う
+		testing.md	srwr・bcuz・qsoku hook の注意を外し、shellcheck が .githooks/ を拾うと書いた
+		working-with-human.md	小さなつまずきの例から srwr init を外した
+	settings.json	srwr・bcuz のフックと許可を外し、Edit・Write と fnaze の MCP を使えるようにした
+	skills/
+		commit-with-tape/	srwr のテープを閉じてコミットするスキルを消した
+		mutation-check/
+			SKILL.md	コマンドを bcuz に通さず、srwr のテープの注意を外した
+.crube/
+	ignore	.gitignore に合わせた：.fnaze/・.githooks/ を足し、.srwr/・.bcuz/ を外した。fnaze の説明のファイルは対象外
+	structure.txt	crube の set・rm：.fnaze/・.githooks/・fnaze-usage.md を説明し、srwr・bcuz のエントリを消した
+	structure_ja.txt	crube の set・rm（日本語）：structure.txt と同じ変更
+.devcontainer/
+	devcontainer.json	srwr-view の拡張を外した
+	postCreate.sh	srwr・bcuz の代わりに fnaze を入れ、.fnaze/ を作り、core.hooksPath を .githooks/ に向ける
+.gitattributes	消した .bcuz/history.jsonl の merge=union を外した
+.githooks/
+	pre-commit	足した：fnaze の説明の無いコミットを止める（fnaze の docs/examples/pre-commit）
+.github/
+	workflows/
+		ci.yml	消した bcuz のフックの qsoku hook の手順を外した
+.gitignore	.fnaze/・.githooks/ を追跡し、.srwr/・.srwrignore・.bcuz/ を外した
+.mcp.json	srwr の MCP サーバーを fnaze のものに置き換えた
+.mtqg/
+	journal.jsonl	mtqg：決まり事 01236f8fe2（道具）を直し、srwr・bcuz の決まり事2件を消し、決まり事 3a1ad854c3 とメモ fcf6a0ac91 を足した
+.srwr/	srwr のテープを消した：ファイルの編集をテープに記録しなくなった
+.srwrignore	消した：srwr を使わなくなった
+CLAUDE.md	srwr・bcuz から Edit・Write と fnaze に移し、文書とコードが食い違うときの決まりを足した
+qsokufile	qsoku hook を外し、shellcheck が .githooks/ も見る

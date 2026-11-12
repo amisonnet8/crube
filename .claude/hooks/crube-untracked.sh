@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# After srwr's new creates a file, tell Claude which paths of it still have no
+# After Write creates a file, tell Claude which paths of it still have no
 # description, in each language of this repository's .crube/ (English and
 # Japanese; .claude/rules/crube-usage.md). Only the new file and the
 # directories above it are reported, so that a file made in a new directory
-# also asks for that directory. It never blocks: the commit step
-# (commit-with-tape) is where status --require all has to pass.
+# also asks for that directory. It never blocks: the step before a commit
+# (.claude/rules/crube-usage.md) is where status --require all has to pass.
 set -euo pipefail
 
-file=$(jq -r '.tool_input.file // empty')
+file=$(jq -r '.tool_input.file_path // empty')
 if [ -z "$file" ]; then
   exit 0
 fi
@@ -17,7 +17,7 @@ file=${file#"$CLAUDE_PROJECT_DIR"/}
 report=""
 for lang in en ja; do
   # A crube that does not build or a broken .crube/ is not this hook's
-  # business: qsoku build and the commit step report those.
+  # business: qsoku build and the step before a commit report those.
   json=$(env CRUBE_LANG="$lang" qsoku crube status --json 2>/dev/null) || continue
   paths=$(printf '%s' "$json" | jq -r --arg f "$file" '
     .items[] | select(.kind == "untracked") | .path as $p

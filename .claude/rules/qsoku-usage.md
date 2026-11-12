@@ -14,8 +14,7 @@
 | `qsoku check` | `vet`・`lint`・`unit`をまとめて実行 | **作業の区切りで必ず通す**（`.claude/rules/testing.md`） |
 | `qsoku race` | `CGO_ENABLED=1 go test -race` | 並行性・排他に関わる変更 |
 | `qsoku trivy` | 既知の脆弱性・ライセンスの検査 | 依存を足したとき |
-| `qsoku shellcheck` | 追跡中の`*.sh`・`*.bash`をShellCheckにかける | シェルスクリプトを足したとき |
-| `qsoku hook` | `.claude/hooks/require-bcuz.test.sh`（bcuz を強制するフックの判定の表。`jq`が要る） | `require-bcuz.sh`を変えたとき |
+| `qsoku shellcheck` | 追跡中の`*.sh`・`*.bash`と`.githooks/`のフックをShellCheckにかける | シェルスクリプトを足したとき |
 | `qsoku demo` | README のデモの画像（`docs/assets/demo.svg`・`demo_ja.svg`）を、今の crube の出力から作り直す（e2e の`TestDemoSVG`に`UPDATE_DEMO=1`を付けて動かす） | crube の出力を変えて、`TestDemoSVG`が落ちたとき。作り直したら、画像を見てからコミットする |
 | `qsoku snapshot` | `goreleaser check`のあと、タグなしで配布物を`dist/`に作る（`.goreleaser.yaml`。goreleaser が要る） | タグを打つ前、`.goreleaser.yaml`や`tools/licenses`を変えたとき。中身を見てからタグを打つ（`.claude/rules/distribution.md`） |
 | `qsoku crube <引数>` | 今のソースを`bin/crube`にビルドして、その場で動かす（引数を受ける。居場所は呼んだところのまま） | このリポジトリの`.crube/`を保つとき（`qsoku crube status --require all`、`qsoku crube set …`）、場所を引くとき（`qsoku crube find …`） |
@@ -30,7 +29,6 @@
 qsoku <名前> [引数...]
 ```
 
-- **Claude Codeは、Bashツールでは`bcuz`を通して呼ぶ**：`bcuz "理由" qsoku <名前>`（`.claude/rules/bcuz-usage.md`）。以下の例・表の`qsoku <名前>`は、素の形で書いてある
 - 引数は、項目のコマンドの中で`"$@"`・`$1`として受けられる。**このテンプレートの`qsokufile`の項目は、どれも引数を受けていない**（書いていない引数は捨てられる）。受けたいときは、項目を`unit: (cd //; go test "$@")`のように書き換える。そうすれば`qsoku unit -run TestFoo ./internal/...`が使える
 - **qsoku自身のオプションは無い。** `--help`・`--version`は**名前として調べられる**ので、「定義されていない」というエラーになる。使い方は`qsoku .help`、バージョンは`qsoku .version`
 - コマンドは、どのOSでも、また呼び出し元がどのシェルでも、常に`sh`で実行される

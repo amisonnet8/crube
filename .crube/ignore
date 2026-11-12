@@ -22,24 +22,21 @@ node_modules/
 /.*
 !/.gitignore
 !/.gitattributes
-!/.srwrignore
 !/.golangci.yaml
 !/.goreleaser.yaml
 !/.mcp.json
 !/.devcontainer/
 !/.github/
 !/.mtqg/
-!/.bcuz/
+!/.fnaze/
+!/.githooks/
 !/.claude/
 /.claude/*
 !/.claude/settings.json
 !/.claude/rules/
 !/.claude/skills/
 !/.claude/hooks/
-# srwr: only the closed tapes are committed (never the key).
-!/.srwr/
-/.srwr/*
-!/.srwr/tapes/
-/.srwr/tapes/*.tape.jsonl
 # mtqg: .local/ is not committed.
 /.mtqg/.local/
+# fnaze: the description files, one per commit, are described by changes/ as a whole.
+/.fnaze/changes/*

@@ -1,0 +1,44 @@
+# Follow the rule change from srwr and bcuz to fnaze and the git pre-commit hook
+.bcuz/	Removed bcuz's command record: Bash commands no longer go through bcuz
+.claude/
+	hooks/
+		build.sh	Build after Edit / Write / MultiEdit (file_path) instead of srwr's edit / new
+		crube-untracked.sh	Report undescribed paths after Write (file_path) instead of srwr's new
+		require-bcuz.sh	Removed the PreToolUse hook that forced Bash commands through bcuz
+		require-bcuz.test.sh	Removed the decision table of the removed bcuz hook
+	rules/
+		bcuz-usage.md	Removed: bcuz is no longer used
+		crube-usage.md	Dropped bcuz, srwr and commit-with-tape; the hook now follows Write
+		directory-structure.md	Replaced .bcuz/, .srwr/ and .srwrignore with .fnaze/ and .githooks/
+		fnaze-usage.md	Added: how to describe each commit with fnaze in English and Japanese
+		mtqg-usage.md	Listed the tools in use now (crube, fnaze instead of srwr, bcuz)
+		qsoku-usage.md	Removed qsoku hook and bcuz; shellcheck also covers .githooks/
+		srwr-usage.md	Removed: srwr (strict mode) is no longer used; Edit and Write are allowed
+		testing.md	Removed the srwr, bcuz and qsoku hook notes; shellcheck lists .githooks/
+		working-with-human.md	Removed the srwr init examples from the small blockers
+	settings.json	Removed the srwr and bcuz hooks and permissions; allowed Edit / Write and the fnaze MCP
+	skills/
+		commit-with-tape/	Removed the skill to close srwr tapes before committing
+		mutation-check/
+			SKILL.md	Commands no longer go through bcuz, and no srwr tape notes
+.crube/
+	ignore	Followed .gitignore: .fnaze/ and .githooks/ in, .srwr/ and .bcuz/ out; left out the fnaze description files
+	structure.txt	crube set / rm: described .fnaze/, .githooks/ and fnaze-usage.md; removed srwr and bcuz entries
+	structure_ja.txt	crube set / rm (Japanese): the same changes as structure.txt
+.devcontainer/
+	devcontainer.json	Removed the srwr-view extension
+	postCreate.sh	Install fnaze instead of srwr and bcuz, make .fnaze/, point core.hooksPath at .githooks/
+.gitattributes	Removed merge=union for the removed .bcuz/history.jsonl
+.githooks/
+	pre-commit	Added: stops a commit without a fnaze description (fnaze's docs/examples/pre-commit)
+.github/
+	workflows/
+		ci.yml	Removed the qsoku hook step of the removed bcuz hook
+.gitignore	Track .fnaze/ and .githooks/; dropped .srwr/, .srwrignore and .bcuz/
+.mcp.json	Replaced the srwr MCP server with fnaze's
+.mtqg/
+	journal.jsonl	mtqg: edited rule 01236f8fe2 (tools), deleted two srwr/bcuz rules, added rule 3a1ad854c3 and memo fcf6a0ac91
+.srwr/	Removed the srwr tapes: file edits are no longer recorded on tapes
+.srwrignore	Removed: srwr is no longer used
+CLAUDE.md	Moved from srwr / bcuz to Edit / Write and fnaze; added the rule for docs that disagree with code
+qsokufile	Removed qsoku hook; shellcheck also checks .githooks/
