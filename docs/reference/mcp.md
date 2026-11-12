@@ -35,7 +35,7 @@ The writing tools are offered only when the server is started with `crube mcp --
 | Write | `move_description` | from, to | `{ "from", "to", "moved" }` (`moved` is the number of entries moved, those below included) |
 
 - The arguments `path`, `depth`, `limit`, `kinds` and `detail` can be left out. `depth` and `limit` left out or 0 mean no limit; a negative number is an error. The `detail` of `set_description` stays as it is when left out, and `""` removes it.
-- The `path` of `ls` and `show` is **relative to the project root** (whatever the place the server started in). MCP has no current place, and the paths it returns are relative to the root too, so a path in a result can be passed to the next call as it is.
+- The `path` of `ls` and `show`, and the entry paths of `tree` and the write tools, are **relative to the project root** (whatever the place the server started in; the same as the CLI with the project root always as its current directory). MCP has no current place, and the paths it returns are relative to the root too, so a path in a result can be passed to the next call as it is.
 - The `kinds` of `status` is an array of `untracked`, `orphan` and `invalid`. Only `items` are filtered; `coverage` is always that of the whole project. Other values are an error.
 - The tools read `.crube/` again on every call. If `.crube/` is changed while the server runs, the next call sees it.
 

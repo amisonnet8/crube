@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -141,14 +142,13 @@ func TestSetRefused(t *testing.T) {
 		{"desc too wide", "x", strings.Repeat("あ", 129), nil, "desc is 258 columns wide (limit 256)"},
 		{"detail too wide", "x", "X", ptr(strings.Repeat("a", 4097)), "detail is 4097 columns wide (limit 4096)"},
 		{"empty path", "", "X", nil, `invalid entry path ""`},
-		{"only a slash", "/", "X", nil, `invalid entry path "/"`},
-		{"leading slash", "/a", "X", nil, `invalid entry path "/a"`},
-		{"double slash", "a//b", "X", nil, `invalid entry path "a//b"`},
 		{"name with a tab", "a\tb", "X", nil, `name "a\tb" cannot be written in a structure file`},
 		{"name ending in a space", "a/b ", "X", nil, `name "b " cannot be written in a structure file`},
 		{"name starting with a space", " a/", "X", nil, `name " a/" cannot be written in a structure file`},
 		{"name like a detail line", "| x", "X", nil, `name "| x" cannot be written in a structure file`},
-		{"dot dot", "../x", "X", nil, `name "../" cannot be written in a structure file`},
+		{"above the root", "../x", "X", nil, "../x: outside the project"},
+		{"the root", ".", "X", nil, ".: the project root has no entry (give a path below it)"},
+		{"the root, gone round", "a/..", "X", nil, "a/..: the project root has no entry (give a path below it)"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -361,6 +361,20 @@ func TestEntryPathBackslash(t *testing.T) {
 		}
 	})
 
+	t.Run("elsewhere: \\ is a character of a name, also from a subdirectory", func(t *testing.T) {
+		old := osSeparator
+		osSeparator = '/'
+		t.Cleanup(func() { osSeparator = old })
+
+		p := subProject(t)
+		if _, err := p.Set(`a\b`, "X", nil); err != nil {
+			t.Fatal(err)
+		}
+		if got, want := content(t, p, "structure.txt"), "src/\tS\n\tauth/\tA\n\tmain.go\tM\n\ta\\b\tX\ndata/\tD\n"; got != want {
+			t.Errorf("structure.txt: got %q, want %q", got, want)
+		}
+	})
+
 	t.Run("elsewhere: \\ is a character of a name", func(t *testing.T) {
 		old := osSeparator
 		osSeparator = '/'
@@ -372,6 +386,152 @@ func TestEntryPathBackslash(t *testing.T) {
 		}
 		if got, want := content(t, p, "structure.txt"), "a\\b\tX\n"; got != want {
 			t.Errorf("structure.txt: got %q, want %q", got, want)
+		}
+	})
+}
+
+// subBefore is the structure file of subProject.
+const subBefore = "src/\tS\n\tauth/\tA\n\tmain.go\tM\ndata/\tD\n"
+
+// subProject is a project with src/auth/ and data/, opened in src/: entry
+// paths are read from there.
+func subProject(t *testing.T) *Project {
+	t.Helper()
+	p := newProject(t, "", map[string]string{"structure.txt": subBefore})
+	for _, d := range []string{"src/auth", "data"} {
+		if err := os.MkdirAll(filepath.Join(p.Root, filepath.FromSlash(d)), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return open(t, Options{Dir: filepath.Join(p.Root, "src")})
+}
+
+func TestEntryPathFromSubdirectory(t *testing.T) {
+	t.Run("tree", func(t *testing.T) {
+		p := subProject(t)
+		abs := filepath.Join(p.Root, "data") + string(filepath.Separator)
+		for typed, want := range map[string][]string{
+			"auth/":      {"src/auth/"},
+			"./auth/":    {"src/auth/"},
+			"auth/.":     {"src/auth/"},
+			".":          {"src/"},
+			"./":         {"src/"},
+			"../data/":   {"data/"},
+			abs:          {"data/"},
+			"..":         {"src/", "data/"}, // the project root: everything
+			"":           {"src/", "data/"}, // no path: everything
+			"auth//..//": {"src/"},
+		} {
+			r, err := p.Tree(TreeOptions{Path: typed, Depth: 1})
+			if err != nil {
+				t.Errorf("tree %q: %v", typed, err)
+				continue
+			}
+			var got []string
+			for _, n := range r.Entries {
+				got = append(got, n.Path)
+			}
+			if !slices.Equal(got, want) {
+				t.Errorf("tree %q: %q, want %q", typed, got, want)
+			}
+		}
+		for typed, msg := range map[string]string{
+			"../../":  "../../: outside the project",
+			"../..":   "../..: outside the project",
+			"nope/":   "no entry src/nope/",
+			"../src":  "no entry src", // a file entry: not the directory entry src/
+			"./auth ": `name "auth " cannot be written in a structure file`,
+		} {
+			if _, err := p.Tree(TreeOptions{Path: typed}); err == nil || err.Error() != msg {
+				t.Errorf("tree %q: got %v, want %q", typed, err, msg)
+			}
+		}
+	})
+
+	t.Run("set", func(t *testing.T) {
+		for typed, want := range map[string]struct{ path, after string }{
+			"db/":     {"src/db/", "src/\tS\n\tauth/\tA\n\tmain.go\tM\n\tdb/\tX\ndata/\tD\n"},
+			"*.go":    {"src/*.go", "src/\tS\n\tauth/\tA\n\tmain.go\tM\n\t*.go\tX\ndata/\tD\n"},
+			"x//y.go": {"src/x/y.go", "src/\tS\n\tauth/\tA\n\tmain.go\tM\n\tx/\n\t\ty.go\tX\ndata/\tD\n"},
+			".":       {"src/", "src/\tX\n\tauth/\tA\n\tmain.go\tM\ndata/\tD\n"},
+			"../data": {"data", "src/\tS\n\tauth/\tA\n\tmain.go\tM\ndata/\tD\ndata\tX\n"},
+		} {
+			p := subProject(t)
+			r, err := p.Set(typed, "X", nil)
+			if err != nil {
+				t.Errorf("set %q: %v", typed, err)
+				continue
+			}
+			if r.Path != want.path {
+				t.Errorf("set %q returned %q, want %q", typed, r.Path, want.path)
+			}
+			if got := content(t, p, "structure.txt"); got != want.after {
+				t.Errorf("set %q:\ngot  %q\nwant %q", typed, got, want.after)
+			}
+		}
+	})
+
+	t.Run("rm and mv", func(t *testing.T) {
+		p := subProject(t)
+		removed, err := p.Remove("auth/")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if want := (RemoveResult{Path: "src/auth/", Removed: 1}); *removed != want {
+			t.Errorf("rm returned %+v, want %+v", *removed, want)
+		}
+		moved, err := p.Move("main.go", "../cmd/main.go")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if want := (MoveResult{From: "src/main.go", To: "cmd/main.go", Moved: 1}); *moved != want {
+			t.Errorf("mv returned %+v, want %+v", *moved, want)
+		}
+		if got, want := content(t, p, "structure.txt"), "src/\tS\ndata/\tD\ncmd/\n\tmain.go\tM\n"; got != want {
+			t.Errorf("structure.txt:\ngot  %q\nwant %q", got, want)
+		}
+	})
+
+	t.Run("the root and outside are refused", func(t *testing.T) {
+		p := subProject(t)
+		root := "..: the project root has no entry (give a path below it)"
+		if _, err := p.Set("..", "X", nil); err == nil || err.Error() != root {
+			t.Errorf("set ..: got %v, want %q", err, root)
+		}
+		if _, err := p.Remove(".."); err == nil || err.Error() != root {
+			t.Errorf("rm ..: got %v, want %q", err, root)
+		}
+		if _, err := p.Move("..", "x/"); err == nil || err.Error() != root {
+			t.Errorf("mv .. x/: got %v, want %q", err, root)
+		}
+		if _, err := p.Move("auth/", "../.."); err == nil || err.Error() != "../..: outside the project" {
+			t.Errorf("mv auth/ ../..: got %v", err)
+		}
+		if got := content(t, p, "structure.txt"); got != subBefore {
+			t.Errorf("the file was changed: %q", got)
+		}
+	})
+
+	t.Run("complete", func(t *testing.T) {
+		p := subProject(t)
+		for typed, want := range map[string][]Candidate{
+			"":       {{"auth/", "A"}, {"main.go", "M"}},
+			"a":      {{"auth/", "A"}},
+			"./":     {{"./auth/", "A"}, {"./main.go", "M"}},
+			"../d":   {{"../data/", "D"}},
+			"auth/":  nil,
+			"../../": nil, // refused below
+		} {
+			got, err := p.Complete(typed, false)
+			if typed == "../../" {
+				if err == nil || err.Error() != "../../: outside the project" {
+					t.Errorf("complete %q: got %q, %v", typed, got, err)
+				}
+				continue
+			}
+			if err != nil || !slices.Equal(got, want) {
+				t.Errorf("complete %q: got %q, %v; want %q", typed, got, err, want)
+			}
 		}
 	})
 }

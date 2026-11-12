@@ -126,7 +126,7 @@ func fixed(args ...string) func(docLang) []string {
 func TestJSONExamples(t *testing.T) {
 	examples := map[string]jsonExample{
 		"docs/reference/cli.md#0": {cliRoot, "", fixed("ls", "src", "--json")},
-		"docs/reference/cli.md#1": {cliRoot, "src/auth", fixed("tree", "src/", "-d", "2", "--json")},
+		"docs/reference/cli.md#1": {cliRoot, "src/auth", fixed("tree", "..", "-d", "2", "--json")},
 		"docs/reference/cli.md#2": {cliRoot, "", func(l docLang) []string { return []string{"find", l.findWord, "--json"} }},
 		"docs/reference/cli.md#3": {cliRoot, "", fixed("show", "data/2026.csv", "--json")},
 		"docs/reference/cli.md#4": {statusRoot(true), "", fixed("status", "--json")},

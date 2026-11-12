@@ -41,8 +41,8 @@ func TestComplete(t *testing.T) {
 		}
 	}
 
-	if _, err := p.Complete("a//", false); err == nil {
-		t.Error(`Complete("a//") did not fail`)
+	if _, err := p.Complete("../", false); err == nil {
+		t.Error(`Complete("../") did not fail`)
 	}
 }
 

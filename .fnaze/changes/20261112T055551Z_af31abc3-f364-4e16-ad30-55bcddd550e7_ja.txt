@@ -1,0 +1,30 @@
+# CLI のエントリのパスを、ls と同じく現在地から読む（[8-1]）
+.mtqg/
+	journal.jsonl	mtqg：メモ 562a16b6c9、todo [8-1] を完了、用語集 457b6cf9ce（エントリのパス）を直した
+.claude/
+	rules/
+		naming.md	エントリのパス：CLI は現在地から、MCP はルートから読むと書いた
+docs/
+	design/
+		decisions.md	エントリのパスの起点の行と、ルートから読むのをやめた理由を足した
+		decisions_ja.md	decisions.md と同じ変更（日本語）
+	reference/
+		cli.md	エントリのパスを現在地からとし、tree の例を .. に、補完は打った語に続けて出すとした
+		cli_ja.md	cli.md と同じ変更（日本語）
+		mcp.md	MCP のエントリのパスもルートからと書いた
+		mcp_ja.md	mcp.md と同じ変更（日本語）
+e2e/
+	docs_test.go	tree の JSON の例を、src/auth での crube tree .. にした
+internal/
+	cli/
+		text_test.go	祖先の印の例で、src/db から .. を渡す
+	core/
+		complete.go	補完を現在地から、打った形のまま出す
+		complete_test.go	a// はエラーでなくなり、ルートの外の ../ がエラー
+		core.go	コメント：エントリのパスも、操作する場所から読む
+		edit.go	entryPath が現在地からエントリのパスを読み、set・rm・mv が使う
+		edit_test.go	サブディレクトリからのテスト：tree・set・rm・mv・補完、ルートと外
+		read.go	tree が entryPath でパスを読み、ルートなら全体を出す
+	mcpserver/
+		server.go	コメント：エントリのパスもルートから読む
+		server_test.go	サブディレクトリで起動しても、tree のパスをルートから読むことを確かめる

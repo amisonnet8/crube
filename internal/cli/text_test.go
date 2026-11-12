@@ -75,7 +75,7 @@ func TestText(t *testing.T) {
 			"    main.go        エントリポイント\n" +
 			"  data/            データ格納場所\n" +
 			"    *.csv          CSVデータ\n"},
-		{"tree with the mark on an ancestor", []string{"tree", "-C", filepath.Join(dir, "src", "db"), "src/", "-d", "2"}, 0, "" +
+		{"tree with the mark on an ancestor", []string{"tree", "-C", filepath.Join(dir, "src", "db"), "..", "-d", "2"}, 0, "" +
 			"> src/        アプリケーションのソースコード  (here: src/db/)\n" +
 			"    auth/     認証(ログイン、セッション、トークン更新)\n" +
 			"    main.go   エントリポイント\n"},

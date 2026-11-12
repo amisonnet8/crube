@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"path"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -35,8 +36,7 @@ type MoveResult struct {
 // added as lines without a desc; a new entry goes after its siblings. It
 // returns the entry as written.
 func (p *Project) Set(entryPath, desc string, detail *string) (*SetResult, error) {
-	entryPath = normEntryPath(entryPath)
-	names, err := splitEntryPath(entryPath)
+	entryPath, names, err := p.entryBelowRoot(entryPath)
 	if err != nil {
 		return nil, err
 	}
@@ -80,8 +80,7 @@ func (p *Project) Set(entryPath, desc string, detail *string) (*SetResult, error
 // Remove removes the entry at entryPath, and every entry below it, from the
 // structure file of the language. Files of the project are not touched.
 func (p *Project) Remove(entryPath string) (*RemoveResult, error) {
-	entryPath = normEntryPath(entryPath)
-	names, err := splitEntryPath(entryPath)
+	entryPath, names, err := p.entryBelowRoot(entryPath)
 	if err != nil {
 		return nil, err
 	}
@@ -106,12 +105,11 @@ func (p *Project) Remove(entryPath string) (*RemoveResult, error) {
 // as lines without a desc; the entry goes after its new siblings. Files of
 // the project are not touched.
 func (p *Project) Move(from, to string) (*MoveResult, error) {
-	from, to = normEntryPath(from), normEntryPath(to)
-	fromNames, err := splitEntryPath(from)
+	from, fromNames, err := p.entryBelowRoot(from)
 	if err != nil {
 		return nil, err
 	}
-	toNames, err := splitEntryPath(to)
+	to, toNames, err := p.entryBelowRoot(to)
 	if err != nil {
 		return nil, err
 	}
@@ -165,6 +163,68 @@ func normEntryPath(entryPath string) string {
 		return strings.ReplaceAll(entryPath, `\`, "/")
 	}
 	return entryPath
+}
+
+// entryPath reads an entry path as a user types it: from where the operation
+// runs (the project root for the MCP server), as ls reads a real path, so
+// that ".", "..", empty names ("a//b") and an absolute path are read the same
+// way. Only the names are cleaned: the last one may still be a pattern. A
+// path ending in "/", "." or ".." is a directory entry. It returns the entry
+// path from the project root and the names of its entries, or "" and no
+// names for the project root itself. A path outside the project is refused.
+func (p *Project) entryPath(typed string) (string, []string, error) {
+	s := normEntryPath(typed)
+	if s == "" {
+		return "", nil, fmt.Errorf("invalid entry path %q", typed)
+	}
+	last := s[strings.LastIndex(s, "/")+1:]
+	isDir := last == "" || last == "." || last == ".."
+	var rel string
+	if filepath.IsAbs(s) {
+		var err error
+		if rel, _, err = p.realPath(s); err != nil {
+			return "", nil, err
+		}
+	} else {
+		// With "/" only, so that "\" stays a character of a name where it can
+		// be one (normEntryPath has turned it into "/" where it cannot).
+		here, err := filepath.Rel(p.Root, p.dir)
+		if err != nil {
+			return "", nil, err
+		}
+		rel = path.Join(filepath.ToSlash(here), s)
+		if rel == ".." || strings.HasPrefix(rel, "../") {
+			return "", nil, fmt.Errorf("%s: outside the project", s)
+		}
+		if rel == "." {
+			rel = ""
+		}
+	}
+	if rel == "" {
+		return "", nil, nil
+	}
+	if isDir {
+		rel += "/"
+	}
+	names, err := splitEntryPath(rel)
+	if err != nil {
+		return "", nil, err
+	}
+	return rel, names, nil
+}
+
+// entryBelowRoot is entryPath for an operation that needs an entry: the
+// project root has none.
+func (p *Project) entryBelowRoot(typed string) (string, []string, error) {
+	path, names, err := p.entryPath(typed)
+	if err == nil && names == nil {
+		err = rootHasNoEntry(typed)
+	}
+	return path, names, err
+}
+
+func rootHasNoEntry(path string) error {
+	return fmt.Errorf("%s: the project root has no entry (give a path below it)", path)
 }
 
 // splitEntryPath splits an entry path into the names of its entries, each

@@ -22,17 +22,19 @@ type Candidate struct {
 // directory: Ignored looks at the directories above a path). With real (for
 // set), the names that are really there and that no entry has exactly are
 // offered too, after the entries; ignored ones are left out. The paths are
-// from the project root.
+// read from where the operation runs, as the other operations read entry
+// paths, and the candidates start with what was typed.
 func (p *Project) Complete(typed string, real bool) ([]Candidate, error) {
 	typed = normEntryPath(typed)
 	cut := strings.LastIndex(typed, "/") + 1
 	dir, prefix := typed[:cut], typed[cut:]
-	var names []string // the entry names of dir, each ending in "/"
-	if dir != "" {
-		var err error
-		if names, err = splitEntryPath(dir); err != nil {
-			return nil, err
-		}
+	at := dir
+	if at == "" {
+		at = "./"
+	}
+	_, names, err := p.entryPath(at) // the entry names of dir, each ending in "/"
+	if err != nil {
+		return nil, err
 	}
 	plain := make([]string, len(names)) // the same, without their "/"
 	for i, n := range names {

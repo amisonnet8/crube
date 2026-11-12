@@ -1,0 +1,30 @@
+# Read the entry paths of the CLI from the current directory, as ls does ([8-1])
+.mtqg/
+	journal.jsonl	mtqg: memo 562a16b6c9, todo [8-1] done, glossary 457b6cf9ce (entry path) edited
+.claude/
+	rules/
+		naming.md	Entry path: read from the current directory in the CLI, from the root in MCP
+docs/
+	design/
+		decisions.md	Added where entry paths start, and why reading from the root was dropped
+		decisions_ja.md	Same as decisions.md, in Japanese
+	reference/
+		cli.md	Entry paths are relative to the current directory; tree example uses ..; completion follows what was typed
+		cli_ja.md	Same as cli.md, in Japanese
+		mcp.md	Entry paths of MCP are relative to the root too
+		mcp_ja.md	Same as mcp.md, in Japanese
+e2e/
+	docs_test.go	The JSON example of tree runs crube tree .. in src/auth
+internal/
+	cli/
+		text_test.go	The ancestor mark example gives .. from src/db
+	core/
+		complete.go	Complete from the current directory, keeping what was typed
+		complete_test.go	a// is no longer an error; ../ outside the project is
+		core.go	Comments: entry paths are read from where the operation runs
+		edit.go	entryPath reads entry paths from the current directory; set, rm and mv use it
+		edit_test.go	Tests from a subdirectory: tree, set, rm, mv, complete, the root and outside
+		read.go	tree reads its path with entryPath; the root shows everything
+	mcpserver/
+		server.go	Comment: entry paths are read from the root
+		server_test.go	MCP reads tree paths from the root even when started in a subdirectory

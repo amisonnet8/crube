@@ -215,7 +215,7 @@ func Run(ctx context.Context, o Options) error {
 }
 
 // open finds the project for one call, so that changes to .crube/ between
-// calls are seen. Real paths are read from the project root.
+// calls are seen. Real paths and entry paths are read from the project root.
 func open(o Options) (*core.Project, error) {
 	p, err := core.Open(core.Options{Dir: o.Dir, Lang: o.Lang})
 	if err != nil {

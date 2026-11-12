@@ -74,15 +74,17 @@ The value of `CRUBE_LANG` is used as it is (`ja-JP` is not brought to `ja`, and 
 
 ## Entry paths
 
-The path given to `tree` / `set` / `rm` / `mv` is the position of an entry in the structure file: the names from the root, joined with `/`. The last name can be a pattern. Wherever it is run, it is the position from the root.
+The path given to `tree` / `set` / `rm` / `mv` is the position of an entry in the structure file: names joined with `/`. The last name can be a pattern. Like `ls`, it is read relative to the current directory (with `-C`, that directory).
 
 ```
 data/*.csv        # the entry "*.csv" under data/
 src/auth/         # a directory entry (ending in /)
 ```
 
+- `.`, `..`, empty levels (`a//b`) and absolute paths are read as written, as `ls` reads them, and turned into the position from the project root before the entry is looked for (in `src`, `auth/` is `src/auth/` and `../data/` is `data/`). A path ending in `/`, `.` or `..` is a directory entry. Entry paths in results and errors are positions from the root.
+- A path outside the project is an error (`crube: ../../: outside the project`). For the project root itself, `tree` shows everything, and `set` / `rm` / `mv` give an error (`crube: ..: the project root has no entry (give a path below it)`).
 - An entry path finds an entry by the exact name at each level. It is not matched as a pattern (`crube rm "src/*.go"` removes only the entry "`*.go`" under `src/`).
-- A path with a name that a structure file cannot hold ([file-format.md](file-format.md#names-that-cannot-be-written), and `.`, `..`), or with an empty level (`a//b`), is an error.
+- A path with a name that a structure file cannot hold ([file-format.md](file-format.md#names-that-cannot-be-written)) is an error.
 
 The path given to `ls` / `show` is a real path. It is read relative to the current directory (with `-C`, that directory), and one that points outside the project is an error (`crube: ../: outside the project`).
 
@@ -212,14 +214,14 @@ $ crube tree
 
 ```
 $ cd src/db          # there is no entry for src/db/
-$ crube tree src/ -d 2
+$ crube tree .. -d 2
 > src/        Application source code  (here: src/db/)
     auth/     Authentication (login, sessions, token refresh)
     main.go   Entry point
 ```
 
-- With `path` (an entry path), only the subtree of that entry is shown. Without such an entry, it is an error (`crube: no entry src/x/`). `-d` limits the number of levels shown (`-d 1` is the top level only; no limit if left out).
-- With `--json`, the entries are output as nested JSON. The `here` at the top is the current directory (`""` at the project root), and the `here` of each entry tells whether it is the line with the mark. The example below is the output of `crube tree src/ -d 2 --json` run in `src/auth`.
+- With `path` (an [entry path](#entry-paths), relative to the current directory), only the subtree of that entry is shown (`crube tree .` in `src` shows the subtree of `src/`). Without such an entry, it is an error (`crube: no entry src/x/`). Without `path`, or with the project root, everything is shown. `-d` limits the number of levels shown (`-d 1` is the top level only; no limit if left out).
+- With `--json`, the entries are output as nested JSON. The `here` at the top is the current directory (`""` at the project root), and the `here` of each entry tells whether it is the line with the mark. The example below is the output of `crube tree .. -d 2 --json` run in `src/auth`.
 
 ```json
 {
@@ -450,8 +452,8 @@ What is completed:
 | The path of `tree`, `set` and `rm`, and `from` / `to` of `mv` | Entry paths |
 | After `completion` | The 4 shells |
 
-- Entry paths are offered one level at a time: the entries directly under the entry up to the last `/` of the word being typed, as paths from the root, with their descs (`crube tree src/<TAB>` gives `src/auth/` and `src/main.go`). A directory entry ends in `/`, with no space after it. Ignored entries are not offered (as with `tree`).
-- For the path of `set`, real paths without a description (directly in the same directory, with no entry of exactly that name) are offered too, besides the entries: as paths from the root, following the ignore settings. This is for adding new descriptions.
+- Entry paths are offered one level at a time: the entries directly under the entry up to the last `/` of the word being typed (relative to the current directory; the current directory if there is none), following what was typed, with their descs (`crube tree src/<TAB>` gives `src/auth/` and `src/main.go`; `crube tree <TAB>` in `src` gives `auth/` and `main.go`). A directory entry ends in `/`, with no space after it. Ignored entries are not offered (as with `tree`).
+- For the path of `set`, real paths without a description (directly in the same directory, with no entry of exactly that name) are offered too, besides the entries: following what was typed, and the ignore settings. This is for adding new descriptions.
 - A pattern entry (`data/*.csv`) is inserted in quotes so that the shell does not expand it (zsh and fish escape it instead). The quotes and backslashes of the word being typed are removed before looking for candidates.
 - Some shells do not complete a value after `=` (`--require=`). Write `--require <TAB>`.
 - The value of `-C` and the path of `ls` and `show` (real paths) are left to the shell's file completion. The values of `-d`, `--limit` and `--detail`, descs, and the words of `find` are not completed.

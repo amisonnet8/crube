@@ -113,7 +113,7 @@ func (p *Project) Show(path string) (*ShowResult, error) {
 		return nil, err
 	}
 	if len(names) == 0 {
-		return nil, fmt.Errorf("%s: the project root has no entry (give a path below it)", path)
+		return nil, rootHasNoEntry(path)
 	}
 	tree, _, err := p.Load()
 	if err != nil {
@@ -196,18 +196,19 @@ func (p *Project) Tree(o TreeOptions) (*TreeResult, error) {
 
 	top := tree.Entries
 	var topNames []string // the names above the entries of top
-	o.Path = normEntryPath(o.Path)
-	if o.Path != "" {
-		names, err := splitEntryPath(o.Path)
+	if o.Path != "" {     // the path of the project root shows everything too
+		path, names, err := p.entryPath(o.Path)
 		if err != nil {
 			return nil, err
 		}
-		list, i := lookup(tree, names)
-		if i < 0 {
-			return nil, fmt.Errorf("no entry %s", o.Path)
+		if names != nil {
+			list, i := lookup(tree, names)
+			if i < 0 {
+				return nil, fmt.Errorf("no entry %s", path)
+			}
+			top = []*structure.Entry{(*list)[i]}
+			topNames = names[:len(names)-1]
 		}
-		top = []*structure.Entry{(*list)[i]}
-		topNames = names[:len(names)-1]
 	}
 
 	r := &TreeResult{Entries: []*TreeNode{}}

@@ -27,7 +27,7 @@ type Options struct {
 // Project is a project found from Options.
 type Project struct {
 	Root     string // the project root, absolute
-	dir      string // where the operation runs (o.Dir), absolute: real paths are relative to it
+	dir      string // where the operation runs (o.Dir), absolute: real paths and entry paths are relative to it
 	lang     string
 	noIgnore bool
 }
@@ -52,9 +52,10 @@ func Open(o Options) (*Project, error) {
 	return &Project{Root: root, dir: dir, lang: o.Lang, noIgnore: o.NoIgnore}, nil
 }
 
-// AtRoot returns the same project, with real paths read from the project root
-// instead of from where the operation runs (the MCP server has no current
-// place: the paths it gets are those it returned, from the root).
+// AtRoot returns the same project, with real paths and entry paths read from
+// the project root instead of from where the operation runs (the MCP server
+// has no current place: the paths it gets are those it returned, from the
+// root).
 func (p *Project) AtRoot() *Project {
 	q := *p
 	q.dir = p.Root

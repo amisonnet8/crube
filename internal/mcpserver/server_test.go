@@ -114,6 +114,18 @@ func TestRead(t *testing.T) {
 		t.Errorf("tree: %+v", tree)
 	}
 
+	// Entry paths are read from the root too.
+	var sub core.TreeResult
+	if msg := call(t, cs, "tree", map[string]any{"path": "src/", "depth": 1}, &sub); msg != "" {
+		t.Fatal(msg)
+	}
+	if len(sub.Entries) != 1 || sub.Entries[0].Path != "src/" {
+		t.Errorf("tree src/: %+v", sub)
+	}
+	if msg := call(t, cs, "tree", map[string]any{"path": "../"}, &sub); msg != "../: outside the project" {
+		t.Errorf("tree ../: %q", msg)
+	}
+
 	var ls core.LsResult
 	if msg := call(t, cs, "ls", map[string]any{"path": "src"}, &ls); msg != "" {
 		t.Fatal(msg)
