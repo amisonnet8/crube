@@ -1,0 +1,16 @@
+# MCP の crube-ja を crube にまとめ、言語を --lang・lang で渡す（[8-4]）
+.mtqg/
+	journal.jsonl	crube-ja をまとめるかの質問（a6a4ab5351）と [8-4] のメモ（951ce70e77）を記録する
+.claude/
+	rules/
+		directory-structure.md	crube のサーバーが1つの .mcp.json の説明に直す
+		crube-usage.md	MCP は1つで lang、CLI は --lang ja を使い、言語をいつも明示する決まりにする
+	hooks/
+		crube-untracked.sh	言語を CRUBE_LANG でなく --lang で選び、外の CRUBE_LANG に左右されないようにする
+CLAUDE.md	crube の MCP サーバーが1つになったことと、言語をいつも明示することを書く
+.mcp.json	crube-ja のサーバーを消す。1つの crube が言語を引数 lang で受けるため
+.devcontainer/
+	postCreate.sh	コメントで挙げる MCP サーバーを crube だけにする
+.crube/
+	structure.txt	internal/lang/ の desc を --lang に合わせる（qsoku crube set）
+	structure_ja.txt	internal/lang/ の desc を --lang に合わせる（qsoku crube set --lang ja）

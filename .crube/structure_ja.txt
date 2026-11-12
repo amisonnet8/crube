@@ -89,7 +89,7 @@ internal/	crube のパッケージ：コアと、その上の CLI
 	ignore/	.crube/ignore：.gitignore と同じ規則と、init が書く既定のファイル
 		ignore.go	除外の規則の解析と照合
 		*_test.go	テスト（期待値は git check-ignore で求めた）
-	lang/	CRUBE_LANG から使う structure ファイルを選ぶ
+	lang/	--lang（MCP は lang）か CRUBE_LANG から使う structure ファイルを選ぶ
 		lang.go	言語タグとファイル名（structure_<タグ>.txt）
 		*_test.go	同名ファイルのテスト
 	match/	実在のパスとエントリの照合（名前の完全一致が先、次にパターンを書いた順）

@@ -18,12 +18,12 @@ report=""
 for lang in en ja; do
   # A crube that does not build or a broken .crube/ is not this hook's
   # business: qsoku build and the step before a commit report those.
-  json=$(env CRUBE_LANG="$lang" qsoku crube status --json 2>/dev/null) || continue
+  json=$(qsoku crube status --json --lang "$lang" 2>/dev/null) || continue
   paths=$(printf '%s' "$json" | jq -r --arg f "$file" '
     .items[] | select(.kind == "untracked") | .path as $p
     | select($p == $f or ($p | endswith("/")) and ($f | startswith($p))) | $p')
   if [ -n "$paths" ]; then
-    report+="CRUBE_LANG=$lang: $(printf '%s' "$paths" | paste -sd ' ')"$'\n'
+    report+="--lang $lang: $(printf '%s' "$paths" | paste -sd ' ')"$'\n'
   fi
 done
 

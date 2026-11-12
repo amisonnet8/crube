@@ -6,12 +6,14 @@
 
 | 入口 | 使い方 |
 |---|---|
-| MCP（`.mcp.json`の`crube`・`crube-ja`） | `find`・`tree`・`ls`・`show`・`status`と、書き込みの`set_description`・`move_description`・`remove_description`。`crube`は英語（`.crube/structure.txt`）、`crube-ja`は日本語（`.crube/structure_ja.txt`）。言語はサーバーごとに1つ |
-| CLI（`qsoku crube <引数>`） | `qsoku crube find …`。日本語は`env CRUBE_LANG=ja qsoku crube …`。毎回、今のソースから作って動かす（`.claude/rules/qsoku-usage.md`） |
+| MCP（`.mcp.json`の`crube`） | `find`・`tree`・`ls`・`show`・`status`と、書き込みの`set_description`・`move_description`・`remove_description`。**サーバーは1つ**で、言語は道具の引数`lang`で渡す（日本語は`lang: "ja"`で`.crube/structure_ja.txt`。省くと英語の`.crube/structure.txt`） |
+| CLI（`qsoku crube <引数>`） | `qsoku crube find …`。日本語は`qsoku crube find … --lang ja`。毎回、今のソースから作って動かす（`.claude/rules/qsoku-usage.md`） |
 
 - MCPのサーバーも`qsoku crube mcp --allow-write`で起動するので、**起動したときのソース**で動く。crubeのコードを変えたあと、MCPは古いままなので、変えた動きは`qsoku crube`で確かめる（MCPを新しくするには、Claude Codeの`/mcp`でつなぎ直す）
 - `postCreate.sh`が入れる`crube`コマンドは、コンテナを作ったときのソースの写し。人間が手で使うためのもので、Claude Codeは使わない
-- `.claude/settings.json`の`enabledMcpjsonServers`に`crube`・`crube-ja`が無いと、MCPは現れない（人間が管理する）。そのときはCLIで進める
+- **言語は、MCP でも CLI でもいつも明示する**（`lang: "en"`・`"ja"`、`--lang en`・`--lang ja`）。省くと、サーバーや手元の環境の`CRUBE_LANG`しだいで、思っていない言語のファイルに書く。`--lang`・`lang`を付ければ`CRUBE_LANG`は使われない
+- `lang`の引数は、それを入れたあと（v0.2.0 から）のソースで起動したサーバーにだけある。古いサーバーは`lang`を知らない（`/mcp`でつなぎ直す）
+- `.claude/settings.json`の`enabledMcpjsonServers`に`crube`が無いと、MCPは現れない（人間が管理する）。そのときはCLIで進める
 
 ## 場所を探すとき
 
@@ -30,7 +32,7 @@
 ## 気づくための仕組み
 
 - **`Write`のあと**：フック`.claude/hooks/crube-untracked.sh`が、作ったファイルと、その上のディレクトリのうち説明の無いものを、言語ごとに知らせる（止めはしない）。知らされたら、続けて両方の言語で説明を付ける
-- **コミットの前**：`qsoku crube status --require all`と`env CRUBE_LANG=ja qsoku crube status --require all`の両方を通す。Bashで作った・動かした・消したもの（`git rm`、ツールが書いたもの）は、フックが見ないので、ここで見つかる
+- **コミットの前**：`qsoku crube status --require all --lang en`と`qsoku crube status --require all --lang ja`の両方を通す。Bashで作った・動かした・消したもの（`git rm`、ツールが書いたもの）は、フックが見ないので、ここで見つかる
 
 ## 落とし穴
 

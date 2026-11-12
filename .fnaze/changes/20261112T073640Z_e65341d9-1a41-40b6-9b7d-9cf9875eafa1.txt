@@ -1,0 +1,16 @@
+# Merge the crube-ja MCP server into crube and give the language with --lang / lang ([8-4])
+.mtqg/
+	journal.jsonl	Record the question on merging crube-ja (a6a4ab5351) and the [8-4] memo (951ce70e77)
+.claude/
+	rules/
+		directory-structure.md	Describe .mcp.json with the one crube server
+		crube-usage.md	Use one MCP server with lang and --lang ja in the CLI; always give the language
+	hooks/
+		crube-untracked.sh	Pick the language with --lang instead of CRUBE_LANG, so that an outer CRUBE_LANG cannot change it
+CLAUDE.md	Describe the single crube MCP server and giving the language explicitly
+.mcp.json	Remove the crube-ja server: the one crube server takes the language as the lang argument
+.devcontainer/
+	postCreate.sh	Name only the crube MCP server in the comment
+.crube/
+	structure.txt	Update the desc of internal/lang/ for --lang (qsoku crube set)
+	structure_ja.txt	Update the desc of internal/lang/ for --lang (qsoku crube set --lang ja)

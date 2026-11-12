@@ -103,7 +103,7 @@ go install github.com/amisonnet8/mtqg/cmd/mtqg@latest
 # crube: built from this repository's own source, so a fresh devcontainer has
 # a `crube` command and its completion (below) to use interactively. It is a
 # snapshot of the source at creation, for people. Claude Code does not use it:
-# it uses `qsoku crube` and the crube / crube-ja MCP servers of .mcp.json, which
+# it uses `qsoku crube` and the crube MCP server of .mcp.json, which
 # build the current source each time (.claude/rules/crube-usage.md).
 (cd "$(dirname "$0")/.." && go install ./cmd/crube)
 

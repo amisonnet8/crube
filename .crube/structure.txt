@@ -89,7 +89,7 @@ internal/	Packages of crube: the core, and the CLI on top of it
 	ignore/	.crube/ignore: the rules of .gitignore, and the default file written by init
 		ignore.go	Parsing and matching of the ignore rules
 		*_test.go	Tests, with the expected values taken from git check-ignore
-	lang/	Choosing the structure file from CRUBE_LANG
+	lang/	Choosing the structure file from --lang (lang of MCP) or CRUBE_LANG
 		lang.go	Language tags and file names (structure_<tag>.txt)
 		*_test.go	Tests of the file of the same name
 	match/	Matching real paths to entries (exact name first, then patterns in order)

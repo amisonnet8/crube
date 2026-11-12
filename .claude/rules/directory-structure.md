@@ -16,7 +16,7 @@
 ├── .golangci.yaml          ← lintの設定
 ├── .goreleaser.yaml        ← 配布物の作り方（goreleaser。`release.yml`と`qsoku snapshot`が使う。`.claude/rules/distribution.md`）
 ├── trivy.yaml              ← 脆弱性・ライセンス検査の設定
-├── .mcp.json               ← mtqg・このリポジトリ自身のcrube（英語の`crube`・日本語の`crube-ja`）・fnazeのMCPサーバーの配線
+├── .mcp.json               ← mtqg・このリポジトリ自身のcrube（1つ。言語は道具の引数`lang`）・fnazeのMCPサーバーの配線
 ├── .crube/                 ← このリポジトリ自身の説明（crube の dogfooding。`structure.txt`は英語、`structure_ja.txt`は日本語、`ignore`は`.gitignore`に合わせて手で保つ）。**コミットする**
 ├── .fnaze/changes/         ← コミットごとの説明（fnaze。`.claude/rules/fnaze-usage.md`）。**コミットする**
 ├── .githooks/              ← git のフック（`pre-commit`：説明の無いコミットを止める。`core.hooksPath`は`postCreate.sh`が設定する）
@@ -67,7 +67,7 @@
 - **`internal/structure/`**: structure ファイルのバイト列と木（`Tree`・`Entry`）の変換だけを持つ。ファイルの探索・ディスクへの書き込み・照合は持たない（ほかのコアのパッケージに置く）
 - **`go.sum`**: コミットする（改ざん検知・再現可能なビルドのため）
 - **`.mtqg/`**: コミットされる。中のファイルは直接編集せず、すべて`mtqg`のコマンド経由で書く（`.claude/rules/mtqg-usage.md`）。`.mtqg/.local/`はコミットされない
-- **`.mcp.json`**: `mtqg mcp`（MCPサーバー）の配線。`mtqg init --agent claude-code`が書くものと同じ。その後ろに、このリポジトリ自身のcrubeのMCPサーバー（`qsoku crube mcp --allow-write`。`crube-ja`は`CRUBE_LANG=ja`）を手で足している（`.claude/rules/crube-usage.md`）。最後に、fnazeのMCPサーバー（`fnaze mcp --allow-write`。1つだけ）を足している（`.claude/rules/fnaze-usage.md`）
+- **`.mcp.json`**: `mtqg mcp`（MCPサーバー）の配線。`mtqg init --agent claude-code`が書くものと同じ。その後ろに、このリポジトリ自身のcrubeのMCPサーバー（`qsoku crube mcp --allow-write`。1つだけで、言語は道具の引数`lang`で渡す）を手で足している（`.claude/rules/crube-usage.md`）。最後に、fnazeのMCPサーバー（`fnaze mcp --allow-write`。1つだけ）を足している（`.claude/rules/fnaze-usage.md`）
 - **`.fnaze/`**: コミットごとの説明を fnaze で書き、そのコミットに入れる（`.claude/rules/fnaze-usage.md`）。**コミットする**（`.gitignore`の`!/.fnaze/`）。`.devcontainer/postCreate.sh`が無ければ`fnaze init`で作る。説明のファイルは、crube の説明を付けず`.crube/ignore`で外す（パターンのエントリにすると、最初の`fnaze new`まで何にも当たらず`orphan`になるため）
 - **`.githooks/`**: 追跡する git のフック。`.git/hooks/`は git に乗らないので、ここに置いて`core.hooksPath`で指す（`.devcontainer/postCreate.sh`）。`pre-commit`は fnaze の`docs/examples/pre-commit`と、先頭のコメントのほかは同じ中身
 - **`.devcontainer/devcontainer-lock.json`**: コンテナのビルドで自動で作られる（このテンプレートには置いていない）。**できたらコミットする**（この版のfeatureでテストなどが通った証明になる）。featureを新しくしたいときは、lockを消してビルドし直し、新しいlockをコミットする
