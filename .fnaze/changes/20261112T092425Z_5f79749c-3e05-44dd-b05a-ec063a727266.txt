@@ -1,0 +1,3 @@
+# Drop the crube-ja MCP server from the Claude Code settings ([8-4])
+.claude/
+	settings.json	Remove mcp__crube-ja and crube-ja: .mcp.json has one crube server that takes lang (edited by the human)

@@ -1,0 +1,3 @@
+# Claude Code の設定から MCP の crube-ja を外す（[8-4]）
+.claude/
+	settings.json	mcp__crube-ja と crube-ja を外す。.mcp.json の crube は1つで lang を受けるため（人間が編集）
