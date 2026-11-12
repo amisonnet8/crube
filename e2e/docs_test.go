@@ -198,13 +198,13 @@ func TestErrorExamples(t *testing.T) {
 			write(t, r, map[string]string{"build/x": "", ".crube/ignore": "build/\n"})
 			return r
 		}, []string{"show", "build/x"}},
-		"crube: .crube: .crube/ is always left out, even with --no-ignore":                                  {root, []string{"ls", ".crube", "--no-ignore"}},
-		`crube: unknown command "lss" (see crube --help)`:                                                   {nil, []string{"lss"}},
-		"crube: ls: unknown option --foo":                                                                   {nil, []string{"ls", "--foo"}},
-		"crube: ls: -C needs a value":                                                                       {nil, []string{"ls", "-C"}},
-		`crube: find: invalid --limit "x" (use a number of 1 or more)`:                                      {root, []string{"find", "--limit", "x", "q"}},
-		"crube: ls: too many arguments (usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore])": {nil, []string{"ls", "a", "b"}},
-		"crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--json] [-C <dir>])": {nil, []string{"set", "x"}},
+		"crube: .crube: .crube/ is always left out, even with --no-ignore":                                                 {root, []string{"ls", ".crube", "--no-ignore"}},
+		`crube: unknown command "lss" (see crube --help)`:                                                                  {nil, []string{"lss"}},
+		"crube: ls: unknown option --foo":                                                                                  {nil, []string{"ls", "--foo"}},
+		"crube: ls: -C needs a value":                                                                                      {nil, []string{"ls", "-C"}},
+		`crube: find: invalid --limit "x" (use a number of 1 or more)`:                                                     {root, []string{"find", "--limit", "x", "q"}},
+		"crube: ls: too many arguments (usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore] [--lang <tag>])": {nil, []string{"ls", "a", "b"}},
+		"crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--json] [-C <dir>] [--lang <tag>])": {nil, []string{"set", "x"}},
 	}
 
 	for _, l := range docLangs {

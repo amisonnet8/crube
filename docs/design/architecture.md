@@ -30,7 +30,7 @@ All the logic is in a core library, and the CLI and the MCP server are thin wrap
 | Module | Role |
 | --- | --- |
 | Store | Reads a structure file line by line and builds the tree. Writing outputs the whole file again in the canonical form |
-| Language | Picks, from `CRUBE_LANG`, the one structure file to read and edit |
+| Language | Picks, from `--lang` (`lang` in MCP) or `CRUBE_LANG`, the one structure file to read and edit |
 | Matching | Finds the entry that matches a real path (an exact match, or else the first `path.Match` from the top) |
 | Ignore | Evaluates `.crube/ignore` |
 | Diff engine | Compares the real directories with the structure, and finds untracked paths, orphans and coverage |

@@ -45,7 +45,7 @@ Instructions like these in the agent's rules (`.claude/` and the like) make it e
   update the descriptions with `crube set` / `crube mv` / `crube rm`.
 - If you moved or renamed files, move their descriptions with `crube mv <old path> <new path>`.
 - Write the desc in one line: what is there. Put the details in --detail.
-- If there are files for several languages, switch `CRUBE_LANG` and do the same for each language.
+- If there are files for several languages, do the same for each language, giving it with `--lang` (`lang` in MCP).
 ```
 
 ## When to run it

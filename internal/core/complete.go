@@ -6,6 +6,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/amisonnet8/crube/internal/lang"
+	"github.com/amisonnet8/crube/internal/project"
 )
 
 // Candidate is an entry path offered to complete the one being typed, with
@@ -80,6 +83,16 @@ func (p *Project) Complete(typed string, real bool) ([]Candidate, error) {
 		list = append(list, Candidate{Path: dir + name})
 	}
 	return list, nil
+}
+
+// Languages lists the languages that the project holding dir has a structure
+// file for, to offer as values of --lang (see lang.Tags).
+func Languages(dir string) ([]string, error) {
+	p, err := Open(Options{Dir: dir})
+	if err != nil {
+		return nil, err
+	}
+	return lang.Tags(project.Dir(p.Root))
 }
 
 // child is the names of name (an entry name, or a real name with "/" for a

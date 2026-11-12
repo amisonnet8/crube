@@ -15,6 +15,7 @@ var valueOptions = map[string]bool{
 	"--limit":   true,
 	"--detail":  true,
 	"--require": true,
+	"--lang":    true,
 }
 
 // parsed is a command line after the command name.

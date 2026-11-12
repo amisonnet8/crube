@@ -27,10 +27,11 @@
 | `--json` | 構造化出力（JSON） |
 | `-C <dir>` | 指定したディレクトリで実行したものとして動作する |
 | `--no-ignore` | 除外設定を無効にする（`.crube/` は除外したまま） |
+| `--lang <tag>` | 対象言語を指定する（`CRUBE_LANG` より優先。[言語](#言語)） |
 
 - オプションは、位置引数の前後どこに書いてもよい（`crube ls src --full`）。値をとるオプションは `--limit 3` でも `--limit=3` でもよい。
 - `--` より後ろは、すべて位置引数として読む（`crube set -- note.txt "-v flag help"`）。
-- `init` が受け付けるのは `-C` だけ。`set`・`rm`・`mv` は `--json` と `-C`（と各自のオプション）。`mcp` は `--allow-write` だけ。`completion` はオプションを受け付けない。
+- `init` が受け付けるのは `-C` と `--lang`。`set`・`rm`・`mv` は `--json`・`-C`・`--lang`（と各自のオプション）。`mcp` は `--allow-write` と `--lang`。`completion` はオプションを受け付けない。
 
 ## 使い方と版
 
@@ -51,10 +52,10 @@ commands:
   mcp         run as an MCP server over stdio
   completion  print a shell completion script
 
-common options: --json  -C <dir>  --no-ignore
+common options: --json  -C <dir>  --no-ignore  --lang <tag>
 
 $ crube ls -h
-usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore]
+usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore] [--lang <tag>]
 
 $ crube --version
 crube v0.1.0
@@ -66,11 +67,11 @@ crube v0.1.0
 
 ## 言語
 
-設定ファイルはありません。言語は環境変数 `CRUBE_LANG`（BCP 47。`ja`、`zh-CN` など）だけで指定します。
+設定ファイルはありません。言語（対象言語）は、オプション `--lang <tag>` か環境変数 `CRUBE_LANG`（どちらも BCP 47 の言語タグ。`ja`、`zh-CN` など）で指定します。`--lang` があればそれを、なければ `CRUBE_LANG` を使います。どちらもなければ英語です。
 
-どのコマンドも、環境変数 `CRUBE_LANG` の言語のファイル（`.crube/structure_<言語タグ>.txt`）を参照・編集します。`CRUBE_LANG` が未設定か `en` の場合、またはその言語のファイルがない場合は `.crube/structure.txt`（英語）を使います。使うファイルは常に 1 つです。
+どのコマンドも、対象言語のファイル（`.crube/structure_<言語タグ>.txt`）を参照・編集します。対象言語が英語（指定なしか `en`）の場合、またはその言語のファイルがない場合は `.crube/structure.txt`（英語）を使います。使うファイルは常に 1 つです。`CRUBE_LANG=ja` のまま英語の説明を見るときは、`crube tree --lang en` のように指定します。
 
-`CRUBE_LANG` の値はそのまま使います（`ja-JP` を `ja` に寄せたり、大文字・小文字をそろえたりしない）。言語タグの形（英数字 1〜8 字を `-` でつなぐ）でない値は、どのコマンドでもエラーです（`crube: invalid CRUBE_LANG "ja_JP" (use a language tag such as ja or zh-CN)`）。
+言語タグはそのまま使います（`ja-JP` を `ja` に寄せたり、大文字・小文字をそろえたりしない）。言語タグの形（英数字 1〜8 字を `-` でつなぐ）でない値は、どのコマンドでもエラーです（`crube: invalid --lang "ja_JP" (use a language tag such as ja or zh-CN)`。`CRUBE_LANG` なら `invalid CRUBE_LANG "ja_JP"`）。`--lang` を付けたときは、`CRUBE_LANG` は使わず、確かめもしません。
 
 ## エントリのパス
 
@@ -103,7 +104,7 @@ Windows では、エントリのパスの `\` も `/` として読みます（`s
 
 ## 出力の共通の決まり
 
-- crube 自身が出す文字（印・見出し・メッセージ）は英語だけです。`CRUBE_LANG` は structure ファイルの選択にだけ効きます。
+- crube 自身が出す文字（印・見出し・メッセージ）は英語だけです。対象言語（`--lang`・`CRUBE_LANG`）は structure ファイルの選択にだけ効きます。
 - エラーは標準エラー出力に `crube: <内容>` の 1 行で出し、終了コード 2 で終わります。`--json` を付けたときも同じです。structure ファイルの読み込みエラーには、ファイルと行番号を付けます。
 
 ```
@@ -122,8 +123,8 @@ crube: unknown command "lss" (see crube --help)
 crube: ls: unknown option --foo
 crube: ls: -C needs a value
 crube: find: invalid --limit "x" (use a number of 1 or more)
-crube: ls: too many arguments (usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore])
-crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--json] [-C <dir>])
+crube: ls: too many arguments (usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore] [--lang <tag>])
+crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--json] [-C <dir>] [--lang <tag>])
 ```
 
 ### JSON
@@ -138,13 +139,13 @@ crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--
 ## crube init
 
 ```
-crube init [-C <dir>]
+crube init [-C <dir>] [--lang <tag>]
 ```
 
 `.crube/` と、対象言語の structure ファイルを作ります。作成するのは `.crube/` とその中身だけです。
 
 - 上位へ探しても `.crube/` がなければ、指定ディレクトリに `.crube/` を作り、既定の `ignore` と空の `structure.txt` を置く。
-- `CRUBE_LANG` が英語以外なら、その言語の空ファイル `structure_<言語タグ>.txt` も作る。
+- 対象言語（`--lang`、なければ `CRUBE_LANG`）が英語以外なら、その言語の空ファイル `structure_<言語タグ>.txt` も作る。
 - すでに `.crube/` がある場合は、対象言語のファイルがなければそれだけを作る。言語ファイルを追加するときはこの使い方をする。
 - 作るものが何もなければエラー（終了コード 2）。
 
@@ -423,10 +424,10 @@ crube mv <from> <to> [--json]
 ## crube mcp
 
 ```
-crube mcp [--allow-write]
+crube mcp [--allow-write] [--lang <tag>]
 ```
 
-stdio の MCP サーバーとして起動します。`--allow-write` を付けたときだけ、書き込み系ツールを公開します。詳しくは [mcp_ja.md](mcp_ja.md) を参照してください。
+stdio の MCP サーバーとして起動します。`--allow-write` を付けたときだけ、書き込み系ツールを公開します。`--lang`（なければ `CRUBE_LANG`）は、ツールの呼び出しが `lang` を省いたときの言語です。詳しくは [mcp_ja.md](mcp_ja.md) を参照してください。
 
 ## crube completion
 
@@ -452,6 +453,7 @@ crube completion powershell >> $PROFILE
 | 1 語目 | コマンド（要約付き） |
 | `-` で始まる語 | そのコマンドが受け付けるオプションのうち、行にまだないものと `--help`（1 語目なら `--help`・`--version`） |
 | `--require` の値 | `all`・`dirs` |
+| `--lang` の値 | structure ファイルのある言語（`structure.txt` があれば `en`、続けて `structure_<言語タグ>.txt` の言語タグ） |
 | `tree` のパス、`set` のパス、`rm` のパス、`mv` の `from`・`to` | エントリのパス |
 | `completion` の次 | 4 つのシェル |
 
@@ -460,7 +462,7 @@ crube completion powershell >> $PROFILE
 - パターンのエントリ（`data/*.csv`）は、シェルに展開させないよう、引用符を付けて入れる（zsh と fish はエスケープする）。打ちかけの語の引用符とバックスラッシュは、取り除いてから候補を探す。
 - 等号の形（`--require=`）の後ろの値は、補完しないシェルがある。`--require <TAB>` と書く。
 - `-C` の値と、`ls`・`show` のパス（実在のパス）は、シェルのファイル補完に任せる。`-d`・`--limit`・`--detail` の値、desc、`find` の語は補完しない。
-- 行に `-C <dir>` があればそのディレクトリから、なければカレントディレクトリから `.crube/` を探す。desc は `CRUBE_LANG` の言語のファイルから出す。行の `--no-ignore` に従う。
+- 行に `-C <dir>` があればそのディレクトリから、なければカレントディレクトリから `.crube/` を探す。desc は、行の `--lang`（なければ `CRUBE_LANG`）の言語のファイルから出す。行の `--no-ignore` に従う。
 - `.crube/` がない、structure ファイルが読めないなどのときは、エントリのパスを出さないだけで、何も言わない（TAB のたびに警告が出ると、打っている行が崩れるため）。
 
 ### __complete

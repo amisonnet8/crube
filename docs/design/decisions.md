@@ -17,8 +17,9 @@ What was decided while designing crube, and why.
 | Git | Not depended on. Neither Git's information nor `.gitignore` is used | A simple specification, and the same result in every environment |
 | Number of `.crube/` | One per project, not nested | No rules on what each one covers or on inheriting settings |
 | Fields | Only desc and detail (both optional) | Entry points, other names and related paths can be written as text in the detail |
-| Settings file | None. The language is the `CRUBE_LANG` environment variable; everything else is a command option | No machinery to manage settings |
-| Languages | Just one independent file per language. The file of the `CRUBE_LANG` language is read and edited; without it, the English `structure.txt`. What matches what between languages is not managed | No tracking of translations, no fallback rules |
+| Settings file | None. The language is `--lang` or the `CRUBE_LANG` environment variable; everything else is a command option too | No machinery to manage settings |
+| Languages | Just one independent file per language. The file of the target language is read and edited; without it, the English `structure.txt`. What matches what between languages is not managed | No tracking of translations, no fallback rules |
+| Giving the language | `--lang` (in MCP, `lang` of each call) comes before `CRUBE_LANG`. Without a file for the language, either way, `structure.txt` | One MCP server can read and write the descriptions of every language (with `CRUBE_LANG` only, it takes a server per language; mtqg q 8f4a931b3a). How the language is given does not change the behavior |
 | Detecting moves | Not done. They are reported as orphans and untracked paths; the user moves the description with `mv` | The tool does not guess |
 | Search index | None. Every search reads the structure | No cache to manage |
 | Coverage | No default. status reports whether all / dirs match, and the user picks how far to require | The tool has no policy |
@@ -29,8 +30,8 @@ What was decided while designing crube, and why.
 | Names of MCP tools | Reading and maintenance tools have the CLI's names (`show` and so on). Only the writing tools have other names, such as `set_description` | No drift in behavior. The writing tools get names that cannot be taken for file operations |
 | Libraries | `golang.org/x/text/width` for display width, `golang.org/x/term` for the terminal width, the official Go SDK for MCP. Structure files and ignore are read with the standard library only | No tables or protocols of its own to keep up to date. Only official or near-official libraries |
 | Ambiguous width | Counted as 1 column (○, ① and the like). Combining and format characters (U+0301, U+200D and the like) are 0 columns | The default of most terminals |
-| Language of messages | crube itself prints only English. `CRUBE_LANG` only picks the structure file | No machinery for translations |
-| Matching `CRUBE_LANG` | Only whether `structure_<the value of CRUBE_LANG>.txt` exists. `ja-JP` is not brought to `ja` | No fallback rules |
+| Language of messages | crube itself prints only English. The target language only picks the structure file | No machinery for translations |
+| Matching language tags | Only whether `structure_<language tag>.txt` exists. `ja-JP` is not brought to `ja` | No fallback rules |
 | Matching of find | A case-insensitive substring match. Words separated by spaces are ANDed. Results are in the order of the structure file | People and AI can look things up without minding how they are written |
 | Format of ignore | All the rules of gitignore (`**`, `/` at the start or in the middle, `!`), implemented with the standard library only | A format people already know how to write |
 | Shape of JSON | Paths are relative to the root, separated by `/`. The desc and detail keys are always there, `""` when empty | The same output on every OS, and users need not mind whether a key is there |

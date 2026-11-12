@@ -44,7 +44,7 @@ var usage = func() string {
 	for _, name := range order {
 		fmt.Fprintf(&b, "  %-12s%s\n", name, commands[name].summary)
 	}
-	b.WriteString("\ncommon options: --json  -C <dir>  --no-ignore\n")
+	b.WriteString("\ncommon options: --json  -C <dir>  --no-ignore  --lang <tag>\n")
 	return b.String()
 }()
 
@@ -60,57 +60,57 @@ type command struct {
 }
 
 var (
-	readOptions = []string{"--json", "-C", "--no-ignore"}
-	editOptions = []string{"--json", "-C"}
+	readOptions = []string{"--json", "-C", "--no-ignore", "--lang"}
+	editOptions = []string{"--json", "-C", "--lang"}
 )
 
 var commands = map[string]*command{
 	"init": {
-		usage: "crube init [-C <dir>]", summary: "create .crube/", options: []string{"-C"},
+		usage: "crube init [-C <dir>] [--lang <tag>]", summary: "create .crube/", options: []string{"-C", "--lang"},
 		run: (*runner).init,
 	},
 	"ls": {
-		usage: "crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore]", summary: "list a directory with descriptions",
+		usage: "crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore] [--lang <tag>]", summary: "list a directory with descriptions",
 		options: append([]string{"--full"}, readOptions...), args: []string{"path"},
 		run: (*runner).ls,
 	},
 	"tree": {
-		usage: "crube tree [path] [-d N] [--json] [-C <dir>] [--no-ignore]", summary: "show the descriptions as a tree",
+		usage: "crube tree [path] [-d N] [--json] [-C <dir>] [--no-ignore] [--lang <tag>]", summary: "show the descriptions as a tree",
 		options: append([]string{"-d"}, readOptions...), args: []string{"path"},
 		run: (*runner).tree,
 	},
 	"find": {
-		usage: "crube find <query> [--limit N] [--json] [-C <dir>] [--no-ignore]", summary: "search paths and descriptions",
+		usage: "crube find <query> [--limit N] [--json] [-C <dir>] [--no-ignore] [--lang <tag>]", summary: "search paths and descriptions",
 		options: append([]string{"--limit"}, readOptions...), args: []string{"query"}, min: 1, variadic: true,
 		run: (*runner).find,
 	},
 	"show": {
-		usage: "crube show <path> [--json] [-C <dir>] [--no-ignore]", summary: "show the description of one path",
+		usage: "crube show <path> [--json] [-C <dir>] [--no-ignore] [--lang <tag>]", summary: "show the description of one path",
 		options: readOptions, args: []string{"path"}, min: 1,
 		run: (*runner).show,
 	},
 	"status": {
-		usage: "crube status [--require all|dirs] [--json] [-C <dir>] [--no-ignore]", summary: "report untracked, orphan and invalid entries",
+		usage: "crube status [--require all|dirs] [--json] [-C <dir>] [--no-ignore] [--lang <tag>]", summary: "report untracked, orphan and invalid entries",
 		options: append([]string{"--require"}, readOptions...),
 		run:     (*runner).status,
 	},
 	"set": {
-		usage: "crube set <path> <desc> [--detail <text>] [--json] [-C <dir>]", summary: "add or change a description",
+		usage: "crube set <path> <desc> [--detail <text>] [--json] [-C <dir>] [--lang <tag>]", summary: "add or change a description",
 		options: append([]string{"--detail"}, editOptions...), args: []string{"path", "desc"}, min: 2,
 		run: (*runner).set,
 	},
 	"rm": {
-		usage: "crube rm <path> [--json] [-C <dir>]", summary: "remove a description",
+		usage: "crube rm <path> [--json] [-C <dir>] [--lang <tag>]", summary: "remove a description",
 		options: editOptions, args: []string{"path"}, min: 1,
 		run: (*runner).rm,
 	},
 	"mv": {
-		usage: "crube mv <from> <to> [--json] [-C <dir>]", summary: "move a description",
+		usage: "crube mv <from> <to> [--json] [-C <dir>] [--lang <tag>]", summary: "move a description",
 		options: editOptions, args: []string{"from", "to"}, min: 2,
 		run: (*runner).mv,
 	},
 	"mcp": {
-		usage: "crube mcp [--allow-write]", summary: "run as an MCP server over stdio", options: []string{"--allow-write"},
+		usage: "crube mcp [--allow-write] [--lang <tag>]", summary: "run as an MCP server over stdio", options: []string{"--allow-write", "--lang"},
 		run: (*runner).mcp,
 	},
 	"completion": {
@@ -204,11 +204,20 @@ type runner struct {
 	cmd string
 }
 
+// lang is the target language: --lang, else CRUBE_LANG.
+func (r *runner) lang(p *parsed) (string, error) {
+	return lang.Pick(p.opts["--lang"], "--lang", r.env.Getenv(lang.EnvVar))
+}
+
 // open finds the project from the common options.
 func (r *runner) open(p *parsed) (*core.Project, error) {
+	tag, err := r.lang(p)
+	if err != nil {
+		return nil, err
+	}
 	return core.Open(core.Options{
 		Dir:      p.opts["-C"],
-		Lang:     r.env.Getenv(lang.EnvVar),
+		Lang:     tag,
 		NoIgnore: p.has("--no-ignore"),
 	})
 }
@@ -241,7 +250,11 @@ func (r *runner) output(p *parsed, v any, text func(b *strings.Builder, width in
 }
 
 func (r *runner) init(p *parsed) (int, error) {
-	made, err := core.Init(p.opts["-C"], r.env.Getenv(lang.EnvVar))
+	tag, err := r.lang(p)
+	if err != nil {
+		return 0, err
+	}
+	made, err := core.Init(p.opts["-C"], tag)
 	for _, m := range made {
 		if _, werr := fmt.Fprintln(r.env.Stdout, "created", m); werr != nil {
 			return 0, werr
@@ -383,10 +396,11 @@ func (r *runner) edited(p *parsed, v any) error {
 }
 
 // mcp runs the MCP server over stdio until the client closes it. The language
-// is checked first, so that a wrong CRUBE_LANG stops the server at once.
+// (the one the tools use when a call gives none) is checked first, so that a
+// wrong --lang or CRUBE_LANG stops the server at once.
 func (r *runner) mcp(p *parsed) (int, error) {
-	tag := r.env.Getenv(lang.EnvVar)
-	if err := lang.Check(tag); err != nil {
+	tag, err := r.lang(p)
+	if err != nil {
 		return 0, err
 	}
 	return exitOK, mcpserver.Run(context.Background(), mcpserver.Options{

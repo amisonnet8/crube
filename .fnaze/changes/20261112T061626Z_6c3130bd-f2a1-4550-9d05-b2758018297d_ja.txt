@@ -1,0 +1,52 @@
+# CLI に --lang、MCP の道具に lang を足す（[8-3]）
+.mtqg/
+	journal.jsonl	mtqg：メモ 8f2d2a4fd4、todo [8-3] を完了、用語集 517ac642ff・77c3f458fc・457b6cf9ce を直した
+.claude/
+	rules/
+		directory-structure.md	lang/ は --lang か CRUBE_LANG からファイルを決める、と直した
+		naming.md	言語のオプション --lang（MCP は lang）を CRUBE_LANG と並べて書いた
+	skills/
+		mutation-check/
+			crube-spec.txt	言語の決め方の変異を8件足した
+docs/
+	design/
+		decisions.md	言語の指定の行を足し、CRUBE_LANG の行を対象言語の書き方に直した
+		decisions_ja.md	decisions.md と同じ変更（日本語）
+		architecture.md	言語選択は --lang か CRUBE_LANG から決める
+		architecture_ja.md	architecture.md と同じ変更（日本語）
+		data-model.md	対象言語は --lang、なければ CRUBE_LANG
+		data-model_ja.md	data-model.md と同じ変更（日本語）
+		overview.md	対象言語：--lang、なければ CRUBE_LANG
+		overview_ja.md	overview.md と同じ変更（日本語）
+	reference/
+		cli.md	--lang：共通オプション・言語の節・init・mcp・ヘルプ・エラー文・補完
+		cli_ja.md	cli.md と同じ変更（日本語）
+		mcp.md	サーバーの言語を --lang から、各道具の lang を書いた
+		mcp_ja.md	mcp.md と同じ変更（日本語）
+	README.md	CLI のページの案内に言語（--lang・CRUBE_LANG）と書いた
+	README_ja.md	docs/README.md と同じ変更（日本語）
+	examples/
+		ai-workflow.md	複数の言語は --lang（MCP は lang）で指定する
+		ai-workflow_ja.md	ai-workflow.md と同じ変更（日本語）
+internal/
+	core/
+		complete.go	Languages が補完のための言語を出す
+		core.go	コメント：Lang は lang.Pick が決めた言語
+	mcpserver/
+		server_test.go	呼び出しの lang がサーバーの言語より先
+		server.go	各道具が lang を受ける。set・move の説明を / を省ける動きに合わせた
+	cli/
+		cli_test.go	書式に --lang。--lang が CRUBE_LANG より先にファイルを決めることを確かめる
+		complete.go	補完が行の --lang を読み、その値に言語を出す
+		complete_test.go	補完の --lang のテスト
+		args.go	--lang は値をとる
+		cli.go	--lang を言語を扱う全コマンドで受け、lang.Pick で決める
+	lang/
+		lang.go	Pick（引数を CRUBE_LANG より先に）と Tags（ファイルのある言語）
+		lang_test.go	Pick と Tags のテスト
+CLAUDE.md	守ること：言語は --lang か CRUBE_LANG、と直した
+README.md	言語は --lang か CRUBE_LANG で切り替える、と直した
+README_ja.md	README.md と同じ変更（日本語）
+e2e/
+	docs_test.go	エラー文の例の書式に --lang が入った
+	mcp_test.go	lang と、末尾の / の無いパスで、CLI と MCP が一致することを確かめる

@@ -94,6 +94,7 @@ type position struct {
 	args     int    // the positional arguments so far
 	dashdash bool   // after "--": no option can come any more
 	dir      string // the value of -C
+	lang     string // the value of --lang
 	noIgnore bool
 }
 
@@ -107,8 +108,11 @@ func walk(words []string) position {
 			if w == "=" {
 				continue // bash splits --require=all into three words
 			}
-			if p.pending == "-C" {
+			switch p.pending {
+			case "-C":
 				p.dir = w
+			case "--lang":
+				p.lang = w
 			}
 			p.pending = ""
 		case p.name == "":
@@ -125,6 +129,8 @@ func walk(words []string) position {
 			switch {
 			case name == "-C" && hasValue:
 				p.dir = value
+			case name == "--lang" && hasValue:
+				p.lang = value
 			case valueOptions[name] && !hasValue:
 				p.pending = name
 			case name == "--no-ignore":
@@ -152,6 +158,11 @@ func candidatesAt(p position, word string, env Env) []candidate {
 	case p.cmd == nil:
 	case p.pending == "--require":
 		list = []candidate{{value: "all"}, {value: "dirs"}}
+	case p.pending == "--lang":
+		tags, _ := core.Languages(p.dir) // none when there is no project
+		for _, tag := range tags {
+			list = append(list, candidate{value: tag})
+		}
 	case p.pending != "":
 		// A number, a text, or a directory, which the shell knows about.
 	case option:
@@ -189,7 +200,11 @@ func takesEntryPath(name string, i int) bool {
 // file that does not parse) is no candidates: a message at every TAB would
 // break the line being typed.
 func entryCandidates(p position, word string, env Env) []candidate {
-	proj, err := core.Open(core.Options{Dir: p.dir, Lang: env.Getenv(lang.EnvVar), NoIgnore: p.noIgnore})
+	tag, err := lang.Pick(p.lang, "--lang", env.Getenv(lang.EnvVar))
+	if err != nil {
+		return nil
+	}
+	proj, err := core.Open(core.Options{Dir: p.dir, Lang: tag, NoIgnore: p.noIgnore})
 	if err != nil {
 		return nil
 	}

@@ -42,7 +42,7 @@ crube attaches descriptions to the files and directories of a project, keeps the
 - 📝 **Text people can read**: one file that writes the directory structure indented with tabs. Diffs are easy to review
 - 🩺 **Freshness checks**: `status` reports untracked paths, orphans and values over the limit. In CI, `--require all|dirs` can stop a build
 - 🔌 **A built-in MCP server**: with `crube mcp`, AI agents without a shell get the same features
-- 🌐 **Many languages**: one independent file per language (`structure_ja.txt` and so on), switched with `CRUBE_LANG`
+- 🌐 **Many languages**: one independent file per language (`structure_ja.txt` and so on), switched with `--lang` or `CRUBE_LANG`
 - 📦 **A single binary, no Git needed**: written in Go. It uses neither Git nor `.gitignore`, and gives the same result anywhere
 
 <a id="install"></a>

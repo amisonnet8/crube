@@ -26,7 +26,7 @@
 │   ├── cli/                ← CLI（引数の解析、`core`の呼び出し、出力・エラー文・終了コード、シェル補完）。判定は`core`に任せる。`completions/`は埋め込む補完スクリプト
 │   ├── core/               ← CLIとMCPが呼ぶ操作（init・set・rm・mv、参照の操作）。ほかのパッケージを組み合わせる
 │   ├── ignore/             ← `.crube/ignore`の除外判定（gitignore と同じ書式）と、init が書く既定の中身
-│   ├── lang/               ← `CRUBE_LANG`から使う structure ファイルを1つ決める
+│   ├── lang/               ← `--lang`（MCP は`lang`）か`CRUBE_LANG`から、使う structure ファイルを1つ決める
 │   ├── mcpserver/          ← MCPサーバー（`crube mcp`。公式のGo SDK）。各ツールは`core`を呼ぶだけ
 │   ├── match/              ← 照合（実在のパスに当たるエントリ。完全一致→`path.Match`を書いた順）
 │   ├── project/            ← `.crube/`の探索と、`.crube/`への書き込み（書き込みガード）。**`.crube/`に書くのはここだけ**

@@ -1,0 +1,52 @@
+# Add --lang to the CLI and lang to the MCP tools ([8-3])
+.mtqg/
+	journal.jsonl	mtqg: memo 8f2d2a4fd4, todo [8-3] done, glossary 517ac642ff, 77c3f458fc and 457b6cf9ce edited
+.claude/
+	rules/
+		directory-structure.md	lang/ picks the file from --lang or CRUBE_LANG
+		naming.md	The language option --lang (lang in MCP) next to CRUBE_LANG
+	skills/
+		mutation-check/
+			crube-spec.txt	Added 8 mutations of the language choice
+docs/
+	design/
+		decisions.md	Added how the language is given; rows on CRUBE_LANG now say the target language
+		decisions_ja.md	Same as decisions.md, in Japanese
+		architecture.md	The language module picks from --lang or CRUBE_LANG
+		architecture_ja.md	Same as architecture.md, in Japanese
+		data-model.md	The target language: --lang, else CRUBE_LANG
+		data-model_ja.md	Same as data-model.md, in Japanese
+		overview.md	Target language: --lang, else CRUBE_LANG
+		overview_ja.md	Same as overview.md, in Japanese
+	reference/
+		cli.md	--lang: common options, the language section, init, mcp, help, errors and completion
+		cli_ja.md	Same as cli.md, in Japanese
+		mcp.md	The server's language from --lang, and lang of each tool
+		mcp_ja.md	Same as mcp.md, in Japanese
+	README.md	The CLI page covers the language (--lang, CRUBE_LANG)
+	README_ja.md	Same as docs/README.md, in Japanese
+	examples/
+		ai-workflow.md	Several languages: give each with --lang (lang in MCP)
+		ai-workflow_ja.md	Same as ai-workflow.md, in Japanese
+internal/
+	core/
+		complete.go	Languages lists the languages for completion
+		core.go	Comment: Lang is the language lang.Pick chose
+	mcpserver/
+		server_test.go	lang of a call comes before the server's
+		server.go	Each tool takes lang; descriptions of set and move fit the optional /
+	cli/
+		cli_test.go	Usage strings with --lang; --lang picks the file before CRUBE_LANG
+		complete.go	Completion reads --lang on the line and offers languages as its value
+		complete_test.go	Tests of --lang in completion
+		args.go	--lang takes a value
+		cli.go	--lang on every command that works on a language, through lang.Pick
+	lang/
+		lang.go	Pick (argument before CRUBE_LANG) and Tags (languages with a file)
+		lang_test.go	Tests of Pick and Tags
+CLAUDE.md	Core rule: the language is --lang or CRUBE_LANG
+README.md	Languages are switched with --lang or CRUBE_LANG
+README_ja.md	Same as README.md, in Japanese
+e2e/
+	docs_test.go	The usage in the error examples has --lang
+	mcp_test.go	CLI and MCP agree with lang, and on a path without a trailing /

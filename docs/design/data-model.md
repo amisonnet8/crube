@@ -69,7 +69,7 @@ There is just one structure file per language. Nothing ties the files to each ot
 | `structure.txt` | English (the default) |
 | `structure_<language tag>.txt` | That language (for example `structure_ja.txt`) |
 
-- The **target language** is given by the `CRUBE_LANG` environment variable. Unset, or `en`, it is English.
+- The **target language** is given by the `--lang` option (the argument `lang` in MCP), or else the `CRUBE_LANG` environment variable. With neither, or with `en`, it is English.
 - If there is a file for the target language, reading and editing use only that file.
 - If there is no file for the target language (none has been made), reading and editing use `structure.txt`.
 - The switch is per file. Languages never mix in one view.

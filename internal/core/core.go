@@ -20,7 +20,7 @@ import (
 // Options are what every operation on a project starts from.
 type Options struct {
 	Dir      string // where to start looking for .crube/ (-C); "" is the current directory
-	Lang     string // the value of CRUBE_LANG
+	Lang     string // the target language, as lang.Pick chose it (--lang, lang of MCP, or CRUBE_LANG)
 	NoIgnore bool   // --no-ignore
 }
 

@@ -45,7 +45,7 @@ How to work and what to know are left to the agent's own rules (`.claude/` and t
 | entry | One line of a structure file: a name (of a file or directory, or a pattern) with its description (desc and detail) |
 | project root | The directory where `.crube/` is |
 | pattern | The name of an entry, such as `*.csv`, that matches several names directly in the same directory |
-| target language | The language given by the `CRUBE_LANG` environment variable. Reading and editing use the file of this language |
+| target language | The language given by the `--lang` option (the argument `lang` in MCP), or else the `CRUBE_LANG` environment variable. Reading and editing use the file of this language |
 | default language | English, written in `structure.txt`. It is used when there is no file for the target language |
 | untracked path | A path that exists but has no description |
 | orphan entry | An entry with a description whose path does not exist |

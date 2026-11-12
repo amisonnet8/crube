@@ -135,7 +135,7 @@ func TestUsage(t *testing.T) {
 		}
 	}
 	code, out, errs = run(t, "", "ls", "-h")
-	if code != 0 || out != "usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore]\n" || errs != "" {
+	if code != 0 || out != "usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore] [--lang <tag>]\n" || errs != "" {
 		t.Errorf("ls -h: %d %q %q", code, out, errs)
 	}
 }
@@ -185,12 +185,16 @@ func TestArgumentErrors(t *testing.T) {
 		{[]string{"--json", "ls"}, `crube: unknown command "--json" (see crube --help)` + "\n"},
 		{[]string{"ls", "--foo"}, "crube: ls: unknown option --foo\n"},
 		{[]string{"ls", "-C"}, "crube: ls: -C needs a value\n"},
-		{[]string{"ls", "a", "b"}, "crube: ls: too many arguments (usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore])\n"},
-		{[]string{"set", "x"}, "crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--json] [-C <dir>])\n"},
-		{[]string{"find"}, "crube: find: missing <query> (usage: crube find <query> [--limit N] [--json] [-C <dir>] [--no-ignore])\n"},
-		{[]string{"show"}, "crube: show: missing <path> (usage: crube show <path> [--json] [-C <dir>] [--no-ignore])\n"},
-		{[]string{"rm"}, "crube: rm: missing <path> (usage: crube rm <path> [--json] [-C <dir>])\n"},
-		{[]string{"mv", "x"}, "crube: mv: missing <to> (usage: crube mv <from> <to> [--json] [-C <dir>])\n"},
+		{[]string{"ls", "a", "b"}, "crube: ls: too many arguments (usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore] [--lang <tag>])\n"},
+		{[]string{"set", "x"}, "crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--json] [-C <dir>] [--lang <tag>])\n"},
+		{[]string{"find"}, "crube: find: missing <query> (usage: crube find <query> [--limit N] [--json] [-C <dir>] [--no-ignore] [--lang <tag>])\n"},
+		{[]string{"show"}, "crube: show: missing <path> (usage: crube show <path> [--json] [-C <dir>] [--no-ignore] [--lang <tag>])\n"},
+		{[]string{"rm"}, "crube: rm: missing <path> (usage: crube rm <path> [--json] [-C <dir>] [--lang <tag>])\n"},
+		{[]string{"mv", "x"}, "crube: mv: missing <to> (usage: crube mv <from> <to> [--json] [-C <dir>] [--lang <tag>])\n"},
+		{[]string{"ls", "--lang", "ja_JP"}, "crube: invalid --lang \"ja_JP\" (use a language tag such as ja or zh-CN)\n"},
+		{[]string{"init", "--lang=ja_JP"}, "crube: invalid --lang \"ja_JP\" (use a language tag such as ja or zh-CN)\n"},
+		{[]string{"mcp", "--lang", "ja_JP"}, "crube: invalid --lang \"ja_JP\" (use a language tag such as ja or zh-CN)\n"},
+		{[]string{"ls", "--lang"}, "crube: ls: --lang needs a value\n"},
 		{[]string{"init", "--json"}, "crube: init: unknown option --json\n"},
 		{[]string{"completion"}, "crube: completion: missing <shell> (usage: crube completion <shell>)\n"},
 		{[]string{"completion", "tcsh"}, `crube: completion: unknown shell "tcsh" (use bash, zsh, fish or powershell)` + "\n"},
@@ -467,4 +471,43 @@ func TestStatusExitCode(t *testing.T) {
 		want    int
 	}{{"", 1}, {"dirs", 1}}
 	check("orphan")
+}
+
+// --lang chooses the structure file, before CRUBE_LANG; a language without a
+// file uses structure.txt, as CRUBE_LANG does.
+func TestLangOption(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(dir, ".crube"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	files := map[string]string{"structure.txt": "a\tA\n", "structure_ja.txt": "a\tエー\n"}
+	for name, content := range files {
+		if err := os.WriteFile(filepath.Join(dir, ".crube", name), []byte(content), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	read := func(name string) string {
+		t.Helper()
+		b, err := os.ReadFile(filepath.Join(dir, ".crube", name))
+		if err != nil {
+			t.Fatal(err)
+		}
+		return string(b)
+	}
+
+	if code, out, errs := run(t, "ja", "tree", "-C", dir, "--lang", "en"); code != 0 || out != "  a   A\n" {
+		t.Errorf("tree --lang en with CRUBE_LANG=ja: %d %q %q", code, out, errs)
+	}
+	if code, _, errs := run(t, "", "set", "b", "B", "-C", dir, "--lang", "ja"); code != 0 {
+		t.Fatal(errs)
+	}
+	if code, _, errs := run(t, "", "set", "c", "C", "-C", dir, "--lang", "fr"); code != 0 {
+		t.Fatal(errs)
+	}
+	if got := read("structure_ja.txt"); got != "a\tエー\nb\tB\n" {
+		t.Errorf("structure_ja.txt: %q", got)
+	}
+	if got := read("structure.txt"); got != "a\tA\nc\tC\n" {
+		t.Errorf("structure.txt: %q", got)
+	}
 }

@@ -55,6 +55,8 @@ func TestMCPSameAsCLI(t *testing.T) {
 		{"status", nil, []string{"status"}},
 		{"show", map[string]any{"path": "src/nope.go"}, []string{"show", "src/nope.go"}},
 		{"tree", map[string]any{"path": "nope/"}, []string{"tree", "nope/"}},
+		{"tree", map[string]any{"path": "src", "lang": "en"}, []string{"tree", "src", "--lang", "en"}},
+		{"find", map[string]any{"query": "session", "lang": "ja"}, []string{"find", "session", "--lang", "ja"}}, // no ja file: structure.txt
 		{"set_description", map[string]any{"path": "src/db/", "desc": "Database", "detail": "SQLite"},
 			[]string{"set", "src/db/", "Database", "--detail", "SQLite"}},
 		{"set_description", map[string]any{"path": "x", "desc": strings.Repeat("x", 300)},

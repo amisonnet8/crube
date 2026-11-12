@@ -1,6 +1,6 @@
-// Package lang decides which structure file to read and write from the value
-// of CRUBE_LANG (docs/design/data-model.md "Languages: one independent file
-// per language").
+// Package lang decides which structure file to read and write from the target
+// language: --lang of the CLI or lang of an MCP tool, else CRUBE_LANG
+// (docs/design/data-model.md "Languages: one independent file per language").
 //
 // Each language has a file of its own: structure.txt for English (the
 // default) and structure_<tag>.txt for any other language. Exactly one file is
@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 // EnvVar is the environment variable that names the target language.
@@ -36,10 +37,49 @@ func IsDefault(tag string) bool {
 
 // Check reports whether tag can be used as the value of CRUBE_LANG.
 func Check(tag string) error {
+	return check(EnvVar, tag)
+}
+
+func check(name, tag string) error {
 	if IsDefault(tag) || tagPattern.MatchString(tag) {
 		return nil
 	}
-	return fmt.Errorf("invalid %s %q (use a language tag such as ja or zh-CN)", EnvVar, tag)
+	return fmt.Errorf("invalid %s %q (use a language tag such as ja or zh-CN)", name, tag)
+}
+
+// Pick decides the target language: arg, the language given with the call
+// (--lang of the CLI, lang of an MCP tool; named name in errors), when it is
+// not empty, else env, the value of CRUBE_LANG. Either way the tag is
+// checked, and "" means the default language.
+func Pick(arg, name, env string) (string, error) {
+	if arg != "" {
+		return arg, check(name, arg)
+	}
+	return env, Check(env)
+}
+
+// Tags lists the languages that have a structure file in dir (.crube/):
+// "en" first when structure.txt is there, then the tags of the
+// structure_<tag>.txt files in name order. Other files are left out.
+func Tags(dir string) ([]string, error) {
+	list, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+	var tags []string
+	for _, de := range list {
+		name := de.Name()
+		if name == DefaultFile {
+			tags = append([]string{"en"}, tags...)
+			continue
+		}
+		rest, prefixed := strings.CutPrefix(name, "structure_")
+		tag, suffixed := strings.CutSuffix(rest, ".txt")
+		if prefixed && suffixed && !de.IsDir() && tagPattern.MatchString(tag) && !IsDefault(tag) {
+			tags = append(tags, tag)
+		}
+	}
+	return tags, nil
 }
 
 // FileName returns the name of the structure file of the language tag, in

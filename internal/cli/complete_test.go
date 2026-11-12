@@ -56,11 +56,12 @@ func TestComplete(t *testing.T) {
 		{"", []string{"--word=", "--", "--help"}, ""},
 
 		// Options: those of the command not on the line yet, and --help.
-		{"", []string{"--word=-", "--", "ls"}, "--full\n--json\n-C\n--no-ignore\n--help\n"},
-		{"", []string{"--word=--", "--", "ls", "--json", "-h"}, "--full\n--no-ignore\n"},
-		{"", []string{"--word=-", "--", "status", "--require=all", "-C=x"}, "--json\n--no-ignore\n--help\n"},
-		{"", []string{"--word=-", "--", "init"}, "-C\n--help\n"},
-		{"", []string{"--word=-", "--", "mcp"}, "--allow-write\n--help\n"},
+		{"", []string{"--word=-", "--", "ls"}, "--full\n--json\n-C\n--no-ignore\n--lang\n--help\n"},
+		{"", []string{"--word=--", "--", "ls", "--json", "-h"}, "--full\n--no-ignore\n--lang\n"},
+		{"", []string{"--word=-", "--", "status", "--require=all", "-C=x"}, "--json\n--no-ignore\n--lang\n--help\n"},
+		{"", []string{"--word=-", "--", "status", "--lang=ja"}, "--require\n--json\n-C\n--no-ignore\n--help\n"},
+		{"", []string{"--word=-", "--", "init"}, "-C\n--lang\n--help\n"},
+		{"", []string{"--word=-", "--", "mcp"}, "--allow-write\n--lang\n--help\n"},
 		{"", []string{"--word=-", "--", "completion"}, "--help\n"},
 		{"", []string{"--word=-", "--", "rm", "--"}, ""},
 
@@ -91,6 +92,15 @@ func TestComplete(t *testing.T) {
 		{"", []string{"--word=", "--", "set", "-C", dir, "-"}, ""}, // a lone - is a path, as parse reads it
 		{"", []string{"--word=", "--", "tree", "--no-ignore", "-C", dir}, "src/\tSource\ndata/\tData\nbuild/\tOutput\n"},
 		{"ja", []string{"--word=", "--", "tree", "-C", dir}, "src/\tソース\n"},
+		{"", []string{"--word=", "--", "tree", "-C", dir, "--lang", "ja"}, "src/\tソース\n"},
+		{"", []string{"--word=", "--", "tree", "-C", dir, "--lang=ja"}, "src/\tソース\n"},
+		{"ja", []string{"--word=", "--", "tree", "-C", dir, "--lang", "en"}, "src/\tSource\ndata/\tData\n"},
+		{"", []string{"--word=", "--", "tree", "-C", dir, "--lang", "ja_JP"}, ""},
+
+		// The languages that have a structure file, as values of --lang.
+		{"", []string{"--word=", "--", "tree", "-C", dir, "--lang"}, "en\nja\n"},
+		{"", []string{"--word=j", "--", "set", "-C", dir, "--lang"}, "ja\n"},
+		{"", []string{"--word=", "--", "init", "-C", t.TempDir(), "--lang"}, ""},
 		{"", []string{"--word=", "--", "ls", "-C", dir}, ""},
 		{"", []string{"--word=", "--", "show", "-C", dir}, ""},
 		{"", []string{"--word=", "--", "find", "-C", dir}, ""},

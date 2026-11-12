@@ -10,6 +10,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
 	"github.com/amisonnet8/crube/internal/core"
+	"github.com/amisonnet8/crube/internal/lang"
 	"github.com/amisonnet8/crube/internal/search"
 	"github.com/amisonnet8/crube/internal/status"
 )
@@ -17,7 +18,7 @@ import (
 // Options are what the server runs with.
 type Options struct {
 	Dir        string // where to look for .crube/ from; "" is the current directory
-	Lang       string // the value of CRUBE_LANG when the server started
+	Lang       string // the language when a call gives none: --lang or CRUBE_LANG when the server started
 	AllowWrite bool   // --allow-write: add the tools that write descriptions
 	Version    string
 }
@@ -27,38 +28,46 @@ type Options struct {
 type treeIn struct {
 	Path  string `json:"path,omitempty" jsonschema:"an entry path (such as src/ or data/*.csv): show only that entry and what is below it"`
 	Depth int    `json:"depth,omitempty" jsonschema:"the number of levels to show; 0 or omitted for all"`
+	Lang  string `json:"lang,omitempty" jsonschema:"the language of the descriptions (a language tag such as ja); omitted for the language the server started with"`
 }
 
 type lsIn struct {
 	Path string `json:"path,omitempty" jsonschema:"a directory, relative to the project root; omitted for the root"`
+	Lang string `json:"lang,omitempty" jsonschema:"the language of the descriptions (a language tag such as ja); omitted for the language the server started with"`
 }
 
 type findIn struct {
 	Query string `json:"query" jsonschema:"words to find, separated by spaces; all of them must be found"`
 	Limit int    `json:"limit,omitempty" jsonschema:"the most results to return; 0 or omitted for all"`
+	Lang  string `json:"lang,omitempty" jsonschema:"the language of the descriptions (a language tag such as ja); omitted for the language the server started with"`
 }
 
 type showIn struct {
 	Path string `json:"path" jsonschema:"an existing path, relative to the project root"`
+	Lang string `json:"lang,omitempty" jsonschema:"the language of the descriptions (a language tag such as ja); omitted for the language the server started with"`
 }
 
 type statusIn struct {
 	Kinds []string `json:"kinds,omitempty" jsonschema:"report only these kinds: untracked, orphan, invalid; omitted for all"`
+	Lang  string   `json:"lang,omitempty" jsonschema:"the language of the descriptions (a language tag such as ja); omitted for the language the server started with"`
 }
 
 type setIn struct {
-	Path   string  `json:"path" jsonschema:"the entry path: a name per level joined with /, a directory ending in / (src/auth/), the last name may be a pattern (data/*.csv)"`
+	Path   string  `json:"path" jsonschema:"the entry path: a name per level joined with / (src/auth/; the last / may be left out unless the directory entry is new), the last name may be a pattern (data/*.csv)"`
 	Desc   string  `json:"desc" jsonschema:"one line: what is there"`
 	Detail *string `json:"detail,omitempty" jsonschema:"more lines; omitted keeps the detail as it is, an empty string removes it"`
+	Lang   string  `json:"lang,omitempty" jsonschema:"the language of the descriptions (a language tag such as ja); omitted for the language the server started with"`
 }
 
 type removeIn struct {
 	Path string `json:"path" jsonschema:"the entry path to remove, with every entry below it"`
+	Lang string `json:"lang,omitempty" jsonschema:"the language of the descriptions (a language tag such as ja); omitted for the language the server started with"`
 }
 
 type moveIn struct {
 	From string `json:"from" jsonschema:"the entry path the description is at now"`
-	To   string `json:"to" jsonschema:"the entry path to move it to (a directory entry stays a directory entry)"`
+	To   string `json:"to" jsonschema:"the entry path to move it to; without a trailing /, of the same kind as from"`
+	Lang string `json:"lang,omitempty" jsonschema:"the language of the descriptions (a language tag such as ja); omitted for the language the server started with"`
 }
 
 // treeSchema is the output schema of tree, written by hand: the SDK cannot
@@ -99,7 +108,7 @@ func New(o Options) *mcp.Server {
 		if err := atLeastZero("depth", in.Depth); err != nil {
 			return nil, nil, err
 		}
-		p, err := open(o)
+		p, err := open(o, in.Lang)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -115,7 +124,7 @@ func New(o Options) *mcp.Server {
 		if err := atLeastZero("limit", in.Limit); err != nil {
 			return nil, nil, err
 		}
-		p, err := open(o)
+		p, err := open(o, in.Lang)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -127,7 +136,7 @@ func New(o Options) *mcp.Server {
 		Name:        "ls",
 		Description: "List a directory of the project with the description of each item. path is relative to the project root.",
 	}, func(_ context.Context, _ *mcp.CallToolRequest, in lsIn) (*mcp.CallToolResult, *core.LsResult, error) {
-		p, err := open(o)
+		p, err := open(o, in.Lang)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -139,7 +148,7 @@ func New(o Options) *mcp.Server {
 		Name:        "show",
 		Description: "Show the desc and detail of one existing path.",
 	}, func(_ context.Context, _ *mcp.CallToolRequest, in showIn) (*mcp.CallToolResult, *core.ShowResult, error) {
-		p, err := open(o)
+		p, err := open(o, in.Lang)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -152,7 +161,7 @@ func New(o Options) *mcp.Server {
 		Description: "Report paths without a description (untracked), descriptions of paths that are gone (orphan), " +
 			"values over the limits (invalid), and coverage.",
 	}, func(_ context.Context, _ *mcp.CallToolRequest, in statusIn) (*mcp.CallToolResult, *status.Report, error) {
-		p, err := open(o)
+		p, err := open(o, in.Lang)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -174,7 +183,7 @@ func New(o Options) *mcp.Server {
 		Name:        "set_description",
 		Description: "Add or change the description of an entry. Writes only .crube/; no project file is touched.",
 	}, func(_ context.Context, _ *mcp.CallToolRequest, in setIn) (*mcp.CallToolResult, *core.SetResult, error) {
-		p, err := open(o)
+		p, err := open(o, in.Lang)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -186,7 +195,7 @@ func New(o Options) *mcp.Server {
 		Name:        "remove_description",
 		Description: "Remove the description of an entry and of everything below it. The file itself is not deleted.",
 	}, func(_ context.Context, _ *mcp.CallToolRequest, in removeIn) (*mcp.CallToolResult, *core.RemoveResult, error) {
-		p, err := open(o)
+		p, err := open(o, in.Lang)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -198,7 +207,7 @@ func New(o Options) *mcp.Server {
 		Name:        "move_description",
 		Description: "Move a description (and those below it) to a new path after a file was moved. The file is not moved.",
 	}, func(_ context.Context, _ *mcp.CallToolRequest, in moveIn) (*mcp.CallToolResult, *core.MoveResult, error) {
-		p, err := open(o)
+		p, err := open(o, in.Lang)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -216,8 +225,13 @@ func Run(ctx context.Context, o Options) error {
 
 // open finds the project for one call, so that changes to .crube/ between
 // calls are seen. Real paths and entry paths are read from the project root.
-func open(o Options) (*core.Project, error) {
-	p, err := core.Open(core.Options{Dir: o.Dir, Lang: o.Lang})
+// The language is the call's lang, else the server's.
+func open(o Options, callLang string) (*core.Project, error) {
+	tag, err := lang.Pick(callLang, "lang", o.Lang)
+	if err != nil {
+		return nil, err
+	}
+	p, err := core.Open(core.Options{Dir: o.Dir, Lang: tag})
 	if err != nil {
 		return nil, err
 	}

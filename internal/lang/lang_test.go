@@ -3,6 +3,7 @@ package lang
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 )
 
@@ -64,6 +65,54 @@ func TestSelect(t *testing.T) {
 		if err != nil || got != tt.want {
 			t.Errorf("Select(%q) = %q, %v; want %q", tt.tag, got, err, tt.want)
 		}
+	}
+}
+
+func TestPick(t *testing.T) {
+	tests := []struct{ arg, name, env, want, msg string }{
+		{"", "--lang", "", "", ""},
+		{"ja", "--lang", "", "ja", ""},
+		{"ja", "--lang", "fr", "ja", ""}, // the argument comes first
+		{"", "--lang", "fr", "fr", ""},
+		{"ja", "--lang", "x_y", "ja", ""}, // CRUBE_LANG is not used, so not checked
+		{"ja_JP", "--lang", "", "", `invalid --lang "ja_JP" (use a language tag such as ja or zh-CN)`},
+		{"ja_JP", "lang", "fr", "", `invalid lang "ja_JP" (use a language tag such as ja or zh-CN)`},
+		{"", "--lang", "ja_JP", "", `invalid CRUBE_LANG "ja_JP" (use a language tag such as ja or zh-CN)`},
+	}
+	for _, tt := range tests {
+		got, err := Pick(tt.arg, tt.name, tt.env)
+		if tt.msg != "" {
+			if err == nil || err.Error() != tt.msg {
+				t.Errorf("Pick(%q, %q, %q): got %v, want %q", tt.arg, tt.name, tt.env, err, tt.msg)
+			}
+			continue
+		}
+		if err != nil || got != tt.want {
+			t.Errorf("Pick(%q, %q, %q) = %q, %v; want %q", tt.arg, tt.name, tt.env, got, err, tt.want)
+		}
+	}
+}
+
+func TestTags(t *testing.T) {
+	dir := t.TempDir()
+	for _, name := range []string{"ignore", "notes_ja.txt", "notes.txt", "structure_ja.txt", "structure_zh-CN.txt", "structure_en.txt", "structure_ja_JP.txt"} {
+		if err := os.WriteFile(filepath.Join(dir, name), nil, 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := os.Mkdir(filepath.Join(dir, "structure_fr.txt"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	got, err := Tags(dir)
+	if err != nil || !slices.Equal(got, []string{"ja", "zh-CN"}) {
+		t.Errorf("without structure.txt: %q, %v", got, err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, DefaultFile), nil, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	got, err = Tags(dir)
+	if err != nil || !slices.Equal(got, []string{"en", "ja", "zh-CN"}) {
+		t.Errorf("with structure.txt: %q, %v", got, err)
 	}
 }
 

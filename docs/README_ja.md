@@ -32,7 +32,7 @@ $ crube tree
 
 正確な仕様です。
 
-- [CLI](reference/cli_ja.md) — コマンド、オプション、環境変数 `CRUBE_LANG`、終了コード
+- [CLI](reference/cli_ja.md) — コマンド、オプション、言語（`--lang`・`CRUBE_LANG`）、終了コード
 - [MCP](reference/mcp_ja.md) — ツール一覧と引数
 - [ファイル形式](reference/file-format_ja.md) — `structure.txt` の文法、言語ごとのファイル、`ignore`
 

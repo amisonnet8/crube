@@ -27,10 +27,11 @@ Every command looks for `.crube/` from the current directory (or the directory g
 | `--json` | Structured output (JSON) |
 | `-C <dir>` | Works as if run in the given directory |
 | `--no-ignore` | Turns the ignore settings off (`.crube/` stays left out) |
+| `--lang <tag>` | Gives the target language (before `CRUBE_LANG`; see [Language](#language)) |
 
 - Options can go anywhere before or after the positional arguments (`crube ls src --full`). An option with a value takes `--limit 3` or `--limit=3`.
 - Everything after `--` is read as positional arguments (`crube set -- note.txt "-v flag help"`).
-- `init` takes only `-C`. `set`, `rm` and `mv` take `--json` and `-C` (and their own options). `mcp` takes only `--allow-write`. `completion` takes no options.
+- `init` takes `-C` and `--lang`. `set`, `rm` and `mv` take `--json`, `-C` and `--lang` (and their own options). `mcp` takes `--allow-write` and `--lang`. `completion` takes no options.
 
 ## Usage and version
 
@@ -51,10 +52,10 @@ commands:
   mcp         run as an MCP server over stdio
   completion  print a shell completion script
 
-common options: --json  -C <dir>  --no-ignore
+common options: --json  -C <dir>  --no-ignore  --lang <tag>
 
 $ crube ls -h
-usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore]
+usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore] [--lang <tag>]
 
 $ crube --version
 crube v0.1.0
@@ -66,11 +67,11 @@ crube v0.1.0
 
 ## Language
 
-There is no settings file. The language is given only by the `CRUBE_LANG` environment variable (BCP 47: `ja`, `zh-CN` and so on).
+There is no settings file. The language (the target language) is given by the `--lang <tag>` option or the `CRUBE_LANG` environment variable (both BCP 47 language tags: `ja`, `zh-CN` and so on). `--lang` is used if it is given, or else `CRUBE_LANG`. With neither, it is English.
 
-Every command reads and edits the file of the `CRUBE_LANG` language (`.crube/structure_<language tag>.txt`). When `CRUBE_LANG` is unset or `en`, or there is no file for that language, `.crube/structure.txt` (English) is used. Only one file is ever used.
+Every command reads and edits the file of the target language (`.crube/structure_<language tag>.txt`). When the target language is English (none given, or `en`), or there is no file for that language, `.crube/structure.txt` (English) is used. Only one file is ever used. To see the English descriptions while `CRUBE_LANG=ja` is set, give the language, as in `crube tree --lang en`.
 
-The value of `CRUBE_LANG` is used as it is (`ja-JP` is not brought to `ja`, and case is not changed). A value not in the form of a language tag (1 to 8 letters or digits, joined with `-`) is an error for every command (`crube: invalid CRUBE_LANG "ja_JP" (use a language tag such as ja or zh-CN)`).
+A language tag is used as it is (`ja-JP` is not brought to `ja`, and case is not changed). A value not in the form of a language tag (1 to 8 letters or digits, joined with `-`) is an error for every command (`crube: invalid --lang "ja_JP" (use a language tag such as ja or zh-CN)`; for `CRUBE_LANG`, `invalid CRUBE_LANG "ja_JP"`). With `--lang`, `CRUBE_LANG` is neither used nor checked.
 
 ## Entry paths
 
@@ -103,7 +104,7 @@ On Windows, `\` in an entry path is read as `/` too (`src\auth\` is the same as 
 
 ## Output conventions
 
-- What crube itself prints (marks, headings, messages) is English only. `CRUBE_LANG` only picks the structure file.
+- What crube itself prints (marks, headings, messages) is English only. The target language (`--lang`, `CRUBE_LANG`) only picks the structure file.
 - An error is one line `crube: <what>` on standard error, with exit code 2. The same with `--json`. A load error of the structure file comes with the file and the line number.
 
 ```
@@ -122,8 +123,8 @@ crube: unknown command "lss" (see crube --help)
 crube: ls: unknown option --foo
 crube: ls: -C needs a value
 crube: find: invalid --limit "x" (use a number of 1 or more)
-crube: ls: too many arguments (usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore])
-crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--json] [-C <dir>])
+crube: ls: too many arguments (usage: crube ls [path] [--full] [--json] [-C <dir>] [--no-ignore] [--lang <tag>])
+crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--json] [-C <dir>] [--lang <tag>])
 ```
 
 ### JSON
@@ -138,13 +139,13 @@ crube: set: missing <desc> (usage: crube set <path> <desc> [--detail <text>] [--
 ## crube init
 
 ```
-crube init [-C <dir>]
+crube init [-C <dir>] [--lang <tag>]
 ```
 
 Makes `.crube/` and the structure file of the target language. It makes only `.crube/` and what is in it.
 
 - If no `.crube/` is found upwards, it makes `.crube/` in the given directory, with the default `ignore` and an empty `structure.txt`.
-- If `CRUBE_LANG` is not English, it also makes an empty file for that language, `structure_<language tag>.txt`.
+- If the target language (`--lang`, or else `CRUBE_LANG`) is not English, it also makes an empty file for that language, `structure_<language tag>.txt`.
 - If `.crube/` is already there, it makes only the file of the target language, if that is missing. This is how to add a language file.
 - If there is nothing to make, it is an error (exit code 2).
 
@@ -423,10 +424,10 @@ Moves an entry to another position in the file used for the target language. For
 ## crube mcp
 
 ```
-crube mcp [--allow-write]
+crube mcp [--allow-write] [--lang <tag>]
 ```
 
-Starts an MCP server on stdio. Only with `--allow-write` are the writing tools offered. See [mcp.md](mcp.md) for more.
+Starts an MCP server on stdio. Only with `--allow-write` are the writing tools offered. `--lang` (or else `CRUBE_LANG`) is the language for calls of the tools that leave `lang` out. See [mcp.md](mcp.md) for more.
 
 ## crube completion
 
@@ -452,6 +453,7 @@ What is completed:
 | The first word | Commands (with a summary) |
 | A word starting with `-` | The options the command takes that are not on the line yet, and `--help` (for the first word, `--help` and `--version`) |
 | The value of `--require` | `all`, `dirs` |
+| The value of `--lang` | The languages that have a structure file (`en` if there is `structure.txt`, then the language tags of the `structure_<language tag>.txt` files) |
 | The path of `tree`, `set` and `rm`, and `from` / `to` of `mv` | Entry paths |
 | After `completion` | The 4 shells |
 
@@ -460,7 +462,7 @@ What is completed:
 - A pattern entry (`data/*.csv`) is inserted in quotes so that the shell does not expand it (zsh and fish escape it instead). The quotes and backslashes of the word being typed are removed before looking for candidates.
 - Some shells do not complete a value after `=` (`--require=`). Write `--require <TAB>`.
 - The value of `-C` and the path of `ls` and `show` (real paths) are left to the shell's file completion. The values of `-d`, `--limit` and `--detail`, descs, and the words of `find` are not completed.
-- `.crube/` is looked for from the directory of `-C <dir>` if it is on the line, or else from the current directory. Descs come from the file of the `CRUBE_LANG` language. `--no-ignore` on the line is followed.
+- `.crube/` is looked for from the directory of `-C <dir>` if it is on the line, or else from the current directory. Descs come from the file of the language of `--lang` on the line (or else `CRUBE_LANG`). `--no-ignore` on the line is followed.
 - When there is no `.crube/`, the structure file cannot be read, and so on, entry paths are simply not offered, and nothing is said (a warning on every TAB would break the line being typed).
 
 ### __complete

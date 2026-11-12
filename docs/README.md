@@ -32,7 +32,7 @@ Why crube is shaped the way it is.
 
 The exact specification.
 
-- [CLI](reference/cli.md) — commands, options, the `CRUBE_LANG` environment variable, exit codes
+- [CLI](reference/cli.md) — commands, options, the language (`--lang`, `CRUBE_LANG`), exit codes
 - [MCP](reference/mcp.md) — the tools and their arguments
 - [File format](reference/file-format.md) — the grammar of `structure.txt`, files per language, `ignore`
 

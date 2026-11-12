@@ -17,7 +17,7 @@
 }
 ```
 
-The server looks for `.crube/` from the directory where it started, upwards. The language is the `CRUBE_LANG` environment variable when the server starts (it can be set with `env` in the client's settings, such as `"env": { "CRUBE_LANG": "ja" }`). If it is not in the form of a language tag, the server does not start and stops with exit code 2. The writing tools, too, write only inside `.crube/`. `remove_description` / `move_description` only remove or move descriptions; they do not touch files.
+The server looks for `.crube/` from the directory where it started, upwards. The language of the server is `--lang` when it starts (`"args": ["mcp", "--allow-write", "--lang", "ja"]`), or else the `CRUBE_LANG` environment variable (`env` in the client's settings, such as `"env": { "CRUBE_LANG": "ja" }`). If it is not in the form of a language tag, the server does not start and stops with exit code 2. Each call of a tool can use another language with the argument `lang` (below). The writing tools, too, write only inside `.crube/`. `remove_description` / `move_description` only remove or move descriptions; they do not touch files.
 
 ## Tools
 
@@ -34,7 +34,8 @@ The writing tools are offered only when the server is started with `crube mcp --
 | Write | `remove_description` | path | `{ "path", "removed" }` (`removed` is the number of entries removed, those below included) |
 | Write | `move_description` | from, to | `{ "from", "to", "moved" }` (`moved` is the number of entries moved, those below included) |
 
-- The arguments `path`, `depth`, `limit`, `kinds` and `detail` can be left out. `depth` and `limit` left out or 0 mean no limit; a negative number is an error. The `detail` of `set_description` stays as it is when left out, and `""` removes it.
+- The arguments `path`, `depth`, `limit`, `kinds`, `detail` and `lang` can be left out. `depth` and `limit` left out or 0 mean no limit; a negative number is an error. The `detail` of `set_description` stays as it is when left out, and `""` removes it.
+- Every tool takes `lang` (a language tag) besides the arguments in the table. For that call only, the file of that language is read or edited (as with the CLI's `--lang`; `structure.txt` if there is no such file). Left out, it is the language of the server. A value not in the form of a language tag is an error (`invalid lang "ja_JP" (use a language tag such as ja or zh-CN)`). One server can edit the descriptions in both English and Japanese.
 - The `path` of `ls` and `show`, and the entry paths of `tree` and the write tools, are **relative to the project root** (whatever the place the server started in; the same as the CLI with the project root always as its current directory). Entry paths are read as the CLI reads them (the trailing `/` can be left out, and so on; [cli.md](cli.md#entry-paths)). MCP has no current place, and the paths it returns are relative to the root too, so a path in a result can be passed to the next call as it is.
 - The `kinds` of `status` is an array of `untracked`, `orphan` and `invalid`. Only `items` are filtered; `coverage` is always that of the whole project. Other values are an error.
 - The tools read `.crube/` again on every call. If `.crube/` is changed while the server runs, the next call sees it.

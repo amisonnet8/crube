@@ -165,4 +165,13 @@ init: 既定の ignore を空で書く | internal/core/init.go | file{ignore.Fil
 パス: set で実在のディレクトリをファイルのエントリにする | internal/core/edit.go | if !strings.HasSuffix(last, "/") && p.isRealDir(entryPath) { | if false {
 パス: シンボリックリンクをディレクトリとして扱う | internal/core/edit.go | fi, err := os.Lstat(filepath.Join(p.Root | fi, err := os.Stat(filepath.Join(p.Root
 パス: mv の to を移動元と同じ種類にしない | internal/core/edit.go | if strings.HasSuffix(from, "/") && !strings.HasSuffix(to, "/") { | if false {
+# 言語（[8-3] --lang と MCP の lang）
+言語: --lang より CRUBE_LANG を先にする | internal/lang/lang.go | ⇥if arg != "" {⏎⇥⇥return arg, check(name, arg) | ⇥if arg != "" && env == "" {⏎⇥⇥return arg, check(name, arg)
+言語: --lang の値を確かめない | internal/lang/lang.go | return arg, check(name, arg) | return arg, nil
+言語: --lang の誤りを CRUBE_LANG の誤りと言う | internal/lang/lang.go | return arg, check(name, arg) | return arg, check(EnvVar, arg)
+言語: 言語の一覧に en を出さない | internal/lang/lang.go | ⇥⇥if name == DefaultFile { | ⇥⇥if false && name == DefaultFile {
+言語: 言語の一覧に structure_ で始まらない名前も出す | internal/lang/lang.go | if prefixed && suffixed && | if (prefixed || !prefixed) && suffixed &&
+言語: MCP の呼び出しの lang を使わない | internal/mcpserver/server.go | tag, err := lang.Pick(callLang, "lang", o.Lang) | tag, err := lang.Pick(callLang[:0], "lang", o.Lang)
+言語: CLI の --lang を使わない | internal/cli/cli.go | return lang.Pick(p.opts["--lang"], "--lang", | return lang.Pick("", "--lang",
+言語: 補完で行の --lang を使わない | internal/cli/complete.go | tag, err := lang.Pick(p.lang, "--lang", | tag, err := lang.Pick("", "--lang",
 パス: tree で / のないパスの種類を決めない | internal/core/read.go | if path, names, err = pickKind(tree, path, names); err != nil { | if false {

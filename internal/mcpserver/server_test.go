@@ -257,6 +257,50 @@ func TestWrite(t *testing.T) {
 	}
 }
 
+// lang of a call comes before the language the server started with.
+func TestLang(t *testing.T) {
+	root := project(t)
+	if err := os.WriteFile(filepath.Join(root, ".crube", "structure_ja.txt"), []byte("src/\tソース\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	cs := connect(t, Options{Dir: root, Lang: "ja", AllowWrite: true})
+
+	for callLang, want := range map[string]string{"": "ソース", "ja": "ソース", "en": "Source"} {
+		var tree core.TreeResult
+		args := map[string]any{"depth": 1}
+		if callLang != "" {
+			args["lang"] = callLang
+		}
+		if msg := call(t, cs, "tree", args, &tree); msg != "" {
+			t.Fatal(msg)
+		}
+		if len(tree.Entries) == 0 || tree.Entries[0].Desc != want {
+			t.Errorf("tree with lang %q: %+v, want the desc %q", callLang, tree.Entries, want)
+		}
+	}
+
+	var set core.SetResult
+	if msg := call(t, cs, "set_description", map[string]any{"path": "src/", "desc": "Src", "lang": "en"}, &set); msg != "" {
+		t.Fatal(msg)
+	}
+	for name, want := range map[string]string{
+		"structure.txt":    "src/\tSrc\n\tmain.go\tEntry point\n\t\t| Starts the server.\nold/\tGone\n",
+		"structure_ja.txt": "src/\tソース\n",
+	} {
+		b, err := os.ReadFile(filepath.Join(root, ".crube", name))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(b) != want {
+			t.Errorf("%s: %q, want %q", name, b, want)
+		}
+	}
+
+	if got, want := call(t, cs, "tree", map[string]any{"lang": "ja_JP"}, nil), `invalid lang "ja_JP" (use a language tag such as ja or zh-CN)`; got != want {
+		t.Errorf("lang ja_JP: %q, want %q", got, want)
+	}
+}
+
 func TestErrors(t *testing.T) {
 	root := project(t)
 	cs := connect(t, Options{Dir: root, AllowWrite: true})
