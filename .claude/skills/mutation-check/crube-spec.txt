@@ -101,7 +101,8 @@
 編集: 自分の中への mv を許す | internal/core/edit.go | if len(toNames) > len(fromNames) && slices.Equal(toNames[:len(fromNames)], fromNames) { | if false {
 編集: mv 先が既にあっても動かす | internal/core/edit.go | if _, j := lookup(tree, toNames); j >= 0 { | if _, j := lookup(tree, toNames); false && j >= 0 {
 編集: mv でディレクトリとファイルの種類を変えられる | internal/core/edit.go | if strings.HasSuffix(from, "/") != strings.HasSuffix(to, "/") { | if false {
-編集: 空の名前（a//b）を受け入れる | internal/core/edit.go | ⇥⇥if part == "" {⏎⇥⇥⇥return nil, fmt.Errorf("invalid entry path %q", entryPath) | ⇥⇥if false {⏎⇥⇥⇥return nil, fmt.Errorf("invalid entry path %q", entryPath)
+# 同じ意味なので外す（[8-1] から、a//b は entryPath の path.Join で a/b に直ってから splitEntryPath に渡るので、空の名前はここに届かない）
+#編集: 空の名前（a//b）を受け入れる | internal/core/edit.go | ⇥⇥if part == "" {⏎⇥⇥⇥return nil, fmt.Errorf("invalid entry path %q", entryPath) | ⇥⇥if false {⏎⇥⇥⇥return nil, fmt.Errorf("invalid entry path %q", entryPath)
 編集: 名前の検査をしない | internal/core/edit.go | ⇥⇥if err := structure.CheckName(name); err != nil {⏎⇥⇥⇥return nil, err | ⇥⇥if err := structure.CheckName("x"); err != nil {⏎⇥⇥⇥return nil, err
 編集: どの OS でも \ を区切りとする | internal/core/edit.go | ⇥if osSeparator == | ⇥if true || osSeparator ==
 編集: Windows でも \ を区切りとしない | internal/core/edit.go | ⇥if osSeparator == | ⇥if false && osSeparator ==
@@ -154,3 +155,14 @@ init: 既定の ignore を空で書く | internal/core/init.go | file{ignore.Fil
 補完: -- が無いと --word を語に入れる | internal/cli/complete.go | ⇥var words []string // the words after "--" | ⇥words := args
 補完: bash でパターンを引用符で包まない | internal/cli/completions/crube.bash | value="'${value//\'/\'\\\'\'}'" | value="$value"
 補完: bash で打ちかけの語の引用符を残す | internal/cli/completions/crube.bash | REPLY=${REPLY//\'/} | REPLY=$REPLY
+# エントリのパス（[8-1] 現在地から読む、[8-2] 末尾の / を省ける）
+パス: 現在地からでなくルートから読む | internal/core/edit.go | rel = path.Join(filepath.ToSlash(here), s) | rel = path.Join(filepath.ToSlash(here)[:0]+".", s)
+パス: ルートの外を断らない | internal/core/edit.go | if rel == ".." || strings.HasPrefix(rel, "../") { | if false {
+パス: . や .. で終わるパスをディレクトリのエントリにしない | internal/core/edit.go | isDir := last == "" || last == "." || last == ".." | isDir := last == ""
+パス: set・rm・mv でルートを断らない | internal/core/edit.go | if err == nil && names == nil { | if false {
+パス: / のないパスでディレクトリのエントリを探さない | internal/core/edit.go | ⇥case dir >= 0:⏎⇥⇥return entryPath + "/", dirNames, nil | ⇥case false:⏎⇥⇥return entryPath + "/", dirNames, nil
+パス: ファイルとディレクトリの両方があっても断らない | internal/core/edit.go | ⇥case file >= 0 && dir >= 0: | ⇥case file >= 0 && dir >= 0 && false:
+パス: set で実在のディレクトリをファイルのエントリにする | internal/core/edit.go | if !strings.HasSuffix(last, "/") && p.isRealDir(entryPath) { | if false {
+パス: シンボリックリンクをディレクトリとして扱う | internal/core/edit.go | fi, err := os.Lstat(filepath.Join(p.Root | fi, err := os.Stat(filepath.Join(p.Root
+パス: mv の to を移動元と同じ種類にしない | internal/core/edit.go | if strings.HasSuffix(from, "/") && !strings.HasSuffix(to, "/") { | if false {
+パス: tree で / のないパスの種類を決めない | internal/core/read.go | if path, names, err = pickKind(tree, path, names); err != nil { | if false {

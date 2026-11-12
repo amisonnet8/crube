@@ -1,0 +1,25 @@
+# Let entry paths leave out the trailing / ([8-2])
+.mtqg/
+	journal.jsonl	mtqg: memo c3993949e4, todo [8-2] done
+.claude/
+	rules/
+		crube-usage.md	Pitfall: the trailing / can be left out; set on a new directory still needs it
+	skills/
+		mutation-check/
+			crube-spec.txt	Added 10 mutations of entry paths; commented out a//b, now the same meaning
+docs/
+	design/
+		decisions.md	Added the row on the trailing / of entry paths
+		decisions_ja.md	Same as decisions.md, in Japanese
+	reference/
+		cli.md	Entry paths: the trailing / is optional, both and is a directory errors; mv keeps the kind
+		cli_ja.md	Same as cli.md, in Japanese
+		mcp.md	Entry paths are read as the CLI reads them
+		mcp_ja.md	Same as mcp.md, in Japanese
+internal/
+	core/
+		edit.go	pickKind picks x or x/; set refuses a real directory; mv's to follows from
+		edit_test.go	Tests of paths without a trailing /; ../data now names data/
+		read.go	tree picks the kind of a path without a trailing /
+	mcpserver/
+		server_test.go	set_description takes src for src/, and refuses a real directory

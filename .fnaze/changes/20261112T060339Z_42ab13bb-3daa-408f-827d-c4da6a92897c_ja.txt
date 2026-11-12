@@ -1,0 +1,25 @@
+# エントリのパスの末尾の / を省けるようにする（[8-2]）
+.mtqg/
+	journal.jsonl	mtqg：メモ c3993949e4、todo [8-2] を完了
+.claude/
+	rules/
+		crube-usage.md	落とし穴：末尾の / は省けるが、set で新しいディレクトリには付ける、と直した
+	skills/
+		mutation-check/
+			crube-spec.txt	エントリのパスの変異10件を足し、同じ意味になった a//b の行をコメントにした
+docs/
+	design/
+		decisions.md	エントリのパスの末尾の / の行を足した
+		decisions_ja.md	decisions.md と同じ変更（日本語）
+	reference/
+		cli.md	エントリのパス：末尾の / を省けること、both と is a directory のエラー、mv は種類を保つ
+		cli_ja.md	cli.md と同じ変更（日本語）
+		mcp.md	エントリのパスの読み方は CLI と同じと書いた
+		mcp_ja.md	mcp.md と同じ変更（日本語）
+internal/
+	core/
+		edit.go	pickKind が x か x/ を選び、set は実在のディレクトリを断り、mv の to は移動元に合わせる
+		edit_test.go	末尾の / の無いパスのテスト。../data は data/ を指すように直した
+		read.go	tree も、末尾の / の無いパスの種類を決める
+	mcpserver/
+		server_test.go	set_description が src を src/ とし、実在のディレクトリを断ることを確かめる

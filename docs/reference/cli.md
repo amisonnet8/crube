@@ -79,7 +79,10 @@ The path given to `tree` / `set` / `rm` / `mv` is the position of an entry in th
 ```
 data/*.csv        # the entry "*.csv" under data/
 src/auth/         # a directory entry (ending in /)
+src/auth          # the same (unless there is a file entry src/auth)
 ```
+
+- The trailing `/` can be left out. A path without it names the file entry or the directory entry of that name, whichever is there. If both are, it is an error (`crube: src/db: both src/db and src/db/ are entries (add / for the directory)`). If neither is, it is read as a file entry; but `set` gives an error instead of making a new entry when the path is a real directory (`crube: src/db: is a directory (use src/db/)`; a directory entry is not made by guessing). A symbolic link is taken as a file.
 
 - `.`, `..`, empty levels (`a//b`) and absolute paths are read as written, as `ls` reads them, and turned into the position from the project root before the entry is looked for (in `src`, `auth/` is `src/auth/` and `../data/` is `data/`). A path ending in `/`, `.` or `..` is a directory entry. Entry paths in results and errors are positions from the root.
 - A path outside the project is an error (`crube: ../../: outside the project`). For the project root itself, `tree` shows everything, and `set` / `rm` / `mv` give an error (`crube: ..: the project root has no entry (give a path below it)`).
@@ -414,7 +417,7 @@ Moves an entry to another position in the file used for the target language. For
 
 - Missing parents of the new position are made as lines without a desc.
 - Without an entry at `from`, it is an error. An entry already at `to` is an error too (also when `from` and `to` are the same).
-- Moving between a directory entry (ending in `/`) and a file entry, or into itself, is an error.
+- Without a trailing `/`, `to` is an entry of the same kind as the one moved (`crube mv src/auth lib/auth` moves `src/auth/` to `lib/auth/`). Moving a file entry to a directory entry (ending in `/`), or into itself, is an error.
 - The entry moved goes after its new siblings.
 
 ## crube mcp

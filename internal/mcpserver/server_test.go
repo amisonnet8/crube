@@ -202,6 +202,16 @@ func TestWrite(t *testing.T) {
 	cs := connect(t, Options{Dir: root, AllowWrite: true})
 
 	var set core.SetResult
+	// Without a trailing "/", the directory entry src/ is the only one there.
+	if msg := call(t, cs, "set_description", map[string]any{"path": "src", "desc": "Source"}, &set); msg != "" {
+		t.Fatal(msg)
+	}
+	if set.Path != "src/" {
+		t.Errorf("set src: %+v", set)
+	}
+	if msg := call(t, cs, "set_description", map[string]any{"path": "src/db", "desc": "x"}, nil); msg != "src/db: is a directory (use src/db/)" {
+		t.Errorf("set src/db: %q", msg)
+	}
 	if msg := call(t, cs, "set_description", map[string]any{"path": "src/db/", "desc": "Database", "detail": "SQLite"}, &set); msg != "" {
 		t.Fatal(msg)
 	}

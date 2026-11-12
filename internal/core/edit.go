@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"path/filepath"
 	"slices"
@@ -57,11 +58,19 @@ func (p *Project) Set(entryPath, desc string, detail *string) (*SetResult, error
 
 	var e *structure.Entry
 	err = p.update(func(tree *structure.Tree) error {
+		if entryPath, names, err = pickKind(tree, entryPath, names); err != nil {
+			return err
+		}
 		list := ensureParents(tree, names[:len(names)-1])
 		last := names[len(names)-1]
 		if i := index(*list, last); i >= 0 {
 			e = (*list)[i]
 		} else {
+			// A new file entry: the user did not end the path in "/", so make
+			// sure that it is not a real directory rather than guess.
+			if !strings.HasSuffix(last, "/") && p.isRealDir(entryPath) {
+				return fmt.Errorf("%s: is a directory (use %s/)", entryPath, entryPath)
+			}
 			e = &structure.Entry{Name: last}
 			*list = append(*list, e)
 		}
@@ -86,6 +95,9 @@ func (p *Project) Remove(entryPath string) (*RemoveResult, error) {
 	}
 	var e *structure.Entry
 	err = p.update(func(tree *structure.Tree) error {
+		if entryPath, names, err = pickKind(tree, entryPath, names); err != nil {
+			return err
+		}
 		list, i := lookup(tree, names)
 		if i < 0 {
 			return fmt.Errorf("no entry %s", entryPath)
@@ -113,15 +125,22 @@ func (p *Project) Move(from, to string) (*MoveResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	if strings.HasSuffix(from, "/") != strings.HasSuffix(to, "/") {
-		return nil, fmt.Errorf("cannot move %s to %s: a directory entry (ending in /) stays a directory entry, and a file entry a file entry", from, to)
-	}
-	if len(toNames) > len(fromNames) && slices.Equal(toNames[:len(fromNames)], fromNames) {
-		return nil, fmt.Errorf("cannot move %s into itself", from)
-	}
-
 	var e *structure.Entry
 	err = p.update(func(tree *structure.Tree) error {
+		if from, fromNames, err = pickKind(tree, from, fromNames); err != nil {
+			return err
+		}
+		// to without a trailing "/" is of the same kind as from.
+		if strings.HasSuffix(from, "/") && !strings.HasSuffix(to, "/") {
+			to += "/"
+			toNames[len(toNames)-1] += "/"
+		}
+		if strings.HasSuffix(from, "/") != strings.HasSuffix(to, "/") {
+			return fmt.Errorf("cannot move %s to %s: a directory entry (ending in /) stays a directory entry, and a file entry a file entry", from, to)
+		}
+		if len(toNames) > len(fromNames) && slices.Equal(toNames[:len(fromNames)], fromNames) {
+			return fmt.Errorf("cannot move %s into itself", from)
+		}
 		list, i := lookup(tree, fromNames)
 		if i < 0 {
 			return fmt.Errorf("no entry %s", from)
@@ -225,6 +244,36 @@ func (p *Project) entryBelowRoot(typed string) (string, []string, error) {
 
 func rootHasNoEntry(path string) error {
 	return fmt.Errorf("%s: the project root has no entry (give a path below it)", path)
+}
+
+// pickKind lets an entry path that does not end in "/" name a directory
+// entry: when the directory entry of that name is there and the file entry
+// is not, it returns the directory entry's path and names. When both are
+// there, the path is ambiguous and refused. Otherwise the path is returned as
+// it is, as a file entry.
+func pickKind(tree *structure.Tree, entryPath string, names []string) (string, []string, error) {
+	if strings.HasSuffix(entryPath, "/") {
+		return entryPath, names, nil
+	}
+	n := len(names) - 1
+	dirNames := append(names[:n:n], names[n]+"/")
+	_, file := lookup(tree, names)
+	_, dir := lookup(tree, dirNames)
+	switch {
+	case file >= 0 && dir >= 0:
+		return "", nil, fmt.Errorf("%s: both %s and %s/ are entries (add / for the directory)", entryPath, entryPath, entryPath)
+	case dir >= 0:
+		return entryPath + "/", dirNames, nil
+	}
+	return entryPath, names, nil
+}
+
+// isRealDir tells whether the entry path (from the project root, without a
+// trailing "/") is a real directory of the project. A symbolic link is not:
+// crube takes it as a file.
+func (p *Project) isRealDir(entryPath string) bool {
+	fi, err := os.Lstat(filepath.Join(p.Root, filepath.FromSlash(entryPath)))
+	return err == nil && fi.IsDir()
 }
 
 // splitEntryPath splits an entry path into the names of its entries, each

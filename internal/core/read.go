@@ -202,6 +202,9 @@ func (p *Project) Tree(o TreeOptions) (*TreeResult, error) {
 			return nil, err
 		}
 		if names != nil {
+			if path, names, err = pickKind(tree, path, names); err != nil {
+				return nil, err
+			}
 			list, i := lookup(tree, names)
 			if i < 0 {
 				return nil, fmt.Errorf("no entry %s", path)

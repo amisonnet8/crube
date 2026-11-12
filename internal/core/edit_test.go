@@ -241,7 +241,6 @@ func TestRemoveRefused(t *testing.T) {
 	before := "src/\tS\n\tmain.go\tM\n"
 	for path, msg := range map[string]string{
 		"src/other.go": "no entry src/other.go",
-		"src":          "no entry src", // the entry is src/, a directory entry
 		"*.go":         "no entry *.go",
 		"src/*.go":     "no entry src/*.go", // not matched as a pattern
 	} {
@@ -304,7 +303,6 @@ func TestMoveRefused(t *testing.T) {
 		{"src/main.go", "src/legacy/old.go", "entry src/legacy/old.go already exists"},
 		{"src/main.go", "src/main.go", "entry src/main.go already exists"},
 		{"src/legacy/", "lib/", "entry lib/ already exists"},
-		{"src/legacy/", "lib/legacy", "cannot move src/legacy/ to lib/legacy: a directory entry (ending in /) stays a directory entry, and a file entry a file entry"},
 		{"src/main.go", "lib/main.go/", "cannot move src/main.go to lib/main.go/: a directory entry (ending in /) stays a directory entry, and a file entry a file entry"},
 		{"src/", "src/legacy/new/", "cannot move src/ into itself"},
 		{"src/legacy/", "src/legacy/x/", "cannot move src/legacy/ into itself"},
@@ -421,6 +419,7 @@ func TestEntryPathFromSubdirectory(t *testing.T) {
 			"..":         {"src/", "data/"}, // the project root: everything
 			"":           {"src/", "data/"}, // no path: everything
 			"auth//..//": {"src/"},
+			"../src":     {"src/"}, // no file entry src: the directory entry
 		} {
 			r, err := p.Tree(TreeOptions{Path: typed, Depth: 1})
 			if err != nil {
@@ -439,7 +438,6 @@ func TestEntryPathFromSubdirectory(t *testing.T) {
 			"../../":  "../../: outside the project",
 			"../..":   "../..: outside the project",
 			"nope/":   "no entry src/nope/",
-			"../src":  "no entry src", // a file entry: not the directory entry src/
 			"./auth ": `name "auth " cannot be written in a structure file`,
 		} {
 			if _, err := p.Tree(TreeOptions{Path: typed}); err == nil || err.Error() != msg {
@@ -454,7 +452,7 @@ func TestEntryPathFromSubdirectory(t *testing.T) {
 			"*.go":    {"src/*.go", "src/\tS\n\tauth/\tA\n\tmain.go\tM\n\t*.go\tX\ndata/\tD\n"},
 			"x//y.go": {"src/x/y.go", "src/\tS\n\tauth/\tA\n\tmain.go\tM\n\tx/\n\t\ty.go\tX\ndata/\tD\n"},
 			".":       {"src/", "src/\tX\n\tauth/\tA\n\tmain.go\tM\ndata/\tD\n"},
-			"../data": {"data", "src/\tS\n\tauth/\tA\n\tmain.go\tM\ndata/\tD\ndata\tX\n"},
+			"../data": {"data/", "src/\tS\n\tauth/\tA\n\tmain.go\tM\ndata/\tX\n"}, // only the directory entry is there
 		} {
 			p := subProject(t)
 			r, err := p.Set(typed, "X", nil)
@@ -531,6 +529,150 @@ func TestEntryPathFromSubdirectory(t *testing.T) {
 			}
 			if err != nil || !slices.Equal(got, want) {
 				t.Errorf("complete %q: got %q, %v; want %q", typed, got, err, want)
+			}
+		}
+	})
+}
+
+// slashBefore is the structure file of slashProject: x is both a file entry
+// and a directory entry, and old is a file entry although it is a real
+// directory.
+const slashBefore = "src/\tS\n\tauth/\tA\n\tmain.go\tM\nx\tF\nx/\tD\nold\tO\n"
+
+// slashProject is a project with the real directories src/auth, src/db, x and
+// old, opened at its root. It also returns whether it has lnk, a symbolic
+// link to src.
+func slashProject(t *testing.T) (*Project, bool) {
+	t.Helper()
+	p := newProject(t, "", map[string]string{"structure.txt": slashBefore})
+	for _, d := range []string{"src/auth", "src/db", "x", "old"} {
+		if err := os.MkdirAll(filepath.Join(p.Root, filepath.FromSlash(d)), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	link := os.Symlink("src", filepath.Join(p.Root, "lnk")) == nil
+	return p, link
+}
+
+const bothX = "x: both x and x/ are entries (add / for the directory)"
+
+func TestEntryPathWithoutSlash(t *testing.T) {
+	t.Run("tree", func(t *testing.T) {
+		p, _ := slashProject(t)
+		for typed, want := range map[string]string{
+			"src":         "src/",
+			"src/auth":    "src/auth/",
+			"src/main.go": "src/main.go",
+			"x/":          "x/",
+			"x/.":         "x/", // ending in "." is a directory entry, even with a file entry x
+		} {
+			r, err := p.Tree(TreeOptions{Path: typed, Depth: 1})
+			if err != nil {
+				t.Errorf("tree %q: %v", typed, err)
+				continue
+			}
+			if len(r.Entries) != 1 || r.Entries[0].Path != want {
+				t.Errorf("tree %q: %+v, want %q", typed, r.Entries, want)
+			}
+		}
+		for typed, msg := range map[string]string{
+			"x":        bothX,
+			"src/none": "no entry src/none",
+		} {
+			if _, err := p.Tree(TreeOptions{Path: typed}); err == nil || err.Error() != msg {
+				t.Errorf("tree %q: got %v, want %q", typed, err, msg)
+			}
+		}
+	})
+
+	t.Run("set", func(t *testing.T) {
+		for typed, want := range map[string]struct{ path, after string }{
+			"src":        {"src/", "src/\tN\n\tauth/\tA\n\tmain.go\tM\nx\tF\nx/\tD\nold\tO\n"},
+			"src/auth":   {"src/auth/", "src/\tS\n\tauth/\tN\n\tmain.go\tM\nx\tF\nx/\tD\nold\tO\n"},
+			"src/db/":    {"src/db/", "src/\tS\n\tauth/\tA\n\tmain.go\tM\n\tdb/\tN\nx\tF\nx/\tD\nold\tO\n"},
+			"src/db/.":   {"src/db/", "src/\tS\n\tauth/\tA\n\tmain.go\tM\n\tdb/\tN\nx\tF\nx/\tD\nold\tO\n"},
+			"src/new.go": {"src/new.go", "src/\tS\n\tauth/\tA\n\tmain.go\tM\n\tnew.go\tN\nx\tF\nx/\tD\nold\tO\n"},
+			"old":        {"old", "src/\tS\n\tauth/\tA\n\tmain.go\tM\nx\tF\nx/\tD\nold\tN\n"},
+		} {
+			p, _ := slashProject(t)
+			r, err := p.Set(typed, "N", nil)
+			if err != nil {
+				t.Errorf("set %q: %v", typed, err)
+				continue
+			}
+			if r.Path != want.path {
+				t.Errorf("set %q returned %q, want %q", typed, r.Path, want.path)
+			}
+			if got := content(t, p, "structure.txt"); got != want.after {
+				t.Errorf("set %q:\ngot  %q\nwant %q", typed, got, want.after)
+			}
+		}
+		for typed, msg := range map[string]string{
+			"src/db": "src/db: is a directory (use src/db/)",
+			"x":      bothX,
+		} {
+			p, _ := slashProject(t)
+			if _, err := p.Set(typed, "N", nil); err == nil || err.Error() != msg {
+				t.Errorf("set %q: got %v, want %q", typed, err, msg)
+			}
+			if got := content(t, p, "structure.txt"); got != slashBefore {
+				t.Errorf("set %q changed the file: %q", typed, got)
+			}
+		}
+	})
+
+	t.Run("set: a symbolic link is a file", func(t *testing.T) {
+		p, link := slashProject(t)
+		if !link {
+			t.Skip("cannot make a symbolic link")
+		}
+		r, err := p.Set("lnk", "N", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if r.Path != "lnk" || content(t, p, "structure.txt") != slashBefore+"lnk\tN\n" {
+			t.Errorf("set lnk returned %q, wrote %q", r.Path, content(t, p, "structure.txt"))
+		}
+	})
+
+	t.Run("rm and mv", func(t *testing.T) {
+		p, _ := slashProject(t)
+		removed, err := p.Remove("src/auth")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if want := (RemoveResult{Path: "src/auth/", Removed: 1}); *removed != want {
+			t.Errorf("rm returned %+v, want %+v", *removed, want)
+		}
+
+		for _, to := range []string{"lib/auth", "lib/auth/"} {
+			p, _ = slashProject(t)
+			moved, err := p.Move("src/auth", to)
+			if err != nil {
+				t.Fatalf("mv src/auth %s: %v", to, err)
+			}
+			if want := (MoveResult{From: "src/auth/", To: "lib/auth/", Moved: 1}); *moved != want {
+				t.Errorf("mv src/auth %s returned %+v, want %+v", to, *moved, want)
+			}
+		}
+
+		for _, tt := range []struct{ op, msg string }{
+			{"rm x", bothX},
+			{"mv x y", bothX},
+			{"mv src src/inner", "cannot move src/ into itself"},
+		} {
+			p, _ = slashProject(t)
+			var err error
+			if f := strings.Fields(tt.op); f[0] == "rm" {
+				_, err = p.Remove(f[1])
+			} else {
+				_, err = p.Move(f[1], f[2])
+			}
+			if err == nil || err.Error() != tt.msg {
+				t.Errorf("%s: got %v, want %q", tt.op, err, tt.msg)
+			}
+			if got := content(t, p, "structure.txt"); got != slashBefore {
+				t.Errorf("%s changed the file: %q", tt.op, got)
 			}
 		}
 	})
