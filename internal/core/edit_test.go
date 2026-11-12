@@ -676,4 +676,15 @@ func TestEntryPathWithoutSlash(t *testing.T) {
 			}
 		}
 	})
+
+	// Both entries are found wherever they are in their list, also first
+	// (slashBefore has them third and fourth).
+	t.Run("both, one of them first", func(t *testing.T) {
+		for _, before := range []string{"x\tF\nx/\tD\n", "x/\tD\nx\tF\n"} {
+			p := newProject(t, "", map[string]string{"structure.txt": before})
+			if _, err := p.Remove("x"); err == nil || err.Error() != bothX {
+				t.Errorf("%q: rm x: got %v, want %q", before, err, bothX)
+			}
+		}
+	})
 }

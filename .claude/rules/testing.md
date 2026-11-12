@@ -44,6 +44,11 @@
   - `show`の`filepath.ToSlash`。Linuxでは何もしない。WindowsのCIが`TestTextShowLink`で見る
   - ignore が無いときの`ignore.Parse(nil)`と`&Matcher{}`。中身が同じ
   - CLIの`termWidth`（本物の端末でしか通らない）、`col := 0`の±1（名前は1桁以上ある）、`width > 0`を`> 1`にする変異（1桁の端末でしか違いが出ない）
+- **意味が同じなので残した変異**（[8-5]、2026-11-12。`--lang`とエントリのパスの直しのあと、変えたファイルを回した）
+  - 上と同じ、エラーに添える値：CLI の各コマンドの`return 0, err`、`count`（`--limit`などの数）の`return 0, …`、補完の`completion`の`return 0, …`、`Failed`の`return false, …`
+  - `Run`の`complete(args[1:], …)`を`args[0:]`にする変異。`complete`は`--word=`と`--`の後ろしか読まないので、先頭の`__complete`が混ざっても同じ
+  - `core`の`lookup`の、見つからないときの`-1`を`-2`・`0`にする変異。呼び出し側は`< 0`・`>= 0`でしか見ない。ループの後ろの`return`は、空の`names`でしか通らず、空の`names`は渡らない
+  - `ls`の`len(names) > 0`（ignore を聞く前）と、`tree`の`len(here) > 0`（現在地を求める前）を`>= 0`にする変異。空の`names`は ignore のどの規則にも当たらず、空の`here`では`Here`は`""`のままで、印の付く行も無い
 
 ## Trivy：既知の脆弱性とライセンス
 

@@ -146,7 +146,7 @@ init: 既定の ignore を空で書く | internal/core/init.go | file{ignore.Fil
 補完: mv の to にエントリのパスを出さない | internal/cli/complete.go | ⇥⇥return i <= 1 | ⇥⇥return i == 0
 補完: -C を見ない | internal/cli/complete.go | core.Options{Dir: p.dir, | core.Options{Dir: "",
 補完: --no-ignore を見ない | internal/cli/complete.go | NoIgnore: p.noIgnore}) | NoIgnore: false})
-補完: CRUBE_LANG を見ない | internal/cli/complete.go | Lang: env.Getenv(lang.EnvVar), | Lang: env.Getenv(lang.EnvVar + "_X"),
+補完: CRUBE_LANG を見ない | internal/cli/complete.go | "--lang", env.Getenv(lang.EnvVar)) | "--lang", env.Getenv(lang.EnvVar + "_X"))
 補完: 行にあるオプションも出す | internal/cli/complete.go | ⇥⇥⇥if !p.seen[name] { | ⇥⇥⇥if true {
 補完: -h を --help と見なさない | internal/cli/complete.go | ⇥⇥⇥if name == "-h" { | ⇥⇥⇥if false {
 補完: bash の = を値と読む | internal/cli/complete.go | ⇥⇥⇥if w == "=" {⏎⇥⇥⇥⇥continue | ⇥⇥⇥if false {⏎⇥⇥⇥⇥continue

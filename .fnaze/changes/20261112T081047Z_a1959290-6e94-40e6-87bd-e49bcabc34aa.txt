@@ -1,0 +1,12 @@
+# Check [8-1] to [8-3] by breaking them, and add the test that was missing ([8-5])
+.mtqg/
+	journal.jsonl	Close todos [8-4] (aafdb4be6d) and [8-5] (5063d0d054), add todo [8-7] (70b32305ee) and the [8-5] memo (93774a58c2)
+.claude/
+	rules/
+		testing.md	List the surviving mutations of [8-5] that mean the same, with the reasons
+	skills/
+		mutation-check/
+			crube-spec.txt	Rewrite the completion CRUBE_LANG mutation for the lang.Pick call of [8-3]; it no longer matched
+internal/
+	core/
+		edit_test.go	Test the both-entries error with x or x/ first in its list; the comparison with 0 was not tested

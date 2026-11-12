@@ -1,0 +1,12 @@
+# [8-1]〜[8-3] を壊して確かめ、足りなかったテストを足す（[8-5]）
+.mtqg/
+	journal.jsonl	todo [8-4]（aafdb4be6d）と [8-5]（5063d0d054）を閉じ、todo [8-7]（70b32305ee）と [8-5] のメモ（93774a58c2）を記録する
+.claude/
+	rules/
+		testing.md	[8-5] で残した、意味が同じ変異を理由とともに書く
+	skills/
+		mutation-check/
+			crube-spec.txt	補完の CRUBE_LANG の変異を、[8-3] の lang.Pick の呼び出しに合わせて書き直す（合わなくなっていた）
+internal/
+	core/
+		edit_test.go	x か x/ が先頭にあるときの「両方ある」エラーを確かめる。0 との比べ方がテストされていなかった
