@@ -1,0 +1,3 @@
+# Record the release of v0.2.0
+.mtqg/
+	journal.jsonl	Record that v0.2.0 is released, and what was checked on the Release
