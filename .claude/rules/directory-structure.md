@@ -43,6 +43,7 @@
 ├── .devcontainer/          ← 開発環境（devcontainer.json、postCreate.sh）
 ├── .claude/                ← rules/（ルール）、skills/（mutation-check：壊して確かめる手順と、変異の道具`mutants/`（別の Go モジュール）・crube の仕様の変異の一覧）、hooks/（build.sh、crube-untracked.sh：Write のあとに未説明を知らせる。Claude Code のフックで、git のフックは`.githooks/`）、settings.json（人間が管理する）
 ├── .github/workflows/      ← CI（`ci.yml`）と、タグで動くリリース（`release.yml`。`ci.yml`を呼んでから Release を作って公開する）
+├── .github/release-notes/  ← 版ごとのリリースノート（`<タグ>.md`。英語と日本語を1つに。`release.yml`が Release の本文の先頭に載せる。`.claude/rules/distribution.md`）
 └── .mtqg/                  ← mtqgの記録
 ```
 

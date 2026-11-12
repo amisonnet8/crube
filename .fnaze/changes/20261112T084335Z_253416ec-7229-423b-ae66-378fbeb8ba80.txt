@@ -1,0 +1,15 @@
+# Write the v0.2.0 release notes and put them at the top of the Release ([8-6])
+.mtqg/
+	journal.jsonl	Record where the notes go (q 9425821476), the [8-6] memo, and close todo [8-6] (a05d17b7c7)
+.claude/
+	rules/
+		distribution.md	Write when to add release notes and how to check them
+		directory-structure.md	Add .github/release-notes/
+.github/
+	release-notes/	Add the release notes of each version, so that users learn what to do
+		v0.2.0.md	Notes of v0.2.0: the incompatible change of the CLI's entry paths, the optional /, --lang and lang
+	workflows/
+		release.yml	Pass the notes of the tag, if any, to goreleaser with --release-header
+.crube/
+	structure.txt	Describe .github/release-notes/ and update release.yml (qsoku crube set)
+	structure_ja.txt	Describe .github/release-notes/ and update release.yml (qsoku crube set --lang ja)

@@ -30,7 +30,10 @@
 .github/	GitHub settings
 	workflows/	GitHub Actions workflows
 		ci.yml	CI: qsoku check on Linux, macOS and Windows, the race detector, ShellCheck and Trivy
-		release.yml	Release on a tag: runs ci.yml, attaches goreleaser's archives to a Release and publishes it
+		release.yml	Release on a tag: runs ci.yml, attaches goreleaser's archives to a Release with the notes of the version, and publishes it
+	release-notes/	Release notes of each version, put at the top of the Release by release.yml
+		| <tag>.md, English and Japanese in one file; a version without notes gets only the list of commits (.claude/rules/distribution.md)
+		v0.2.0.md	Notes of v0.2.0: the CLI's entry paths from the current directory (incompatible), the optional /, --lang and lang
 .mtqg/	Process record kept with mtqg: memos, todos, questions, bugs, glossary and rules
 	.gitattributes	Merges journal.jsonl with merge=union
 	.gitignore	Keeps .local/ out of git

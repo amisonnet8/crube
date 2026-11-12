@@ -17,7 +17,10 @@
 ビルド済みのバイナリなどを GitHub Releases で配るときは、次の流れにする。どのプロジェクトも同じ。
 
 1. **人間が**タグ（`v0.1.0`の形）を打って push する。人間がするのはこれだけ
-2. タグで動く workflow（`.github/workflows/release.yml`）が、検査を通してから配布物を作り、Release に添付して**公開する**（本文は goreleaser が前のタグからのコミットで作る）
+2. タグで動く workflow（`.github/workflows/release.yml`）が、検査を通してから配布物を作り、Release に添付して**公開する**（本文は goreleaser が前のタグからのコミットで作る。その版のノート`.github/release-notes/<タグ>.md`があれば、`--release-header`で本文の先頭に載せる）
+
+- **非互換の変更や、利用者に知らせたい変更がある版は、タグを打つ前に、ノート`.github/release-notes/<タグ>.md`を書いてコミットする**（英語と日本語を1つのファイルに。名前はタグと同じ`v0.2.0.md`）。コミットの題だけでは、利用者は何をすればよいか分からないため。ノートが無い版は、コミットの一覧だけになる
+  - ノートが本文の先頭に入ることは、`qsoku snapshot`では確かめられない（タグなしでは本文を作らない）。確かめるなら、`$TMPDIR`にリポジトリを写し、そこで仮のタグを打って`goreleaser release --clean --skip=publish,validate --release-header=<ノート>`を動かし、`dist/CHANGELOG.md`を見る。本物のリポジトリにはタグを打たない
 
 - **Claude Codeは、タグも Release も作らない。** `gh release create`は`.claude/settings.json`で拒否（deny）されている。Release を作るのは workflow の中だけ
 - `release.yml`は、まず`ci.yml`をそのまま呼んで（`workflow_call`）普段の CI の検査をすべて通し、そのあと goreleaser（`.goreleaser.yaml`。`goreleaser-action`の`version: "~> v2"`で、v2 の最新）で配布物を作る。書き込みの権限（`contents: write`）は、Release を作るジョブだけに与える

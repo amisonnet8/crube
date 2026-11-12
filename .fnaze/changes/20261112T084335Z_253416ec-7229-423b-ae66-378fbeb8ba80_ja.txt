@@ -1,0 +1,15 @@
+# v0.2.0 のリリースノートを書き、Release の本文の先頭に載せる（[8-6]）
+.mtqg/
+	journal.jsonl	ノートの置き場の質問（9425821476）と [8-6] のメモを記録し、todo [8-6]（a05d17b7c7）を閉じる
+.claude/
+	rules/
+		distribution.md	リリースノートを書く場面と、確かめ方を書く
+		directory-structure.md	.github/release-notes/ を足す
+.github/
+	release-notes/	版ごとのリリースノートを足す。コミットの題だけでは、利用者は何をすればよいか分からないため
+		v0.2.0.md	v0.2.0 のノート：CLI のエントリのパスの非互換、/ を省けること、--lang と lang
+	workflows/
+		release.yml	その版のノートがあれば、goreleaser に --release-header で渡す
+.crube/
+	structure.txt	.github/release-notes/ の説明を足し、release.yml を直す（qsoku crube set）
+	structure_ja.txt	.github/release-notes/ の説明を足し、release.yml を直す（qsoku crube set --lang ja）

@@ -30,7 +30,10 @@
 .github/	GitHub の設定
 	workflows/	GitHub Actions のワークフロー
 		ci.yml	CI：Linux・macOS・Windows での qsoku check、race、ShellCheck、Trivy
-		release.yml	タグで動くリリース。ci.yml を通してから、goreleaser の配布物を Release に添付して公開する
+		release.yml	タグで動くリリース。ci.yml を通してから、goreleaser の配布物とその版のノートで Release を作って公開する
+	release-notes/	版ごとのリリースノート。release.yml が Release の本文の先頭に載せる
+		| <タグ>.md。英語と日本語を1つのファイルに書く。ノートの無い版は、コミットの一覧だけになる（.claude/rules/distribution.md）
+		v0.2.0.md	v0.2.0 のノート：CLI のエントリのパスを現在地から読む（非互換）、/ を省ける、--lang と lang
 .mtqg/	mtqg の作業記録：メモ・todo・質問・不具合・用語・決まり事
 	.gitattributes	journal.jsonl を merge=union でマージする
 	.gitignore	.local/ を git に入れない
