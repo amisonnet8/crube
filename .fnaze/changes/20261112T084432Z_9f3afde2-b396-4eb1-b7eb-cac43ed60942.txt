@@ -1,0 +1,7 @@
+# Always type -- in fnaze and crube set, with the options before it ([8-7])
+.mtqg/
+	journal.jsonl	Record the [8-7] memo and close todo [8-7] (70b32305ee)
+.claude/
+	rules/
+		fnaze-usage.md	Always type -- in title, set and rm, with the options before it; a desc starting with - was read as an option twice
+		crube-usage.md	Add the same pitfall for crube set in the CLI

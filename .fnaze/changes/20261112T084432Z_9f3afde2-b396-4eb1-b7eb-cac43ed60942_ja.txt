@@ -1,0 +1,7 @@
+# fnaze と crube の set は、いつも -- を付け、オプションをその前に置く（[8-7]）
+.mtqg/
+	journal.jsonl	[8-7] のメモを記録し、todo [8-7]（70b32305ee）を閉じる
+.claude/
+	rules/
+		fnaze-usage.md	title・set・rm はいつも -- を付け、オプションをその前に置く。- で始まる desc がオプションとして2回読まれたため
+		crube-usage.md	CLI の crube set にも同じ落とし穴があることを足す
